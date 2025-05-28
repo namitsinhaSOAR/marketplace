@@ -24,7 +24,6 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 import requests
 from TIPCommon.base.interfaces import Session
 from TIPCommon.base.utils import is_native, nativemethod
-from TIPCommon.utils import none_to_default_value
 
 from integration_testing.custom_types import (
     NO_RESPONSE,
@@ -33,7 +32,6 @@ from integration_testing.custom_types import (
     Request,
     UrlPath,
 )
-from integration_testing.product import MockProduct
 from integration_testing.request import HttpMethod, MockRequest
 
 from .response import MockResponse
@@ -74,7 +72,7 @@ class MockSession(
             HttpMethod.PATCH.value: {},
         }
 
-        self._product: Product = none_to_default_value(mock_product, MockProduct())
+        self._product: Product | None = mock_product
 
         if not is_native(self.get_routed_functions):
             self._set_routes()

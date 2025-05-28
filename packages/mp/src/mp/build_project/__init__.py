@@ -60,7 +60,7 @@ class BuildParams:
         return [self.repository, self.integrations, self.groups]
 
 
-@app.command(name="build", help="Build commands")
+@app.command(name="build", help="Build the marketplace")
 def build(  # noqa: PLR0913
     repository: Annotated[
         list[RepositoryType],
@@ -117,10 +117,7 @@ def build(  # noqa: PLR0913
         verbose: Verbose log options
 
     """
-    run_params: RuntimeParams = mp.core.config.RuntimeParams(
-        quiet=quiet,
-        verbose=verbose,
-    )
+    run_params: RuntimeParams = mp.core.config.RuntimeParams(quiet, verbose)
     run_params.set_in_config()
     _validate_params(
         build_params=BuildParams(repository, integration, group, deconstruct),
@@ -185,12 +182,12 @@ def _build_integrations(
     *,
     deconstruct: bool,
 ) -> None:
-    valid_integrations_: set[pathlib.Path] = _validate_marketplace_paths(
+    valid_integrations_: set[pathlib.Path] = _get_marketplace_paths_from_names(
         integrations,
         marketplace_.path,
     )
     valid_integration_names: set[str] = {i.name for i in valid_integrations_}
-    not_found: set[str] = set(integrations) - valid_integration_names
+    not_found: set[str] = set(integrations).difference(valid_integration_names)
     if not_found:
         rich.print(
             "The following integrations could not be found in"
@@ -210,12 +207,12 @@ def _build_integrations(
 
 
 def _build_groups(groups: Iterable[str], marketplace_: Marketplace) -> None:
-    valid_groups: set[pathlib.Path] = _validate_marketplace_paths(
+    valid_groups: set[pathlib.Path] = _get_marketplace_paths_from_names(
         names=groups,
         marketplace_path=marketplace_.path,
     )
     valid_group_names: set[str] = {g.name for g in valid_groups}
-    not_found: set[str] = set(groups) - valid_group_names
+    not_found: set[str] = set(groups).difference(valid_group_names)
     if not_found:
         rich.print(f"The following groups could not be found: {', '.join(not_found)}")
 
@@ -224,7 +221,7 @@ def _build_groups(groups: Iterable[str], marketplace_: Marketplace) -> None:
         marketplace_.build_groups(valid_groups)
 
 
-def _validate_marketplace_paths(
+def _get_marketplace_paths_from_names(
     names: Iterable[str],
     marketplace_path: pathlib.Path,
 ) -> set[pathlib.Path]:

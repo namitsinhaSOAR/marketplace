@@ -15,19 +15,29 @@
 from __future__ import annotations
 
 import pathlib
+from typing import TYPE_CHECKING
 
 import pytest
 
 import mp.core.constants
+
+if TYPE_CHECKING:
+    from mp.core.config import RuntimeParams
 
 MOCK_MARKETPLACE_DIR_NAME: str = "mock_marketplace"
 INTEGRATION_NAME: str = "mock_integration"
 BUILT_INTEGRATION_DIR_NAME: str = "mock_built_integration"
 
 
+@pytest.fixture(autouse=True)
+def set_runtime_params() -> None:
+    params: RuntimeParams = mp.core.config.RuntimeParams(quiet=True, verbose=False)
+    params.set_in_config()
+
+
 @pytest.fixture
 def mock_get_marketplace_path() -> str:
-    """Mock import path of the `core.config.get_marketplace_path()` function."""
+    """Mock the import path of the `mp.core.config.get_marketplace_path()` function."""
     return "mp.core.config.get_marketplace_path"
 
 

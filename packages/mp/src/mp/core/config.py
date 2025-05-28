@@ -24,6 +24,8 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 import typer
 
+import mp.core.constants
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -46,8 +48,7 @@ DEFAULT_PROCESSES_NUMBER: int = 5
 DEFAULT_QUIET_VALUE: str = "no"
 DEFAULT_VERBOSE_VALUE: str = "no"
 DEFAULT_MARKETPLACE_PATH: pathlib.Path = (
-    #            config.py > core > mp > src > mp > packages > root
-    pathlib.Path(__file__).parent.parent.parent.parent.parent.parent
+    pathlib.Path.home() / mp.core.constants.REPO_NAME
 )
 
 
@@ -209,6 +210,15 @@ def _add_defaults_to_config(config: configparser.ConfigParser) -> None:
 
 
 def _create_default_config(config: configparser.ConfigParser) -> None:
+    mp_path: pathlib.Path = DEFAULT_MARKETPLACE_PATH.expanduser().resolve().absolute()
+    if not mp_path.exists():
+        msg: str = (
+            f"Marketplace path '{mp_path}' does not exist."
+            " Please use 'mp config --marketplace-path ...' to set it to the repo's"
+            " root directory"
+        )
+        raise ValueError(msg)
+
     config[DEFAULT_SECTION_NAME] = {
         MARKETPLACE_PATH_KEY: str(
             DEFAULT_MARKETPLACE_PATH.expanduser().resolve().absolute(),

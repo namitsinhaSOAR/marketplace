@@ -22,7 +22,6 @@ import warnings
 from collections import deque
 from typing import TYPE_CHECKING, Any
 
-import isort
 import libcst as cst
 import rich
 
@@ -40,6 +39,22 @@ class LinterWarning(RuntimeWarning):
 
 class TypeCheckerWarning(RuntimeWarning):
     """Found type check issues."""
+
+
+class TestWarning(RuntimeWarning):
+    """Failed tests."""
+
+
+def test_pre_build_integration(
+    script_path: pathlib.Path,
+    paths: Iterable[pathlib.Path],
+) -> None:
+    """Run prebuilt integration tests."""
+    paths = [p for p in paths if p.is_dir()]
+    status_code, test_results = unix.run_script_on_paths(script_path, paths)
+    rich.print(test_results)
+    if status_code != 0:
+        warnings.warn("Failed Tests", TestWarning, stacklevel=1)
 
 
 def lint_python_files(paths: Iterable[pathlib.Path]) -> None:
@@ -72,7 +87,6 @@ def static_type_check_python_files(paths: Iterable[pathlib.Path]) -> None:
 def format_python_files(paths: Iterable[pathlib.Path]) -> None:
     """Format python files."""
     paths = [p for p in paths if p.is_dir() or futils.is_python_file(p)]
-    sort_imports(paths)
     _, results = unix.ruff_format(paths)
     rich.print(results)
 
@@ -102,18 +116,6 @@ def format_json(str_content: str) -> str:
     """
     json_content: Mapping[str, Any] = json.loads(str_content)
     return json.dumps(json_content, indent=4, sort_keys=True)
-
-
-def sort_imports(paths: Iterable[pathlib.Path]) -> None:
-    """Sort imports in python files."""
-    paths = [p for p in paths if p.suffix == ".py"]
-    for path in paths:
-        if path.is_file():
-            futils.replace_file_content(path, replace_fn=isort.code)
-
-        elif path.is_dir():
-            for file in path.rglob("*.py"):
-                futils.replace_file_content(file, replace_fn=isort.code)
 
 
 def restructure_scripts_imports(paths: Iterable[pathlib.Path]) -> None:

@@ -122,10 +122,7 @@ def check(  # noqa: PLR0913
     if raise_error_on_violations:
         warnings.filterwarnings("error")
 
-    run_params: RuntimeParams = mp.core.config.RuntimeParams(
-        quiet,
-        verbose,
-    )
+    run_params: RuntimeParams = mp.core.config.RuntimeParams(quiet, verbose)
     run_params.set_in_config()
     params: CheckParams = CheckParams(
         file_paths=file_paths,

@@ -193,7 +193,6 @@ def init_python_project(project_path: pathlib.Path) -> None:
         "init",
         "--no-readme",
         "--no-workspace",
-        "--quiet",
         "--python",
         python_version,
     ]
@@ -215,7 +214,7 @@ def ruff_check(
     """Run `ruff check` on the provided paths.
 
     Returns:
-        A tuple of the satus code and output
+        A tuple of the status code and output
 
     """
     command: list[str] = [sys.executable, "-m", "ruff", "check"]
@@ -230,7 +229,7 @@ def ruff_format(
     """Run `ruff format` on the provided paths.
 
     Returns:
-        A tuple of the satus code and output
+        A tuple of the status code and output
 
     """
     command: list[str] = [sys.executable, "-m", "ruff", "format"]
@@ -241,11 +240,28 @@ def mypy(paths: Iterable[pathlib.Path], /, **flags: bool | str) -> tuple[int, st
     """Run `mypy --strict` on the provided paths.
 
     Returns:
-        A tuple of the satus code and output
+        A tuple of the status code and output
 
     """
     command: list[str] = [sys.executable, "-m", "mypy", "--strict"]
     return execute_command_and_get_output(command, paths, **flags)
+
+
+def run_script_on_paths(
+    script_path: pathlib.Path,
+    test_paths: Iterable[pathlib.Path],
+) -> tuple[int, str]:
+    """Run a custom script on the provided paths.
+
+    Returns:
+        A tuple of the status code and output
+
+    """
+    path: str = f"{script_path.resolve().absolute()}"
+    chmod_command: list[str] = ["chmod", "+x", path]
+    sp.run(chmod_command, check=True)  # noqa: S603
+    command: list[str] = [f"{script_path.resolve().absolute()}"]
+    return execute_command_and_get_output(command, test_paths)
 
 
 def execute_command_and_get_output(
@@ -261,7 +277,7 @@ def execute_command_and_get_output(
         **flags: any command flags as keyword arguments
 
     Returns:
-        A tuple of the satus code and output
+        A tuple of the status code and output
 
     Raises:
         CommandError: if a project is already initialized
