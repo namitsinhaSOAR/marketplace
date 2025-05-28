@@ -193,7 +193,6 @@ def init_python_project(project_path: pathlib.Path) -> None:
         "init",
         "--no-readme",
         "--no-workspace",
-        "--quiet",
         "--python",
         python_version,
     ]
