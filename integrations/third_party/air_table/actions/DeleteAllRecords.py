@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from airtable import Airtable
-from soar_sdk.SiemplifyAction import *
+from soar_sdk.SiemplifyAction import SiemplifyAction
 
 INTEGRATION_NAME = "AirTable"
 

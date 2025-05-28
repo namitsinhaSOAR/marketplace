@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 
 from airtable import Airtable
-from soar_sdk.SiemplifyAction import *
+from soar_sdk.SiemplifyAction import SiemplifyAction
 from soar_sdk.SiemplifyUtils import add_prefix_to_dict, convert_dict_to_json_result_dict
 
 INTEGRATION_NAME = "AirTable"
