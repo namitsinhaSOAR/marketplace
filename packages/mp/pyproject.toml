@@ -17,14 +17,14 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 dependencies = [
-    "libcst>=1.7.0",
+    "libcst>=1.8.0",
     "mypy>=1.15.0",
     "pip>=25.1.1",
     "pyyaml>=6.0.2",
     "rich>=14.0.0",
     "ruff>=0.11.11",
     "toml>=0.10.2",
-    "typer>=0.15.4",
+    "typer>=0.16.0",
     "uv>=0.7.8",
 ]
 
