@@ -32,7 +32,6 @@ from TIPCommon.data_models import ConnectorParameter, ConnectorParamTypes, JobPa
 
 from integration_testing import common
 from integration_testing.request import HttpMethod, MockRequest
-from integration_testing.requests.response import MockResponse
 
 from .test_set_meta import CONNECTOR_DEF, JOB_DEF
 
@@ -246,18 +245,6 @@ class TestUseLiveApi:
         assert use_live is False
 
 
-class TestGetEmptyResponse:
-    def test_returns_a_response(self) -> None:
-        response: MockResponse = common.get_empty_response()
-
-        assert isinstance(response, MockResponse)
-
-    def test_returns_an_empty_response(self) -> None:
-        response: MockResponse = common.get_empty_response()
-
-        assert response.content == b""
-
-
 class TestGetConfigFileJson:
     def test_returns_json_with_str_path(self) -> None:
         file_name: str = "mock.json"
@@ -335,7 +322,7 @@ class TestSetIsTestRun:
 
 @dataclasses.dataclass
 class TestGetRequestPayload:
-    empty_args: tuple[str] = ()
+    empty_args: tuple[()] = ()
     empty_headers: dict[str, str] = dataclasses.field(default_factory=dict)
     parsed_url: urllib.parse.ParseResult = dataclasses.field(
         default_factory=functools.partial(urllib.parse.urlparse, "/test/url/"),

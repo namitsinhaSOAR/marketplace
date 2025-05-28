@@ -257,7 +257,7 @@ class TestJob:
 
     def test_set_to_external_context(self) -> None:
         @set_metadata(external_context=MockExternalContext())
-        def do_test(external_context: MockExternalContext) -> None:
+        def do_test(external_context: MockExternalContext[str]) -> None:
             context = DatabaseContextType.GLOBAL
             identifier = "identifier"
             key = "key"
@@ -273,7 +273,7 @@ class TestJob:
 
     def test_get_from_external_context(self) -> None:
         @set_metadata(external_context=MockExternalContext())
-        def do_test(external_context: MockExternalContext) -> None:
+        def do_test(external_context: MockExternalContext[str]) -> None:
             context = DatabaseContextType.GLOBAL
             identifier = "identifier"
             key = "key"
@@ -392,7 +392,7 @@ class TestConnector:
 
     def test_set_to_external_context(self) -> None:
         @set_metadata(external_context=MockExternalContext())
-        def do_test(external_context: MockExternalContext) -> None:
+        def do_test(external_context: MockExternalContext[str]) -> None:
             context = DatabaseContextType.GLOBAL
             identifier = "identifier"
             key = "key"

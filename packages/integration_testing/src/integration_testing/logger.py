@@ -104,6 +104,6 @@ class ColoredFormatter(logging.Formatter):
             the formatted log value
 
         """
-        log_fmt: str = self.formats.get(record.levelno)
+        log_fmt: str | None = self.formats.get(record.levelno)
         formatter: logging.Formatter = logging.Formatter(log_fmt)
         return formatter.format(record)

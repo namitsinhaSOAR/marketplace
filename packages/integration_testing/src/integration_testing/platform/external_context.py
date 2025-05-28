@@ -15,31 +15,32 @@
 from __future__ import annotations
 
 import dataclasses
-import json
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from TIPCommon.data_models import DatabaseContextType
 from TIPCommon.utils import none_to_default_value
 
 if TYPE_CHECKING:
-    from TIPCommon.types import JSON, SingleJson
+    from collections.abc import Sequence
+
+    from TIPCommon.types import SingleJson
 
 _T = TypeVar("_T")
 
 _KEY_GROUP_SEPARATOR: str = "␝"
 
 
-class MockExternalContext:
+class MockExternalContext(Generic[_T]):
     __slots__: tuple[str] = ("_rows",)
 
-    def __init__(self, rows: list[ExternalContextRow[Any]] | None = None) -> None:
-        rows: list[ExternalContextRow[Any]] = none_to_default_value(rows, [])
+    def __init__(self, rows: list[ExternalContextRow[_T]] | None = None) -> None:
+        rows: list[ExternalContextRow[_T]] = none_to_default_value(rows, [])
         self._rows: SingleJson = {
             _create_key(r.context_type, r.identifier, r.property_key): r.property_value
             for r in rows
         }
 
-    def __contains__(self, item: Any) -> bool:  # noqa: ANN401
+    def __contains__(self, item: _T) -> bool:
         return (
             self.has_row(item)
             if isinstance(item, ExternalContextRow | ExternalContextRowKey)
@@ -53,7 +54,7 @@ class MockExternalContext:
     def number_of_rows(self) -> int:
         return len(self._rows)
 
-    def has_row(self, row: ExternalContextRow[Any] | ExternalContextRowKey) -> bool:
+    def has_row(self, row: ExternalContextRow[_T] | ExternalContextRowKey) -> bool:
         """Check whether a row is in the context.
 
         Args:
@@ -79,9 +80,9 @@ class MockExternalContext:
     def get_row_value(
         self,
         context_type: DatabaseContextType,
-        identifier: str | None,
+        identifier: str,
         property_key: str,
-    ) -> Any | None:  # noqa: ANN401
+    ) -> _T | None:
         """Get a specific row property value.
 
         Args:
@@ -96,26 +97,6 @@ class MockExternalContext:
         """
         key: str = _create_key(context_type, identifier, property_key)
         return self._rows.get(key)
-
-    def get_loaded_row_value(
-        self,
-        context_type: DatabaseContextType,
-        identifier: str | None,
-        property_key: str,
-    ) -> JSON | list[Any]:
-        """Get row property value, with the value passed through `json.loads` first.
-
-        Args:
-            context_type: The context type of the row
-            identifier: The identifier of the row
-            property_key: The property key of the row
-
-        Returns:
-            The property value of the row from the external context.
-            If the value cannot be found, it returns None
-
-        """
-        return json.loads(self.get_row_value(context_type, identifier, property_key))
 
     def set_row_value(
         self,
@@ -135,29 +116,6 @@ class MockExternalContext:
         """
         key: str = _create_key(context_type, identifier, property_key)
         self._rows[key] = property_value
-
-    def set_dumped_row_value(
-        self,
-        context_type: DatabaseContextType,
-        identifier: str,
-        property_key: str,
-        property_value: _T,
-    ) -> None:
-        """Set row property value where the value is passed through `json.dumps` first.
-
-        Args:
-            context_type: The context type of the row to set
-            identifier: The identifier of the row to set
-            property_key: The property key of the row to set
-            property_value: The property value of the row to set
-
-        """
-        self.set_row_value(
-            context_type,
-            identifier,
-            property_key,
-            json.dumps(property_value),
-        )
 
     def delete_row(
         self,
@@ -187,7 +145,7 @@ class MockExternalContext:
 
         del self._rows[key]
 
-    def set_rows(self, rows: list[ExternalContextRow[Any]]) -> MockExternalContext:
+    def set_rows(self, rows: Sequence[ExternalContextRow[_T]]) -> MockExternalContext:
         """Set a list of rows in the context.
 
         Args:
@@ -212,7 +170,7 @@ class MockExternalContext:
 
     def delete_rows(
         self,
-        rows: list[ExternalContextRow[Any] | ExternalContextRowKey],
+        rows: Sequence[ExternalContextRow[_T] | ExternalContextRowKey],
     ) -> MockExternalContext:
         """Delete multiple rows from the external context.
 
@@ -227,7 +185,7 @@ class MockExternalContext:
             Self
 
         """
-        not_found_rows: list[ExternalContextRow[Any] | ExternalContextRowKey] = []
+        not_found_rows: list[ExternalContextRow[_T] | ExternalContextRowKey] = []
         for row in rows:
             key: str = _create_key(row.context_type, row.identifier, row.property_key)
 
@@ -246,7 +204,7 @@ class MockExternalContext:
 
         return self
 
-    def drop(self) -> MockExternalContext:
+    def drop(self) -> MockExternalContext[_T]:
         """Drop the entire context (clean it).
 
         Returns:
@@ -270,20 +228,16 @@ def _create_key(
     return _KEY_GROUP_SEPARATOR.join(map(str, keys))
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, slots=True)
 class ExternalContextRow(Generic[_T]):
-    __slots__ = ("context_type", "identifier", "property_key", "property_value")
-
     context_type: DatabaseContextType
-    identifier: str | None
+    identifier: str
     property_key: str
     property_value: _T
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, slots=True)
 class ExternalContextRowKey:
-    __slots__ = ("context_type", "identifier", "property_key")
-
     context_type: DatabaseContextType
-    identifier: str | None
+    identifier: str
     property_key: str

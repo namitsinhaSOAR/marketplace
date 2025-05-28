@@ -58,7 +58,7 @@ class TestContext:
         assert len(cache) == rows_asserted
 
         del cache
-        cache: Cache = cache_class(None)
+        cache = cache_class(None)
         assert len(cache) == rows_asserted
 
     @pytest.mark.parametrize(
@@ -115,6 +115,6 @@ class TestContext:
         )
 
         del cache
-        cache: Cache = cache_class(max_size)
+        cache = cache_class(max_size)
         assert len(cache) >= expected_size
         assert len(cache) <= max_size

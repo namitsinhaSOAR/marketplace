@@ -14,8 +14,6 @@
 
 from __future__ import annotations
 
-import json
-
 import pytest
 from TIPCommon.data_models import DatabaseContextType
 
@@ -98,24 +96,6 @@ class TestMethods:
 
         assert context_row_value == ec_row.property_value
 
-    def test_get_loaded_row_value(self, ec_row: ExternalContextRow[str]) -> None:
-        ec: MockExternalContext = MockExternalContext()
-        val: dict[str, str] = {"loaded": "value"}
-        ec.set_dumped_row_value(
-            context_type=ec_row.context_type,
-            identifier=ec_row.identifier,
-            property_key=ec_row.property_key,
-            property_value=val,
-        )
-
-        context_row_value: dict[str, str] = ec.get_loaded_row_value(
-            context_type=ec_row.context_type,
-            identifier=ec_row.identifier,
-            property_key=ec_row.property_key,
-        )
-
-        assert context_row_value == val
-
     def test_get_non_existing_row_returns_none(
         self,
         ec_row: ExternalContextRow[str],
@@ -155,31 +135,8 @@ class TestMethods:
 
         assert context_row_value == ec_row.property_value
 
-    def test_set_dumped_row_value(self, ec_row: ExternalContextRow[str]) -> None:
-        ec: MockExternalContext = MockExternalContext()
-        val: dict[str, str] = {"loaded": "value"}
-
-        assert ec.number_of_rows == 0
-
-        ec.set_dumped_row_value(
-            context_type=ec_row.context_type,
-            identifier=ec_row.identifier,
-            property_key=ec_row.property_key,
-            property_value=val,
-        )
-
-        assert ec.number_of_rows == 1
-
-        context_row_value: str = ec.get_row_value(
-            context_type=ec_row.context_type,
-            identifier=ec_row.identifier,
-            property_key=ec_row.property_key,
-        )
-
-        assert context_row_value == json.dumps(val)
-
     def test_override_row_value(self, ec_row: ExternalContextRow[str]) -> None:
-        ec: MockExternalContext = MockExternalContext([ec_row])
+        ec: MockExternalContext[str] = MockExternalContext([ec_row])
 
         assert ec.number_of_rows == 1
 
@@ -203,7 +160,7 @@ class TestMethods:
 
     def test_delete_existing_row(self, ec_row: ExternalContextRow[str]) -> None:
         rows: list[ExternalContextRow[str]] = [ec_row]
-        ec: MockExternalContext = MockExternalContext(rows)
+        ec: MockExternalContext[str] = MockExternalContext(rows)
 
         assert ec.number_of_rows == len(rows)
 

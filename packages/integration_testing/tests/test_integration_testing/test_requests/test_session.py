@@ -180,7 +180,7 @@ class TestSessionRequests:
     def test_get_routes_add_routes_to_session_routes(self, url: str) -> None:
         @router.get(url)
         def do_request() -> MockResponse:
-            return get_empty_response()
+            return MockResponse()
 
         class CustomSession(MockSession[MockRequest, MockResponse, None]):
             def get_routed_functions(self) -> list[RouteFunction]:

@@ -20,7 +20,7 @@ import os
 import pathlib
 import sys
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import yaml
 from soar_sdk.OverflowManager import OverflowManager, OverflowManagerSettings
@@ -281,7 +281,7 @@ def use_live_api() -> bool:
     return envar.lower() not in {"false", "", None}
 
 
-def get_empty_response(*_: Any, **__: Any) -> MockResponse:  # noqa: ANN401
+def get_empty_response(_: MockRequest) -> MockResponse:
     """Get an empty response."""
     return MockResponse()
 
@@ -292,7 +292,7 @@ def get_def_file_content(def_file_path: str | pathlib.Path | None) -> SingleJson
         return {}
 
     if isinstance(def_file_path, str):
-        def_file_path: pathlib.Path = pathlib.Path(def_file_path)
+        def_file_path = pathlib.Path(def_file_path)
 
     if def_file_path.suffix not in VALID_DEF_SUFFIXES:
         msg: str = f"The provided config file {def_file_path} path is not a json file!"

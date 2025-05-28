@@ -74,20 +74,16 @@ def set_metadata(  # noqa: PLR0913
             This must be used in connectors that use the Connector base class
 
     """
-    input_context: SingleJson = none_to_default_value(input_context, {})
-    integration_config: SingleJson = none_to_default_value(integration_config, {})
-    parameters: SingleJson = none_to_default_value(parameters, {})
-    entities: SingleJson = none_to_default_value(entities, [])
-    ec: MockExternalContext = none_to_default_value(
-        external_context,
-        MockExternalContext(),
-    )
+    input_context = none_to_default_value(input_context, {})
+    integration_config = none_to_default_value(integration_config, {})
+    parameters = none_to_default_value(parameters, {})
+    entities = none_to_default_value(entities, [])
+    ec = none_to_default_value(external_context, MockExternalContext())
 
-    functools.wraps(func)
-
+    # @functools.wraps(func)
     def decorator(fn: TestFn) -> TestFn:
         if "external_context" in inspect.signature(fn).parameters:
-            fn: TestFn = functools.partial(fn, external_context=ec)
+            fn = functools.partial(fn, external_context=ec)
 
         @functools.wraps(fn)
         def wrapper(*args: Any, **kwargs: Any) -> None:  # noqa: ANN401
@@ -143,13 +139,15 @@ def _get_json_context_patch_path_and_fn(
     return context_path, mock_get_context
 
 
-def _get_entities_path_and_fn(entities: list[Entity]) -> tuple[str, list[Entity]]:
+def _get_entities_path_and_fn(
+    entities: list[Entity] | None,
+) -> tuple[str, list[Entity] | None]:
     path: str = "soar_sdk.SiemplifyAction.SiemplifyAction.target_entities"
     return path, entities
 
 
 def _get_integration_config_path_and_fn(
-    file_path: str | pathlib.Path,
+    file_path: str | pathlib.Path | None,
     integration_config: SingleJson,
 ) -> PatchParams:
     path: str = "soar_sdk.Siemplify.Siemplify.get_configuration_from_server"

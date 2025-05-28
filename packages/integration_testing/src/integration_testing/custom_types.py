@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import abc
 import re
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, NotRequired, TypeAlias, TypeVar
 
 from .request import MockRequest
 
@@ -29,11 +29,11 @@ Response = TypeVar("Response")
 Request = TypeVar("Request", bound=MockRequest)
 Product = TypeVar("Product")
 
-UrlPath = str | re.Pattern
+UrlPath: TypeAlias = str | re.Pattern
 
 
-class ActOnRequestFn(abc.ABC, Generic[Response]):
-    __routes__: MutableMapping[str, list[UrlPath]]
+class RouteFunction(abc.ABC, Generic[Response]):
+    __routes__: NotRequired[MutableMapping[str, set[UrlPath]]]
 
     @abc.abstractmethod
     def __call__(self, request: Request) -> Response:

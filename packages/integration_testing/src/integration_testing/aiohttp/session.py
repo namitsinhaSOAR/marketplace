@@ -18,7 +18,6 @@ import dataclasses
 import re
 import urllib.parse
 from collections import UserList
-from collections.abc import Callable, Iterable, MutableMapping
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -33,19 +32,20 @@ from TIPCommon.base.utils import is_native, nativemethod
 from integration_testing.aiohttp.response import MockClientResponse
 from integration_testing.custom_types import (
     NO_RESPONSE,
-    ActOnRequestFn,
     Product,
     Request,
+    RouteFunction,
     UrlPath,
 )
 from integration_testing.request import HttpMethod, MockRequest
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, MutableMapping
+
     from TIPCommon.types import SingleJson
 
 
 Response = TypeVar("Response", bound=MockClientResponse)
-RouteFunction = ActOnRequestFn[Response] | Callable[[Request], Response]
 Routes = dict[str, dict[UrlPath, RouteFunction]]
 
 
@@ -83,9 +83,11 @@ class HistoryRecordsList(UserList[HistoryRecord[Request, Response]]):
         stop: int = -1,
     ) -> None:
         """Assert that all history records path matches given regex."""
-        assert all(
+        if not all(
             re.search(regex_pattern, hr.request.url.path) for hr in self[start:stop]
-        )
+        ):
+            msg: str = "Not all history records have the expected path regex."
+            raise RuntimeError(msg)
 
     def assert_headers(
         self,
@@ -95,7 +97,9 @@ class HistoryRecordsList(UserList[HistoryRecord[Request, Response]]):
     ) -> None:
         """Assert that all history records have specific headers set."""
         for key, value in headers.items():
-            assert all(hr.request.headers.get(key) == value for hr in self[start:stop])
+            if not all(hr.request.headers.get(key) == value for hr in self[start:stop]):
+                msg: str = "Not all history records have the expected headers set."
+                raise RuntimeError(msg)
 
 
 class MockClientSession(
@@ -171,7 +175,7 @@ class MockClientSession(
         return await self.request(HttpMethod.PATCH.value, url, *args, **kwargs)
 
     async def _do_request(self, method: str, request: Request) -> Response:
-        response: object | Response = NO_RESPONSE
+        response: Response = NO_RESPONSE
         path: str = request.url.path
         for path_pattern, fn in self.routes[method].items():
             if re.search(path_pattern, path) is not None:
@@ -184,12 +188,13 @@ class MockClientSession(
 
     def _validate_response(
         self,
-        response: object | Response,
+        response: Response,
         method: str,
         path: str,
     ) -> None:
+        msg: str
         if response is None:
-            msg: str = (
+            msg = (
                 f"Null Response! Request with method '{method}' to URL '{path}' "
                 "returned None instead of a response object. Perhaps you forgot "
                 "to return a response object in the correlating router."
@@ -197,7 +202,7 @@ class MockClientSession(
             raise RuntimeError(msg)
 
         if response is NO_RESPONSE:
-            msg: str = (
+            msg = (
                 f"path '{path}' doesn't match with any of the other '{method}' "
                 f"routes patterns: {list(self.routes[method].keys())}"
             )

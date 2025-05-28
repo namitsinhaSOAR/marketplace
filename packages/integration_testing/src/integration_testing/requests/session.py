@@ -18,7 +18,6 @@ import dataclasses
 import re
 import urllib.parse
 from collections import OrderedDict
-from collections.abc import Callable, Iterable, MutableMapping
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 import requests
@@ -27,9 +26,9 @@ from TIPCommon.base.utils import is_native, nativemethod
 
 from integration_testing.custom_types import (
     NO_RESPONSE,
-    ActOnRequestFn,
     Product,
     Request,
+    RouteFunction,
     UrlPath,
 )
 from integration_testing.request import HttpMethod, MockRequest
@@ -37,12 +36,13 @@ from integration_testing.request import HttpMethod, MockRequest
 from .response import MockResponse
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, MutableMapping
+
     from TIPCommon.types import SingleJson
 
 
 Response = TypeVar("Response", bound=MockResponse)
-RouteFunction = ActOnRequestFn[Response] | Callable[[Request], Response]
-Routes = dict[str, dict[UrlPath, RouteFunction]]
+Routes = dict[str, dict[UrlPath, RouteFunction[Response]]]
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
@@ -78,7 +78,7 @@ class MockSession(
             self._set_routes()
 
     @nativemethod
-    def get_routed_functions(self) -> Iterable[RouteFunction]:
+    def get_routed_functions(self) -> Iterable[RouteFunction[Response]]:
         """Get the routed functions."""
         raise NotImplementedError
 
@@ -125,7 +125,7 @@ class MockSession(
         return self.request(HttpMethod.PATCH.value, url, *args, **kwargs)
 
     def _do_request(self, method: str, request: Request) -> Response:
-        response: object | Response = NO_RESPONSE
+        response: Response = NO_RESPONSE
         path: str = request.url.path
         for path_pattern, fn in self.routes[method].items():
             if re.fullmatch(path_pattern, path) is not None:
@@ -137,12 +137,13 @@ class MockSession(
 
     def _validate_response(
         self,
-        response: object | Response,
+        response: Response,
         method: str,
         path: str,
     ) -> None:
+        msg: str
         if response is None or response is NotImplemented:
-            msg: str = (
+            msg = (
                 "Null or UnImplemented Response!"
                 f" Request with method '{method}' to URL '{path}'"
                 f" returned {response!r} instead of a response object."
@@ -152,20 +153,20 @@ class MockSession(
             raise RuntimeError(msg)
 
         if response is NO_RESPONSE:
-            msg: str = (
+            msg = (
                 f"path '{path}' doesn't match with any of the other '{method}' "
                 f"routes patterns: {list(self.routes[method].keys())}"
             )
             raise ValueError(msg)
 
     def _set_routes(self) -> None:
-        functions: Iterable[RouteFunction] = self.get_routed_functions()
+        functions: Iterable[RouteFunction[Response]] = self.get_routed_functions()
         for function in functions:
             if not hasattr(function, "__routes__"):
                 msg: str = f"Function '{function.__name__}' has no routes"
                 raise ValueError(msg)
 
-            routes: MutableMapping[str, list[UrlPath]] = function.__routes__
+            routes: MutableMapping[str, set[UrlPath]] = function.__routes__
             for method, paths in routes.items():
                 for path in paths:
                     self.routes[method][path] = function

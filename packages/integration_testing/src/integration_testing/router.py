@@ -41,7 +41,7 @@ def get(path: UrlPath) -> Callable[[RouteFunction], RouteFunction]:
     """Add a GET route to a function."""
 
     def wrapper(fn: RouteFunction) -> RouteFunction:
-        routes: dict[HttpMethod, tuple[UrlPath]] = {HttpMethod.GET: (path,)}
+        routes: dict[HttpMethod, Iterable[UrlPath]] = {HttpMethod.GET: (path,)}
         _add_routes(routes, fn)
         return fn
 
@@ -52,7 +52,7 @@ def delete(path: UrlPath) -> Callable[[RouteFunction], RouteFunction]:
     """Add a DELETE route to a function."""
 
     def wrapper(fn: RouteFunction) -> RouteFunction:
-        routes: dict[HttpMethod, tuple[UrlPath]] = {HttpMethod.DELETE: (path,)}
+        routes: dict[HttpMethod, Iterable[UrlPath]] = {HttpMethod.DELETE: (path,)}
         _add_routes(routes, fn)
         return fn
 
@@ -63,7 +63,7 @@ def post(path: UrlPath) -> Callable[[RouteFunction], RouteFunction]:
     """Add a POST route to a function."""
 
     def wrapper(fn: RouteFunction) -> RouteFunction:
-        routes: dict[HttpMethod, tuple[UrlPath]] = {HttpMethod.POST: (path,)}
+        routes: dict[HttpMethod, Iterable[UrlPath]] = {HttpMethod.POST: (path,)}
         _add_routes(routes, fn)
         return fn
 
@@ -74,7 +74,7 @@ def put(path: UrlPath) -> Callable[[RouteFunction], RouteFunction]:
     """Add a PUT route to a function."""
 
     def wrapper(fn: RouteFunction) -> RouteFunction:
-        routes: dict[HttpMethod, tuple[UrlPath]] = {HttpMethod.PUT: (path,)}
+        routes: dict[HttpMethod, Iterable[UrlPath]] = {HttpMethod.PUT: (path,)}
         _add_routes(routes, fn)
         return fn
 
@@ -85,7 +85,7 @@ def patch(path: UrlPath) -> Callable[[RouteFunction], RouteFunction]:
     """Add a PATCH route to a function."""
 
     def wrapper(fn: RouteFunction) -> RouteFunction:
-        routes: dict[HttpMethod, tuple[UrlPath]] = {HttpMethod.PATCH: (path,)}
+        routes: dict[HttpMethod, Iterable[UrlPath]] = {HttpMethod.PATCH: (path,)}
         _add_routes(routes, fn)
         return fn
 
@@ -97,7 +97,7 @@ def _add_routes(
     fn: RouteFunction,
 ) -> RouteFunction:
     if getattr(fn, "__routes__", None) is None:
-        fn.__routes__: collections.defaultdict = collections.defaultdict(set)
+        fn.__routes__ = collections.defaultdict(set)
 
     for method, paths in routes.items():
         fn.__routes__[method.value].update(paths)
