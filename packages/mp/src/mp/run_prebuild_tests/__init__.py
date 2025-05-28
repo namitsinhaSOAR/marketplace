@@ -34,8 +34,8 @@ if TYPE_CHECKING:
 
     from mp.core.config import RuntimeParams
 
-PREBUILT_TEST_FILE: pathlib.Path = (
-    pathlib.Path(__file__).parent / "run_prebuild_tests.sh"
+RUN_PRE_BUILD_TESTS_PATH: pathlib.Path = (
+    pathlib.Path(__file__).parent / "run_pre_build_tests.sh"
 )
 
 __all__: list[str] = ["app"]
@@ -52,8 +52,8 @@ class TestParams:
         return [self.repository, self.integrations, self.groups]
 
 
-@app.command(name="test", help="Run integration prebuild tests")
-def run_prebuild_tests(
+@app.command(name="test", help="Run integration pre_build tests")
+def run_pre_build_tests(  # noqa: PLR0913
     repository: Annotated[
         list[RepositoryType],
         typer.Option(
@@ -204,8 +204,9 @@ def _test_integrations(
             f" the {marketplace_path.name} marketplace:"
             f" {', '.join(valid_integration_names)}"
         )
-        mp.core.code_manipulation.test_prebuilt_integration(
-            PREBUILT_TEST_FILE, valid_integrations_
+        mp.core.code_manipulation.test_pre_build_integration(
+            script_path=RUN_PRE_BUILD_TESTS_PATH,
+            paths=valid_integrations_,
         )
 
 

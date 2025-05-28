@@ -45,7 +45,7 @@ class TestWarning(RuntimeWarning):
     """Failed tests."""
 
 
-def test_prebuilt_integration(
+def test_pre_build_integration(
     script_path: pathlib.Path,
     paths: Iterable[pathlib.Path],
 ) -> None:
