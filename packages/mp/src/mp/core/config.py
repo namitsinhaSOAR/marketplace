@@ -24,6 +24,8 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 import typer
 
+import mp.core.constants
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -46,8 +48,7 @@ DEFAULT_PROCESSES_NUMBER: int = 5
 DEFAULT_QUIET_VALUE: str = "no"
 DEFAULT_VERBOSE_VALUE: str = "no"
 DEFAULT_MARKETPLACE_PATH: pathlib.Path = (
-    #            config.py > core > mp > src > mp > packages > root
-    pathlib.Path(__file__).parent.parent.parent.parent.parent.parent
+    pathlib.Path.home() / mp.core.constants.REPO_NAME
 )
 
 

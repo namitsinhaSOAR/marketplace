@@ -75,4 +75,4 @@ class Code(Restructurable):
             file for file in out_dir.iterdir() if futils.is_python_file(file)
         }
         mp.core.code_manipulation.restructure_scripts_imports(files)
-        mp.core.code_manipulation.sort_imports(files)
+        mp.core.code_manipulation.format_python_files(files)
