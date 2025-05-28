@@ -210,6 +210,15 @@ def _add_defaults_to_config(config: configparser.ConfigParser) -> None:
 
 
 def _create_default_config(config: configparser.ConfigParser) -> None:
+    mp_path: pathlib.Path = DEFAULT_MARKETPLACE_PATH.expanduser().resolve().absolute()
+    if not mp_path.exists():
+        msg: str = (
+            f"Marketplace path '{mp_path}' does not exist."
+            " Please use 'mp config --marketplace-path ...' to set it to the repo's"
+            " root directory"
+        )
+        raise ValueError(msg)
+
     config[DEFAULT_SECTION_NAME] = {
         MARKETPLACE_PATH_KEY: str(
             DEFAULT_MARKETPLACE_PATH.expanduser().resolve().absolute(),

@@ -37,7 +37,7 @@ def set_runtime_params() -> None:
 
 @pytest.fixture
 def mock_get_marketplace_path() -> str:
-    """Mock the import path of the `core.config.get_marketplace_path()` function."""
+    """Mock the import path of the `mp.core.config.get_marketplace_path()` function."""
     return "mp.core.config.get_marketplace_path"
 
 
