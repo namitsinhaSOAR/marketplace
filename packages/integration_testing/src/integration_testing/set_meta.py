@@ -160,7 +160,7 @@ def _get_integration_config_path_and_fn(
     if not integration_config:
         mock_get_configuration = functools.partial(
             get_def_file_content,
-            json_file_path=file_path,
+            def_file_path=file_path,
         )
 
     return path, lambda *_: mock_get_configuration()

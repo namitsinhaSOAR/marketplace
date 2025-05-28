@@ -18,7 +18,6 @@ import abc
 import re
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from .product import MockProduct
 from .request import MockRequest
 
 if TYPE_CHECKING:
@@ -28,7 +27,7 @@ NO_RESPONSE: object = object()
 
 Response = TypeVar("Response")
 Request = TypeVar("Request", bound=MockRequest)
-Product = TypeVar("Product", bound=MockProduct)
+Product = TypeVar("Product")
 
 UrlPath = str | re.Pattern
 

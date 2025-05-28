@@ -29,7 +29,6 @@ from typing import (
 
 import aiohttp
 from TIPCommon.base.utils import is_native, nativemethod
-from TIPCommon.utils import none_to_default_value
 
 from integration_testing.aiohttp.response import MockClientResponse
 from integration_testing.custom_types import (
@@ -39,7 +38,6 @@ from integration_testing.custom_types import (
     Request,
     UrlPath,
 )
-from integration_testing.product import MockProduct
 from integration_testing.request import HttpMethod, MockRequest
 
 if TYPE_CHECKING:
@@ -121,7 +119,7 @@ class MockClientSession(
             HttpMethod.PATCH.value: {},
         }
 
-        self._product: Product = none_to_default_value(mock_product, MockProduct())
+        self._product: Product | None = mock_product
 
         if not is_native(self.get_routed_functions):
             self._set_routes()
