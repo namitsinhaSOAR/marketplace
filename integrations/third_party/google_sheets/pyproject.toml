@@ -1,0 +1,19 @@
+[project]
+name = "Google-Sheets"
+version = "13.0"
+description = "Google Sheets is a spreadsheet program included as part of a free, web-based software office suite offered by Google within its Google Drive service. "
+requires-python = ">=3.11"
+dependencies = [
+    "gspread==6.1.4",
+]
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+integration-testing = { path = "../../../packages/integration_testing" }

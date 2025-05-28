@@ -1,0 +1,96 @@
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: StartTime
+    transformation_function: to_string
+    raw_data_primary_field_match_term: alert_triggered
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: false
+    extract_function: none
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: DestinationDomain
+    transformation_function: to_string
+    raw_data_primary_field_match_term: entity_domains
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: true
+    extract_function_param: ','
+    extract_function: delimiter
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: DestinationAddress
+    transformation_function: to_string
+    raw_data_primary_field_match_term: entity_ips
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: false
+    extract_function_param: ','
+    extract_function: delimiter
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: CVE
+    transformation_function: to_string
+    raw_data_primary_field_match_term: entity_vulns
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: true
+    extract_function_param: ','
+    extract_function: delimiter
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: DestinationURL
+    transformation_function: to_string
+    raw_data_primary_field_match_term: entity_urls
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: true
+    extract_function_param: ','
+    extract_function: delimiter
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: FileHash
+    transformation_function: to_string
+    raw_data_primary_field_match_term: entity_hashes
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: true
+    extract_function_param: ','
+    extract_function: delimiter
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: EmailSubject
+    transformation_function: to_string
+    raw_data_primary_field_match_term: entity_emails
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: true
+    extract_function_param: ','
+    extract_function: delimiter
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: Name
+    transformation_function: to_string
+    raw_data_primary_field_match_term: alert_title
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: false
+    extract_function: none
+-   source: RecordedFutureIntelligence
+    product: Recorded Future Classic Alert
+    security_event_file_name: Message
+    transformation_function: to_string
+    raw_data_primary_field_match_term: title
+    raw_data_primary_field_comparison_type: equal
+    raw_data_secondary_field_comparison_type: equal
+    raw_data_third_field_comparison_type: equal
+    is_artifact: false
+    extract_function: none

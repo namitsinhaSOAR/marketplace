@@ -1,0 +1,62 @@
+[project]
+name = "mp"
+version = "0.2.7"
+description = "General Purpose CLI tool for Google SecOps Marketplace"
+readme = "README.md"
+authors = [
+    { name = "Tal Shapir", email = "talshapir@google.com" },
+    { name = "Iddo Arie", email = "iddoa@google.com" },
+]
+requires-python = ">=3.11"
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "isort>=6.0.1",
+    "libcst>=1.7.0",
+    "mypy>=1.15.0",
+    "pip>=25.1.1",
+    "pyyaml>=6.0.2",
+    "rich>=14.0.0",
+    "ruff>=0.11.11",
+    "toml>=0.10.2",
+    "typer>=0.15.4",
+    "uv>=0.7.8",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "pytest-xdist>=3.7.0",
+    "types-pyyaml>=6.0.12.20250516",
+    "types-toml>=0.10.8.20240310",
+]
+
+[project.scripts]
+mp = "mp:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.mypy]
+exclude = [
+    '\.?venv',
+    'build',
+    'dist',
+]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+addopts = [
+    "--import-mode=importlib",
+]
+testpaths = [
+    "tests/",
+]

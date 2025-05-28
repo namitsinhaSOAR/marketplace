@@ -1,0 +1,61 @@
+{
+    "Actions": [
+        "Mock Integration Action"
+    ],
+    "Connectors": [
+        "Mock Integration Connector"
+    ],
+    "CustomFamilies": [
+        "Mock Integration Family"
+    ],
+    "Description": "Mock Integration description",
+    "DisplayName": "Mock Integration",
+    "DocumentationLink": "https://cloud.google.com/chronicle/docs/soar/marketplace-integrations/mock-integration",
+    "ExampleUseCases": [],
+    "Identifier": "mock_integration",
+    "IntegrationProperties": [
+        {
+            "PropertyDisplayName": "Mock Parameter",
+            "IntegrationIdentifier": "mock_integration",
+            "IsMandatory": true,
+            "PropertyDescription": "Description",
+            "PropertyName": "Mock Parameter",
+            "PropertyType": 3,
+            "Value": ""
+        }
+    ],
+    "IsCustom": false,
+    "Jobs": [
+        "Mock Integration Job"
+    ],
+    "Managers": [
+        "data_model",
+        "manager"
+    ],
+    "MappingRules": [
+        "Default mapping rules"
+    ],
+    "MinimumSystemVersion": 5.3,
+    "PackageName": "Mock Integration",
+    "ReleaseNotes": [
+        {
+            "Items": [
+                "New Integration Added - Mock Integration."
+            ],
+            "PublishTimeUnixTime": 0,
+            "Version": 1.0
+        },
+        {
+            "Items": [
+                "Change Description 1",
+                "Change Description 2"
+            ],
+            "PublishTimeUnixTime": 1719273600000,
+            "Version": 2.0
+        }
+    ],
+    "Version": 2.0,
+    "Widgets": [
+        "Mock Integration - Widget"
+    ]
+}

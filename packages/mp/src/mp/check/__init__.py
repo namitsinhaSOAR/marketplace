@@ -1,0 +1,197 @@
+"""Package providing code checking and linting functionalities.
+
+This package offers a command-line interface for checking and linting
+Python code within the project. It allows users to specify files or
+directories to check, automatically fix minor issues, check only changed
+files, perform static type checking, and control the verbosity of the output.
+It leverages external tools and internal modules to ensure code quality
+and consistency.
+"""
+
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import annotations
+
+import pathlib
+import warnings
+from typing import TYPE_CHECKING, Annotated, NamedTuple
+
+import rich
+import typer
+
+import mp.core.code_manipulation
+import mp.core.config
+import mp.core.file_utilities as futils
+import mp.core.unix
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from mp.core.config import RuntimeParams
+
+__all__: list[str] = ["app"]
+app: typer.Typer = typer.Typer()
+
+
+class CheckParams(NamedTuple):
+    file_paths: list[str] | None
+    fix: bool
+    changed_files: bool
+    static_type_check: bool
+    raise_error_on_violations: bool
+
+
+@app.command(name="check", help="Check and lint python")
+def check(  # noqa: PLR0913
+    file_paths: Annotated[
+        list[str] | None,
+        typer.Argument(
+            help="Path of the files or dirs to check",
+            show_default=False,
+        ),
+    ] = None,
+    *,
+    fix: Annotated[
+        bool,
+        typer.Option(
+            help="Fix minor issues in the code that require no action from the user",
+        ),
+    ] = False,
+    changed_files: Annotated[
+        bool,
+        typer.Option(
+            help=(
+                "Check all changed files based on a diff with the head"
+                " commit instead of --file-paths"
+            ),
+        ),
+    ] = False,
+    static_type_check: Annotated[
+        bool,
+        typer.Option(
+            help="Perform static type checking on the provided files",
+        ),
+    ] = False,
+    raise_error_on_violations: Annotated[
+        bool,
+        typer.Option(
+            help="Whether to raise error on lint and type check violations",
+        ),
+    ] = False,
+    quiet: Annotated[
+        bool,
+        typer.Option(
+            help="Log less on runtime.",
+        ),
+    ] = False,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            help="Log more on runtime.",
+        ),
+    ] = False,
+) -> None:
+    """`mp check`.
+
+    Args:
+        file_paths: file paths to check/lint
+        fix: whether to fix found issues
+        changed_files: whether to ignore `file_paths` provided and check only the
+            changed files in the last commit
+        static_type_check: whether to perform static type analysis on the code
+        raise_error_on_violations: whether to raise error if any violations are found
+        quiet: quiet log options
+        verbose: Verbose log options
+
+    """
+    if file_paths is None:
+        file_paths = []
+
+    if raise_error_on_violations:
+        warnings.filterwarnings("error")
+
+    run_params: RuntimeParams = mp.core.config.RuntimeParams(
+        quiet,
+        verbose,
+    )
+    run_params.set_in_config()
+    params: CheckParams = CheckParams(
+        file_paths=file_paths,
+        fix=False,
+        changed_files=False,
+        static_type_check=False,
+        raise_error_on_violations=False,
+    )
+    _validate_args(params)
+    sources: list[str] = _get_source_files(file_paths, changed_file=changed_files)
+    paths: set[pathlib.Path] = _get_relevant_source_paths(sources)
+    if not paths:
+        rich.print(f"No relevant python files found to check is sources {paths}")
+        return
+
+    names: str = ", ".join(p.name for p in paths)
+    _check_paths(paths, names, fix=fix)
+    if static_type_check:
+        _static_check_paths(paths, names)
+
+
+def _get_source_files(file_paths: list[str], *, changed_file: bool) -> list[str]:
+    sources: list[str] = (
+        mp.core.unix.get_changed_files() if changed_file else file_paths
+    )
+    if not sources:
+        msg: str = "No files found to check"
+        raise ValueError(msg)
+
+    return sources
+
+
+def _get_relevant_source_paths(sources: list[str]) -> set[pathlib.Path]:
+    return {
+        path
+        for source in sources
+        if futils.is_python_file(
+            path := pathlib.Path(source).resolve().expanduser().absolute(),
+        )
+        or path.is_dir()
+    }
+
+
+def _check_paths(
+    paths: Iterable[pathlib.Path],
+    names: str,
+    *,
+    fix: bool,
+) -> None:
+    rich.print(f"Checking Python files: {names}")
+    if fix:
+        mp.core.code_manipulation.lint_and_fix_python_files(paths)
+    else:
+        mp.core.code_manipulation.lint_python_files(paths)
+
+
+def _static_check_paths(paths: Iterable[pathlib.Path], names: str) -> None:
+    rich.print(f"Performing static type checking on files: {names}")
+    mp.core.code_manipulation.static_type_check_python_files(paths)
+
+
+def _validate_args(check_params: CheckParams) -> None:
+    if check_params.file_paths is None and not check_params.changed_files:
+        msg: str = "At least one path or --changed-files must be provided"
+        raise typer.BadParameter(msg)
+
+    if check_params.file_paths is not None and check_params.changed_files:
+        msg = "Either provide paths or use --changed-files."
+        raise typer.BadParameter(msg)

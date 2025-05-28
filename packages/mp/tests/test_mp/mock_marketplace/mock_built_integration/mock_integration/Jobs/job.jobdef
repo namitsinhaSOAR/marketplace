@@ -1,0 +1,19 @@
+{
+    "Creator": "Admin",
+    "Description": "Description.",
+    "Integration": "MockIntegration",
+    "IsCustom": false,
+    "IsEnabled": true,
+    "Name": "Mock Integration Job",
+    "Parameters": [
+        {
+            "DefaultValue": "Default Environment",
+            "Description": "Name of the environment for the cases.",
+            "IsMandatory": true,
+            "Name": "Environment Name",
+            "Type": 2
+        }
+    ],
+    "RunIntervalInSeconds": 900,
+    "Version": 1
+}

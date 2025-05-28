@@ -1,0 +1,19 @@
+[project]
+name = "DUO"
+version = "3.0"
+description = "Cisco's MFA Solution. Duo is engineered to provide a simple, streamlined login experience for every user and application, and as a cloud-based solution, it integrates easily with your existing technology."
+requires-python = ">=3.11"
+dependencies = [
+    "duo-client==5.3.0",
+]
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+integration-testing = { path = "../../../packages/integration_testing" }

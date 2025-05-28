@@ -1,0 +1,28 @@
+{
+    "Creator": "admin",
+    "Description": "Mock Integration Connector Description.",
+    "DocumentationLink": "https://cloud.google.com/chronicle/docs/soar/marketplace-integrations/mock-integration-connector",
+    "Integration": "MockIntegration",
+    "IsConnectorRulesSupported": false,
+    "IsCustom": false,
+    "IsEnabled": true,
+    "Name": "Mock Integration Connector",
+    "Parameters": [
+        {
+            "DefaultValue": "",
+            "Description": "ID of the project that will be used in the integration to host the Pub/Sub Topic and Subscription connection.",
+            "IsAdvanced": false,
+            "IsMandatory": false,
+            "Mode": 2,
+            "Name": "PubSub Project ID",
+            "Type": 2
+        }
+    ],
+    "Rules": [
+        {
+            "RuleName": "EXTERNAL",
+            "RuleType": 0
+        }
+    ],
+    "Version": 1.0
+}

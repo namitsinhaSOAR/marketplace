@@ -1,0 +1,19 @@
+[project]
+name = "DataDog"
+version = "8.0"
+description = "Datadog is an essential monitoring platform for cloud applications. It brings together data from servers, containers, databases, and third-party services to make your stack entirely observable. These capabilities help DevOps teams avoid downtime, resolve performance issues, and ensure customers are getting the best user experience."
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.32.3",
+]
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+integration-testing = { path = "../../../packages/integration_testing" }

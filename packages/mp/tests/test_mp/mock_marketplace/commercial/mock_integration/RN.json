@@ -1,0 +1,38 @@
+[
+    {
+        "ChangeDescription": "New Integration Added - Mock Integration.",
+        "Deprecated": true,
+        "IntroducedInIntegrationVersion": 1.0,
+        "ItemName": "Connector Name",
+        "ItemType": "Connector",
+        "New": true,
+        "PublishTime": null,
+        "Regressive": false,
+        "Removed": false,
+        "TicketNumber": "some ticket"
+    },
+    {
+        "ChangeDescription": "Change Description 1",
+        "Deprecated": false,
+        "IntroducedInIntegrationVersion": 2.0,
+        "ItemName": "Integration Name",
+        "ItemType": "Integration",
+        "New": false,
+        "PublishTime": 1719273600,
+        "Regressive": false,
+        "Removed": false,
+        "TicketNumber": "some ticket"
+    },
+    {
+        "ChangeDescription": "Change Description 2",
+        "Deprecated": false,
+        "IntroducedInIntegrationVersion": 2.0,
+        "ItemName": "Integration Name",
+        "ItemType": "Integration",
+        "New": false,
+        "PublishTime": 1719273600,
+        "Regressive": false,
+        "Removed": false,
+        "TicketNumber": "some ticket"
+    }
+]

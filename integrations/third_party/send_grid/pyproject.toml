@@ -1,0 +1,21 @@
+[project]
+name = "SendGridIntegration"
+version = "32.0"
+description = "SendGrid integration is a web API email delivery service"
+requires-python = ">=3.11"
+dependencies = [
+    "sendgrid==6.11.0",
+    "starkbank-ecdsa",
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+integration-testing = { path = "../../../packages/integration_testing" }
+starkbank-ecdsa = { url = "https://files.pythonhosted.org/packages/a3/f8/a6091be6a60ed4df9ac806c89fbc5fe1a3416d0284f3ba70aa09a3419428/starkbank-ecdsa-2.2.0.tar.gz" }
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]

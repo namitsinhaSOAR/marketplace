@@ -1,0 +1,19 @@
+[project]
+name = "Cybersixgill-DVE-Feed"
+version = "5.0"
+description = "The Cybersixgill Dynamic Vulnerability Exploit (DVE) Score is based on the most comprehensive collection of vulnerability-related threat intelligence and is the only solution that provides users total context and predicts the immediate risks of a vulnerability based on threat actorsâ€™ intent. Google SecOps users can track threats stemming from CVEs that most others define as irrelevant and have a higher probability of being exploited via Google SecOpsâ€™s dashboard."
+requires-python = ">=3.11"
+dependencies = [
+    "sixgill-clients==0.2.26",
+]
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+integration-testing = { path = "../../../packages/integration_testing" }

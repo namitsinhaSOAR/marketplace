@@ -1,0 +1,19 @@
+[project]
+name = "Azure-Dev-Ops"
+version = "6.0"
+description = "Azure DevOps Server is a Microsoft product that provides version control, reporting, requirements management, project management, automated builds, testing and release management capabilities. It covers the entire application lifecycle, and enables DevOps capabilities."
+requires-python = ">=3.11"
+dependencies = [
+    "azure-devops==7.1.0b4",
+]
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+integration-testing = { path = "../../../packages/integration_testing" }

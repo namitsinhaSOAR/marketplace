@@ -1,0 +1,53 @@
+[project]
+name = "integration-testing"
+version = "1.0.2"
+description = "Blackbox testing infrastructure to test and run marketplace integration scripts locally using mocks."
+readme = "README.md"
+authors = [
+    { name = "talshapir", email = "talshapir@google.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp>=3.11.18",
+    "environmentcommon",
+    "pyyaml>=6.0.2",
+    "requests>=2.32.3",
+    "soar-sdk",
+    "tipcommon",
+    "yarl>=1.20.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pytest>=8.3.5",
+    "pytest-xdist>=3.6.1",
+    "ruff>=0.11.10",
+]
+
+[tool.mypy]
+exclude = [
+    '\.?venv',
+    'build',
+    'dist',
+]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+addopts = [
+    "--import-mode=importlib",
+]
+testpaths = [
+    "tests/",
+]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.uv.sources]
+tipcommon = { path = "../TIPCommon-2.0.6/TIPCommon-2.0.6-py2.py3-none-any.whl" }
+environmentcommon = { path = "../EnvironmentCommon-1.0.2/EnvironmentCommon-1.0.2-py2.py3-none-any.whl" }
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }

@@ -1,0 +1,20 @@
+[project]
+name = "Logzio"
+version = "3.0"
+description = "Automatically remediate security incidents identified by Logz.io and increase observability into incident details.\nFor more information on configuration and integration details:\nhttps://docs.logz.io/user-guide/cloud-siem/integration/siemplify/"
+requires-python = ">=3.11"
+dependencies = [
+    "dateparser==1.2.0",
+    "requests>=2.32.3",
+]
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+integration-testing = { path = "../../../packages/integration_testing" }

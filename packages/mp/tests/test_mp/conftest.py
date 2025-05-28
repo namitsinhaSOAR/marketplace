@@ -1,0 +1,85 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import annotations
+
+import pathlib
+
+import pytest
+
+import mp.core.constants
+
+MOCK_MARKETPLACE_DIR_NAME: str = "mock_marketplace"
+INTEGRATION_NAME: str = "mock_integration"
+BUILT_INTEGRATION_DIR_NAME: str = "mock_built_integration"
+
+
+@pytest.fixture
+def mock_get_marketplace_path() -> str:
+    """Mock import path of the `core.config.get_marketplace_path()` function."""
+    return "mp.core.config.get_marketplace_path"
+
+
+@pytest.fixture
+def built_integration(mock_marketplace: pathlib.Path) -> pathlib.Path:
+    """Path of a mocked built integration."""
+    return mock_marketplace / BUILT_INTEGRATION_DIR_NAME / INTEGRATION_NAME
+
+
+@pytest.fixture
+def half_built_integration(mock_commercial: pathlib.Path) -> pathlib.Path:
+    """Path of a mocked half-built integration."""
+    return mock_commercial / INTEGRATION_NAME
+
+
+@pytest.fixture
+def non_built_integration(mock_community: pathlib.Path) -> pathlib.Path:
+    """Path of a mocked non-built integration."""
+    return mock_community / INTEGRATION_NAME
+
+
+@pytest.fixture
+def mock_marketplace() -> pathlib.Path:
+    """Path of a mocked marketplace."""
+    return pathlib.Path(__file__).parent / MOCK_MARKETPLACE_DIR_NAME
+
+
+@pytest.fixture
+def mock_community(mock_marketplace: pathlib.Path) -> pathlib.Path:
+    """Path of mocked third_party community integrations."""
+    return mock_marketplace / mp.core.constants.COMMUNITY_DIR_NAME
+
+
+@pytest.fixture
+def mock_commercial(mock_marketplace: pathlib.Path) -> pathlib.Path:
+    """Path of mocked commercial integrations."""
+    return mock_marketplace / mp.core.constants.COMMERCIAL_DIR_NAME
+
+
+@pytest.fixture
+def full_details(built_integration: pathlib.Path) -> pathlib.Path:
+    """Path to a mock `.fulldetails` file."""
+    return built_integration / mp.core.constants.INTEGRATION_FULLDETAILS_FILE.format(
+        INTEGRATION_NAME,
+    )
+
+
+@pytest.fixture
+def marketplace_json(mock_marketplace: pathlib.Path) -> pathlib.Path:
+    """Path to a mock `marketplace.json` file."""
+    return (
+        mock_marketplace
+        / BUILT_INTEGRATION_DIR_NAME
+        / mp.core.constants.MARKETPLACE_JSON_NAME
+    )

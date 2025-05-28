@@ -1,0 +1,21 @@
+[project]
+name = "Marketo"
+version = "16.0"
+description = "Marketo, Inc. is an American software company, headquartered in San Mateo, California. Marketo develops and sells marketing automation software for account-based marketing and other marketing services and products including SEO and content creation."
+requires-python = ">=3.11"
+dependencies = [
+    "marketorestpython",
+]
+
+[tool.uv.sources]
+integration-testing = { path = "../../../packages/integration_testing" }
+marketorestpython = { url = "https://files.pythonhosted.org/packages/8b/1e/e08d123a31e2c40909b4c55b7d2af9485dd11ae52a866b97dc6df8e55c79/marketorestpython-0.5.24.tar.gz" }
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]

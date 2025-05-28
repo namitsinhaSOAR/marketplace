@@ -1,0 +1,268 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import annotations
+
+import dataclasses
+from typing import TYPE_CHECKING, NotRequired, Self
+
+import mp.core.constants
+import mp.core.data_models.abc
+import mp.core.utils
+
+from .dynamic_results_metadata import (
+    BuiltDynamicResultsMetadata,
+    DynamicResultsMetadata,
+    NonBuiltDynamicResultsMetadata,
+)
+from .parameter import (
+    ActionParameter,
+    BuiltActionParameter,
+    NonBuiltActionParameter,
+)
+
+if TYPE_CHECKING:
+    import pathlib
+    from collections.abc import Sequence
+
+DEFAULT_SCRIPT_RESULT_NAME: str = "is_success"
+DEFAULT_SIMULATION_DATA: str = '{"Entities": []}'
+
+
+class BuiltActionMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
+    Description: str
+    DynamicResultsMetadata: Sequence[BuiltDynamicResultsMetadata]
+    IntegrationIdentifier: str
+    IsAsync: bool
+    IsCustom: bool
+    IsEnabled: bool
+    Name: str
+    Parameters: Sequence[BuiltActionParameter]
+    Creator: str
+    ScriptResultName: str
+    SimulationDataJson: NotRequired[str]
+    DefaultResultValue: NotRequired[str | None]
+    Version: float
+
+
+class NonBuiltActionMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+    description: str
+    dynamic_results_metadata: Sequence[NonBuiltDynamicResultsMetadata]
+    integration_identifier: str
+    is_async: NotRequired[bool]
+    is_custom: NotRequired[bool]
+    is_enabled: NotRequired[bool]
+    name: str
+    parameters: Sequence[NonBuiltActionParameter]
+    creator: NotRequired[str]
+    script_result_name: NotRequired[str]
+    simulation_data_json: NotRequired[str]
+    default_result_value: NotRequired[str | None]
+    version: NotRequired[float]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
+class ActionMetadata(
+    mp.core.data_models.abc.ScriptMetadata[BuiltActionMetadata, NonBuiltActionMetadata],
+):
+    file_name: str
+    description: str
+    dynamic_results_metadata: Sequence[
+        mp.core.data_models.abc.Buildable[
+            BuiltDynamicResultsMetadata,
+            NonBuiltDynamicResultsMetadata,
+        ]
+    ]
+    integration_identifier: str
+    is_async: bool
+    is_custom: bool
+    is_enabled: bool
+    name: str
+    parameters: Sequence[
+        mp.core.data_models.abc.Buildable[BuiltActionParameter, NonBuiltActionParameter]
+    ]
+    default_result_value: str | None
+    creator: str
+    script_result_name: str
+    simulation_data_json: str
+    version: float
+
+    @classmethod
+    def from_built_integration_path(cls, path: pathlib.Path) -> list[Self]:
+        """Create based on the metadata files found in the built-integration path.
+
+        Args:
+            path: the path to the built integration
+
+        Returns:
+            A sequence of `ActionMetadata` objects
+
+        """
+        meta_path: pathlib.Path = path / mp.core.constants.OUT_ACTIONS_META_DIR
+        if not meta_path.exists():
+            return []
+
+        return [
+            cls._from_built_integration_path(p)
+            for p in meta_path.rglob(f"*{mp.core.constants.ACTIONS_META_SUFFIX}")
+        ]
+
+    @classmethod
+    def from_non_built_integration_path(cls, path: pathlib.Path) -> list[Self]:
+        """Create based on the metadata files found in the non-built-integration path.
+
+        Args:
+            path: the path to the non-built integration
+
+        Returns:
+            A sequence of `ActionMetadata` objects
+
+        """
+        meta_path: pathlib.Path = path / mp.core.constants.ACTIONS_DIR
+        if not meta_path.exists():
+            return []
+
+        return [
+            cls._from_non_built_integration_path(p)
+            for p in meta_path.rglob(f"*{mp.core.constants.DEF_FILE_SUFFIX}")
+        ]
+
+    @classmethod
+    def _from_built(cls, file_name: str, built: BuiltActionMetadata) -> ActionMetadata:
+        """Create the obj from a built action metadata dict.
+
+        Args:
+            file_name: The action's metadata file name
+            built: the built dict
+
+        Returns:
+            An `ActionMetadata` object
+
+        """
+        return cls(
+            file_name=file_name,
+            creator=built["Creator"],
+            description=built["Description"],
+            dynamic_results_metadata=[
+                DynamicResultsMetadata.from_built(drm)
+                for drm in built.get("DynamicResultsMetadata", []) or []
+            ],
+            integration_identifier=built["IntegrationIdentifier"],
+            is_async=built.get("IsAsync", False),
+            is_custom=built.get("IsCustom", False),
+            is_enabled=built.get("IsEnabled", True),
+            name=built["Name"],
+            parameters=[ActionParameter.from_built(p) for p in built["Parameters"]],
+            script_result_name=built.get("ScriptResultName", "is_success"),
+            simulation_data_json=built.get("SimulationDataJson", '{"Entities": []}'),
+            default_result_value=built.get("DefaultResultValue"),
+            version=built.get("Version", 1.0),
+        )
+
+    @classmethod
+    def _from_non_built(
+        cls,
+        file_name: str,
+        non_built: NonBuiltActionMetadata,
+    ) -> ActionMetadata:
+        """Create the obj from a non-built action metadata dict.
+
+        Args:
+            file_name: The action's metadata file name
+            non_built: the non-built dict
+
+        Returns:
+            An `ActionMetadata` object
+
+        """
+        return cls(
+            file_name=file_name,
+            creator=non_built.get("creator", "admin"),
+            description=non_built["description"],
+            dynamic_results_metadata=[
+                DynamicResultsMetadata.from_non_built(drm)
+                for drm in non_built.get("dynamic_results_metadata", [])
+            ],
+            integration_identifier=non_built["integration_identifier"],
+            is_async=non_built.get("is_async", False),
+            is_custom=non_built.get("is_custom", False),
+            is_enabled=non_built.get("is_enabled", True),
+            name=non_built["name"],
+            parameters=[
+                ActionParameter.from_non_built(p) for p in non_built["parameters"]
+            ],
+            script_result_name=non_built.get("script_result_name", "is_success"),
+            simulation_data_json=non_built.get(
+                "simulation_data_json",
+                '{"Entities": []}',
+            ),
+            default_result_value=non_built.get("default_result_value"),
+            version=non_built.get("version", 1.0),
+        )
+
+    def to_built(self) -> BuiltActionMetadata:
+        """Create a built action metadata dict.
+
+        Returns:
+            A built version of the action metadata dict
+
+        """
+        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
+            {
+                "Creator": self.creator,
+                "Description": self.description,
+                "DynamicResultsMetadata": [
+                    m.to_built() for m in self.dynamic_results_metadata
+                ],
+                "IntegrationIdentifier": self.integration_identifier,
+                "IsAsync": self.is_async,
+                "IsCustom": self.is_custom,
+                "IsEnabled": self.is_enabled,
+                "Name": self.name,
+                "Parameters": [p.to_built() for p in self.parameters],
+                "ScriptResultName": self.script_result_name,
+                "SimulationDataJson": self.simulation_data_json,
+                "DefaultResultValue": self.default_result_value,
+                "Version": self.version,
+            },
+        )
+
+    def to_non_built(self) -> NonBuiltActionMetadata:
+        """Create a non-built action metadata dict.
+
+        Returns:
+            A non-built version of the action metadata dict
+
+        """
+        non_built: NonBuiltActionMetadata = {
+            "name": self.name,
+            "description": self.description,
+            "integration_identifier": self.integration_identifier,
+            "parameters": [p.to_non_built() for p in self.parameters],
+            "dynamic_results_metadata": [
+                m.to_non_built() for m in self.dynamic_results_metadata
+            ],
+            "default_result_value": self.default_result_value,
+            "creator": self.creator,
+        }
+        if self.is_async:
+            non_built["is_async"] = self.is_async
+
+        if self.simulation_data_json != DEFAULT_SIMULATION_DATA:
+            non_built["simulation_data_json"] = self.simulation_data_json
+
+        if self.script_result_name != DEFAULT_SCRIPT_RESULT_NAME:
+            non_built["script_result_name"] = self.script_result_name
+
+        return mp.core.utils.copy_mapping_without_none_values(non_built)  # type: ignore[return-value]

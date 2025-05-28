@@ -1,0 +1,20 @@
+[
+    {
+        "EventName": null,
+        "ExtractionFunction": 2,
+        "ExtractionFunctionParam": ",",
+        "IsArtifact": false,
+        "Product": "Mock Integration",
+        "RawDataPrimaryFieldComparisonType": 0,
+        "RawDataPrimaryFieldMatchTerm": "device_username",
+        "RawDataSecondaryFieldComparisonType": 0,
+        "RawDataSecondaryFieldMatchTerm": "",
+        "RawDataThirdFieldComparisonType": 0,
+        "RawDataThirdFieldMatchTerm": "",
+        "SecurityEventFieldName": "SourceUserName",
+        "Source": "MockIntegration",
+        "TransformationFunction": 0,
+        "TransformationFunctionParam": ""
+    }
+
+]

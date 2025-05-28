@@ -1,0 +1,19 @@
+[project]
+name = "Spell-Checker"
+version = "7.0"
+description = "Pyspellchecker provides a library for determining if a word is misspelled and what the likely correct spelling would be based on word frequency."
+requires-python = ">=3.11"
+dependencies = [
+    "pyspellchecker==0.8.2",
+]
+
+[dependency-groups]
+dev = [
+    "integration-testing",
+    "pytest>=8.3.5",
+    "soar-sdk",
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+integration-testing = { path = "../../../packages/integration_testing" }

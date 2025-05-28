@@ -1,0 +1,142 @@
+"""Package providing code formatting capabilities.
+
+This package offers a command-line interface to automatically format
+Python (`.py`) and JSON (`.json`) files within the project. It allows
+users to specify files or directories for formatting and can also format
+only the files that have been changed according to the Git history. It
+uses external tools and internal modules to ensure consistent code
+style and readability.
+"""
+
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import annotations
+
+import pathlib
+from typing import TYPE_CHECKING, Annotated
+
+import rich
+import typer
+
+import mp.core.code_manipulation
+import mp.core.config
+import mp.core.file_utilities as futils
+import mp.core.unix
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from mp.core.config import RuntimeParams
+
+__all__: list[str] = ["app"]
+app: typer.Typer = typer.Typer()
+
+
+@app.command(name="format", help="Format '.py' and '.json' files")
+def format_files(
+    file_paths: Annotated[
+        list[str] | None,
+        typer.Argument(
+            help="Path of the files or dirs to format",
+            show_default=False,
+        ),
+    ] = None,
+    *,
+    changed_files: Annotated[
+        bool,
+        typer.Option(
+            help=(
+                "Check all changed files based on a diff with the"
+                " origin/develop branch instead of --file-paths"
+            ),
+        ),
+    ] = False,
+    quiet: Annotated[
+        bool,
+        typer.Option(
+            help="Log less on runtime.",
+        ),
+    ] = False,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            help="Log more on runtime.",
+        ),
+    ] = False,
+) -> None:
+    """`mp format`.
+
+    Args:
+        file_paths: the files to format
+        changed_files: whether to ignore `file_paths` provided and check only the
+            changed files in the last commit
+        quiet: quiet log options
+        verbose: Verbose log options
+
+    """
+    if file_paths is None:
+        file_paths = []
+
+    run_params: RuntimeParams = mp.core.config.RuntimeParams(quiet, verbose)
+    run_params.set_in_config()
+    sources: list[str] = _get_source_files(file_paths, changed_file=changed_files)
+    paths: set[pathlib.Path] = _get_relevant_source_paths(sources)
+    _format_python_files(paths)
+    _format_json_files(paths)
+
+
+def _get_source_files(file_paths: list[str], *, changed_file: bool) -> list[str]:
+    sources: list[str] = (
+        mp.core.unix.get_changed_files() if changed_file else file_paths
+    )
+    if not sources:
+        msg: str = "No files found to check"
+        raise ValueError(msg)
+
+    return sources
+
+
+def _get_relevant_source_paths(sources: list[str]) -> set[pathlib.Path]:
+    paths: set[pathlib.Path] = {
+        path
+        for source in sources
+        if futils.is_python_file(
+            path := pathlib.Path(source).resolve().expanduser().absolute(),
+        )
+        or futils.is_json_file(path)
+        or path.is_dir()
+    }
+    if not paths:
+        msg: str = f"No relevant python files found to check is sources {sources}"
+        raise ValueError(msg)
+
+    return paths
+
+
+def _format_python_files(paths: Iterable[pathlib.Path]) -> None:
+    rich.print(f"Formatting Python files: {', '.join(p.name for p in paths)}")
+    mp.core.code_manipulation.format_python_files(paths)
+
+
+def _format_json_files(paths: Iterable[pathlib.Path]) -> None:
+    json_files: set[pathlib.Path] = {
+        p for p in paths if futils.is_json_file(p) or p.is_dir()
+    }
+    if json_files:
+        rich.print(f"Formatting JSON files: {', '.join(p.name for p in json_files)}")
+        mp.core.code_manipulation.format_json_files(json_files)
+
+    else:
+        rich.print("No JSON files found")

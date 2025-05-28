@@ -1,0 +1,28 @@
+{
+    "Parameters": [
+        {
+            "ConnectorDefinitionId": -1,
+            "CreationTimeUnixTimeInMs": 1570446244,
+            "DefaultValue": "Hello World",
+            "Description": "Enter the source field name in order to retrieve the Product Field name.",
+            "Id": -1,
+            "IsMandatory": true,
+            "Mode": 0,
+            "ModificationTimeUnixTimeInMs": 1570446244,
+            "Name": "Username",
+            "Type": 2
+        },
+        {
+            "ConnectorDefinitionId": -1,
+            "CreationTimeUnixTimeInMs": 1570446244,
+            "DefaultValue": "123",
+            "Description": "Enter the source field name in order to retrieve the Event Field name.",
+            "Id": -1,
+            "IsMandatory": false,
+            "Mode": 0,
+            "ModificationTimeUnixTimeInMs": 1570446244,
+            "Name": "Password",
+            "Type": 3
+        }
+    ]
+}

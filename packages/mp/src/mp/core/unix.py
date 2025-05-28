@@ -1,0 +1,377 @@
+"""Module for interacting with the operating system and executing shell commands."""
+
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import annotations
+
+import subprocess as sp
+import sys
+from typing import TYPE_CHECKING
+
+from . import config, constants
+from . import file_utilities as futils
+
+if TYPE_CHECKING:
+    import pathlib
+    from collections.abc import Iterable
+
+COMMAND_ERR_MSG: str = "Error happened while executing a command: {0}"
+
+
+class CommandError(Exception):
+    """Error that happens during commands."""
+
+
+def compile_core_integration_dependencies(
+    project_path: pathlib.Path,
+    requirements_path: pathlib.Path,
+) -> None:
+    """Compile/Export all project dependencies into a requirements' file.
+
+    Args:
+        project_path: the path to the project folder - one that contains a
+            `pyproject.toml` file
+        requirements_path: the path to the requirements' file to write the contents into
+
+    Raises:
+        CommandError: if a project is already initialized
+
+    """
+    python_version: str = (
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    )
+    command: list[str] = [
+        sys.executable,
+        "-m",
+        "uv",
+        "export",
+        "--project",
+        str(project_path),
+        "--output-file",
+        str(requirements_path),
+        "--no-hashes",
+        "--no-dev",
+        "--python",
+        python_version,
+    ]
+    runtime_config: list[str] = _get_runtime_config()
+    command.extend(runtime_config)
+
+    try:
+        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603 - check for execution of untrusted input
+    except sp.CalledProcessError as e:
+        raise CommandError(COMMAND_ERR_MSG.format(e)) from e
+
+
+def download_wheels_from_requirements(
+    requirements_path: pathlib.Path,
+    dst_path: pathlib.Path,
+) -> None:
+    """Download `.whl` files from a requirements' file.
+
+    Args:
+        requirements_path: the path of the requirements file
+        dst_path: the path to install the `.whl` files into
+
+    Raises:
+        CommandError: if a project is already initialized
+
+    """
+    python_version: str = _get_python_version()
+    command: list[str] = [
+        sys.executable,
+        "-m",
+        "pip",
+        "download",
+        "-r",
+        str(requirements_path),
+        "-d",
+        str(dst_path),
+        "--only-binary=:all:",
+        "--python-version",
+        python_version,
+        "--implementation",
+        "cp",
+        "--platform",
+        "none-any",
+        "--platform",
+        "manylinux_2_17_x86_64",
+    ]
+    runtime_config: list[str] = _get_runtime_config()
+    command.extend(runtime_config)
+
+    try:
+        sp.run(command, cwd=requirements_path.parent, check=True, text=True)  # noqa: S603 - check for execution of untrusted input
+    except sp.CalledProcessError as e:
+        raise CommandError(COMMAND_ERR_MSG.format(e)) from e
+
+
+def add_dependencies_to_toml(
+    project_path: pathlib.Path,
+    requirements_path: pathlib.Path,
+) -> None:
+    """Add dependencies from requirements to a python project's TOML file.
+
+    Args:
+        project_path: the path to the project
+        requirements_path: the path to the requirements to add
+
+    Raises:
+        CommandError: if a project is already initialized
+
+    """
+    python_version: str = _get_python_version()
+    command: list[str] = [
+        sys.executable,
+        "-m",
+        "uv",
+        "add",
+        "-r",
+        str(requirements_path),
+        "--python",
+        python_version,
+    ]
+    runtime_config: list[str] = _get_runtime_config()
+    command.extend(runtime_config)
+
+    try:
+        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603 - check for execution of untrusted input
+    except sp.CalledProcessError as e:
+        raise CommandError(COMMAND_ERR_MSG.format(e)) from e
+
+
+def init_python_project_if_not_exists(project_path: pathlib.Path) -> None:
+    """Initialize a python project in a folder.
+
+    If a project is already initialized in there, nothing will happen.
+
+    Args:
+        project_path: the path to initialize the project
+
+    """
+    pyproject: pathlib.Path = project_path / constants.PROJECT_FILE
+    if pyproject.exists():
+        return
+
+    initials: set[pathlib.Path] = set(project_path.iterdir())
+    keep: set[pathlib.Path] = {project_path / constants.PROJECT_FILE}
+
+    init_python_project(project_path)
+
+    paths: set[pathlib.Path] = set(project_path.iterdir())
+    paths_to_remove: set[pathlib.Path] = paths.difference(initials).difference(keep)
+    futils.remove_paths_if_exists(*paths_to_remove)
+
+
+def init_python_project(project_path: pathlib.Path) -> None:
+    """Initialize a python project in a folder.
+
+    Args:
+        project_path: the path to initialize the project
+
+    Raises:
+        CommandError: if a project is already initialized
+
+    """
+    python_version: str = _get_python_version()
+    command: list[str] = [
+        sys.executable,
+        "-m",
+        "uv",
+        "init",
+        "--no-readme",
+        "--no-workspace",
+        "--quiet",
+        "--python",
+        python_version,
+    ]
+
+    runtime_config: list[str] = _get_runtime_config()
+    command.extend(runtime_config)
+
+    try:
+        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603 - check for execution of untrusted input
+    except sp.CalledProcessError as e:
+        raise CommandError(COMMAND_ERR_MSG.format(e)) from e
+
+
+def ruff_check(
+    paths: Iterable[pathlib.Path],
+    /,
+    **flags: bool | str,
+) -> tuple[int, str]:
+    """Run `ruff check` on the provided paths.
+
+    Returns:
+        A tuple of the satus code and output
+
+    """
+    command: list[str] = [sys.executable, "-m", "ruff", "check"]
+    return execute_command_and_get_output(command, paths, **flags)
+
+
+def ruff_format(
+    paths: Iterable[pathlib.Path],
+    /,
+    **flags: bool | str,
+) -> tuple[int, str]:
+    """Run `ruff format` on the provided paths.
+
+    Returns:
+        A tuple of the satus code and output
+
+    """
+    command: list[str] = [sys.executable, "-m", "ruff", "format"]
+    return execute_command_and_get_output(command, paths, **flags)
+
+
+def mypy(paths: Iterable[pathlib.Path], /, **flags: bool | str) -> tuple[int, str]:
+    """Run `mypy --strict` on the provided paths.
+
+    Returns:
+        A tuple of the satus code and output
+
+    """
+    command: list[str] = [sys.executable, "-m", "mypy", "--strict"]
+    return execute_command_and_get_output(command, paths, **flags)
+
+
+def execute_command_and_get_output(
+    command: list[str],
+    paths: Iterable[pathlib.Path],
+    **flags: bool | str,
+) -> tuple[int, str]:
+    """Execute a command and capture its output and status code.
+
+    Args:
+        command: the command values to execute
+        paths: path values for the command
+        **flags: any command flags as keyword arguments
+
+    Returns:
+        A tuple of the satus code and output
+
+    Raises:
+        CommandError: if a project is already initialized
+
+    """
+    command.extend(str(path) for path in paths)
+
+    flags_: list[str] = get_flags_to_command(**flags)
+    command.extend(flags_)
+
+    runtime_config: list[str] = _get_runtime_config()
+    command.extend(runtime_config)
+
+    try:
+        result: sp.CompletedProcess = sp.run(  # noqa: S603 - check for execution of untrusted input
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+    except sp.CalledProcessError as e:
+        raise CommandError(COMMAND_ERR_MSG.format(e)) from e
+
+    else:
+        output: str = ""
+        if result.stdout:
+            output += f"STDOUT: {result.stdout}\n"
+
+        if result.stderr:
+            output += f"STDERR: {result.stderr}"
+
+        return result.returncode, output
+
+
+def get_changed_files() -> list[str]:
+    """Get a list of file names that were changed since the last commit.
+
+    Returns:
+        A list of file names that were changed since the last commit.
+
+    Raises:
+        CommandError: The command failed to be executed
+
+    """
+    command: list[str] = [
+        "/usr/bin/git",
+        "diff",
+        "HEAD^",
+        "HEAD",
+        "--name-only",
+        "--diff-filter=ACMRTUXB",
+    ]
+    try:
+        result: sp.CompletedProcess = sp.run(  # noqa: S603 - check for execution of untrusted input
+            command,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        return result.stdout.split()
+    except sp.CalledProcessError as e:
+        raise CommandError(COMMAND_ERR_MSG.format(e)) from e
+
+
+def _get_runtime_config() -> list[str]:
+    result: list[str] = []
+    if config.is_quiet():
+        result.append("--quiet")
+
+    if config.is_verbose():
+        result.append("--verbose")
+
+    return result
+
+
+def get_flags_to_command(**flags: bool | str | list[str]) -> list[str]:
+    """Get all the kwarg flags as a string with the appropriate `-` or `--`.
+
+    Examples:
+        >>> get_flags_to_command(f=True, name="TIPCommon", files=["1", "2"])
+        >>> "-f --name TIPCommon --files 1 2"
+
+    Args:
+        **flags: The flags to parse
+
+    Returns:
+        A string containing the flags for a command.
+
+    """
+    if not flags:
+        return []
+
+    all_flags: list[str] = []
+    for flag, value in flags.items():
+        f: str = flag.replace("_", "-")
+        f = f"-{f}" if len(f) == 1 else f"--{f}"
+        all_flags.append(f)
+        if isinstance(value, bool):
+            if value is False:
+                all_flags.pop()
+
+        elif isinstance(value, list):
+            all_flags.extend(value)
+
+        else:
+            all_flags.append(value)
+
+    return all_flags
+
+
+def _get_python_version() -> str:
+    return f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
