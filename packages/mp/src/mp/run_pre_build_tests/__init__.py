@@ -25,7 +25,7 @@ import typer
 import mp.build_project.marketplace
 import mp.core.code_manipulation
 import mp.core.config
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 import mp.core.unix
 from mp.core.custom_types import Products, RepositoryType
 
@@ -112,8 +112,8 @@ def run_pre_build_tests(  # noqa: PLR0913
     run_params: RuntimeParams = mp.core.config.RuntimeParams(quiet, verbose)
     run_params.set_in_config()
     _validate_params(test_params=TestParams(repository, integration, group))
-    commercial_path: pathlib.Path = futils.get_commercial_path()
-    community_path: pathlib.Path = futils.get_community_path()
+    commercial_path: pathlib.Path = mp.core.file_utils.get_commercial_path()
+    community_path: pathlib.Path = mp.core.file_utils.get_community_path()
     if integration:
         rich.print("Testing integrations...")
         _test_integrations(set(integration), commercial_path)
@@ -153,7 +153,7 @@ def _validate_params(test_params: TestParams) -> None:
 
 def _test_repository(repo: pathlib.Path) -> None:
     products: Products[set[pathlib.Path]] = (
-        futils.get_integrations_and_groups_from_paths(repo)
+        mp.core.file_utils.get_integrations_and_groups_from_paths(repo)
     )
     if products.integrations:
         _test_integrations(products.integrations, repo)

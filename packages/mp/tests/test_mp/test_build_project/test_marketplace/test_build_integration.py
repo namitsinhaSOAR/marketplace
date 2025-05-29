@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import shutil
 import unittest.mock
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -83,12 +83,14 @@ def assert_build_integration(
         }
         assert actual_file_names == expected_file_names
 
-        actual, expected = test_mp.common.compare_dependencies(
+        actual_file_names, expected_file_names = test_mp.common.compare_dependencies(
             expected=built_integration / mp.core.constants.OUT_DEPENDENCIES_DIR,
             actual=out_integration / mp.core.constants.OUT_DEPENDENCIES_DIR,
         )
-        assert actual == expected
+        assert actual_file_names == expected_file_names
 
+        actual: dict[str, Any]
+        expected: dict[str, Any]
         actual, expected = test_mp.common.get_json_content(
             expected=built_integration / mp.core.constants.RN_JSON_FILE,
             actual=out_integration / mp.core.constants.RN_JSON_FILE,

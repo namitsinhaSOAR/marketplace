@@ -221,7 +221,7 @@ def _remove_path_if_exists(path: pathlib.Path) -> None:
         shutil.rmtree(path)
 
 
-def remove_and_create_dir(path: pathlib.Path) -> None:
+def recreate_dir(path: pathlib.Path) -> None:
     """Remove the provided directory and create a new one."""
     if path.exists() and is_path_in_marketplace(path):
         shutil.rmtree(path)
@@ -239,6 +239,16 @@ def is_path_in_marketplace(path: pathlib.Path) -> bool:
 
     """
     return config.get_marketplace_path() in path.parents
+
+
+def is_built_or_half_built(integration: pathlib.Path) -> bool:
+    """Check whether an integration is built or half-built.
+
+    Returns:
+        Whether the integration is in a built or half-built format
+
+    """
+    return is_built(integration) or is_half_built(integration)
 
 
 def is_built(integration: pathlib.Path) -> bool:

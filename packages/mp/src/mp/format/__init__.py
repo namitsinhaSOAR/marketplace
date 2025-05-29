@@ -32,7 +32,7 @@ import typer
 
 import mp.core.code_manipulation
 import mp.core.config
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 import mp.core.unix
 
 if TYPE_CHECKING:
@@ -112,10 +112,10 @@ def _get_relevant_source_paths(sources: list[str]) -> set[pathlib.Path]:
     paths: set[pathlib.Path] = {
         path
         for source in sources
-        if futils.is_python_file(
+        if mp.core.file_utils.is_python_file(
             path := pathlib.Path(source).resolve().expanduser().absolute(),
         )
-        or futils.is_json_file(path)
+        or mp.core.file_utils.is_json_file(path)
         or path.is_dir()
     }
     if not paths:
@@ -132,7 +132,7 @@ def _format_python_files(paths: Iterable[pathlib.Path]) -> None:
 
 def _format_json_files(paths: Iterable[pathlib.Path]) -> None:
     json_files: set[pathlib.Path] = {
-        p for p in paths if futils.is_json_file(p) or p.is_dir()
+        p for p in paths if mp.core.file_utils.is_json_file(p) or p.is_dir()
     }
     if json_files:
         rich.print(f"Formatting JSON files: {', '.join(p.name for p in json_files)}")

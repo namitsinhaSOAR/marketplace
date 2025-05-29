@@ -27,10 +27,13 @@ import shutil
 import tomllib
 from typing import TYPE_CHECKING, Any, TypeAlias
 
+import rich
 import toml
 
+import mp.core
 import mp.core.constants
-import mp.core.file_utilities as futils
+import mp.core.file_utils
+import mp.core.unix
 from mp.core.data_models.action.metadata import ActionMetadata
 from mp.core.data_models.connector.metadata import ConnectorMetadata
 from mp.core.data_models.integration_meta.metadata import (
@@ -51,25 +54,6 @@ if TYPE_CHECKING:
 _ValidMetadata: TypeAlias = (
     ActionMetadata | ConnectorMetadata | JobMetadata | WidgetMetadata
 )
-
-
-def update_pyproject(
-    integration_out_path: pathlib.Path,
-    integration: Integration,
-) -> None:
-    """Update an integration's pyproject.toml file from its definition file.
-
-    Args:
-        integration_out_path: path to the integration's "out" folder
-        integration: The integration object
-
-    """
-    pyproject_toml: pathlib.Path = integration_out_path / mp.core.constants.PROJECT_FILE
-    toml_content: MutableMapping[str, Any] = tomllib.loads(
-        pyproject_toml.read_text(encoding="utf-8"),
-    )
-    _update_pyproject_from_integration_meta(toml_content, integration.metadata)
-    pyproject_toml.write_text(toml.dumps(toml_content), encoding="utf-8")
 
 
 def _update_pyproject_from_integration_meta(
@@ -93,6 +77,47 @@ class DeconstructIntegration:
     out_path: pathlib.Path
     integration: Integration
 
+    def initiate_project(self) -> None:
+        """Initialize a new python project.
+
+        Initializes a project by setting up a Python environment, updating the
+        project configuration, and optionally adding dependencies based on a
+        'requirements.txt' file.
+
+        Raises:
+            mp.core.unix.CommandError: If an error occurs while adding dependencies
+                to the project's configuration from the 'requirements.txt' file.
+
+        """
+        mp.core.unix.init_python_project_if_not_exists(self.out_path)
+        self.update_pyproject()
+        requirements: pathlib.Path = self.path / mp.core.constants.REQUIREMENTS_FILE
+        if requirements.exists():
+            try:
+                rich.print(f"Adding requirements to {mp.core.constants.PROJECT_FILE}")
+                mp.core.unix.add_dependencies_to_toml(
+                    project_path=self.out_path,
+                    requirements_path=requirements,
+                )
+            except mp.core.unix.CommandError as e:
+                rich.print(f"Failed to install dependencies from requirements: {e}")
+
+    def update_pyproject(self) -> None:
+        """Update an integration's pyproject.toml file from its definition file."""
+        pyproject_toml: pathlib.Path = self.out_path / mp.core.constants.PROJECT_FILE
+        toml_content: MutableMapping[str, Any] = tomllib.loads(
+            pyproject_toml.read_text(encoding="utf-8"),
+        )
+        _update_pyproject_from_integration_meta(toml_content, self.integration.metadata)
+        pyproject_toml.write_text(toml.dumps(toml_content), encoding="utf-8")
+        self._copy_lock_file()
+
+    def _copy_lock_file(self) -> None:
+        lock_file: pathlib.Path = self.path / mp.core.constants.LOCK_FILE
+        out_lock_file: pathlib.Path = self.out_path / mp.core.constants.LOCK_FILE
+        if lock_file.exists() and not out_lock_file.exists():
+            shutil.copyfile(lock_file, out_lock_file)
+
     def deconstruct_integration_files(self) -> None:
         """Deconstruct an integration's code to its "out" path."""
         self._create_definition_file()
@@ -104,11 +129,14 @@ class DeconstructIntegration:
 
     def _create_definition_file(self) -> None:
         def_file: pathlib.Path = self.out_path / mp.core.constants.DEFINITION_FILE
-        futils.write_yaml_to_file(self.integration.metadata.to_non_built(), def_file)
+        mp.core.file_utils.write_yaml_to_file(
+            content=self.integration.metadata.to_non_built(),
+            path=def_file,
+        )
 
     def _create_release_notes(self) -> None:
         rn: pathlib.Path = self.out_path / mp.core.constants.RELEASE_NOTES_FILE
-        futils.write_yaml_to_file(
+        mp.core.file_utils.write_yaml_to_file(
             content=[r.to_non_built() for r in self.integration.release_notes],
             path=rn,
         )
@@ -119,7 +147,7 @@ class DeconstructIntegration:
             c.to_non_built() for c in self.integration.custom_families
         ]
         if families:
-            futils.write_yaml_to_file(families, cf)
+            mp.core.file_utils.write_yaml_to_file(families, cf)
 
     def _create_mapping_rules(self) -> None:
         mr: pathlib.Path = self.out_path / mp.core.constants.MAPPING_RULES_FILE
@@ -127,7 +155,7 @@ class DeconstructIntegration:
             m.to_non_built() for m in self.integration.mapping_rules
         ]
         if mapping:
-            futils.write_yaml_to_file(mapping, mr)
+            mp.core.file_utils.write_yaml_to_file(mapping, mr)
 
     def _create_scripts_dirs(self) -> None:
         self._create_scripts_dir(
@@ -192,4 +220,4 @@ def _write_definitions(
 ) -> None:
     for file_name, metadata in component.items():
         name: str = f"{file_name}{mp.core.constants.DEF_FILE_SUFFIX}"
-        futils.write_yaml_to_file(metadata.to_non_built(), path / name)
+        mp.core.file_utils.write_yaml_to_file(metadata.to_non_built(), path / name)

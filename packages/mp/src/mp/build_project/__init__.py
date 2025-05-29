@@ -32,7 +32,7 @@ import rich
 import typer
 
 import mp.core.config
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 from mp.core.custom_types import RepositoryType
 
 from .marketplace import Marketplace
@@ -123,8 +123,8 @@ def build(  # noqa: PLR0913
         build_params=BuildParams(repository, integration, group, deconstruct),
     )
 
-    commercial_mp: Marketplace = Marketplace(futils.get_commercial_path())
-    community_mp: Marketplace = Marketplace(futils.get_community_path())
+    commercial_mp: Marketplace = Marketplace(mp.core.file_utils.get_commercial_path())
+    community_mp: Marketplace = Marketplace(mp.core.file_utils.get_community_path())
     if integration:
         rich.print("Building integrations...")
         _build_integrations(set(integration), commercial_mp, deconstruct=deconstruct)

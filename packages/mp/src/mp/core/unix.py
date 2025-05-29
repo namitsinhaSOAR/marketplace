@@ -20,8 +20,7 @@ import subprocess as sp
 import sys
 from typing import TYPE_CHECKING
 
-from . import config, constants
-from . import file_utilities as futils
+from . import config, constants, file_utils
 
 if TYPE_CHECKING:
     import pathlib
@@ -70,7 +69,7 @@ def compile_core_integration_dependencies(
     command.extend(runtime_config)
 
     try:
-        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603 - check for execution of untrusted input
+        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603
     except sp.CalledProcessError as e:
         raise CommandError(COMMAND_ERR_MSG.format(e)) from e
 
@@ -82,7 +81,7 @@ def download_wheels_from_requirements(
     """Download `.whl` files from a requirements' file.
 
     Args:
-        requirements_path: the path of the requirements file
+        requirements_path: the path of the 'requirements.txt' file
         dst_path: the path to install the `.whl` files into
 
     Raises:
@@ -113,7 +112,7 @@ def download_wheels_from_requirements(
     command.extend(runtime_config)
 
     try:
-        sp.run(command, cwd=requirements_path.parent, check=True, text=True)  # noqa: S603 - check for execution of untrusted input
+        sp.run(command, cwd=requirements_path.parent, check=True, text=True)  # noqa: S603
     except sp.CalledProcessError as e:
         raise CommandError(COMMAND_ERR_MSG.format(e)) from e
 
@@ -147,7 +146,7 @@ def add_dependencies_to_toml(
     command.extend(runtime_config)
 
     try:
-        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603 - check for execution of untrusted input
+        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603
     except sp.CalledProcessError as e:
         raise CommandError(COMMAND_ERR_MSG.format(e)) from e
 
@@ -166,13 +165,16 @@ def init_python_project_if_not_exists(project_path: pathlib.Path) -> None:
         return
 
     initials: set[pathlib.Path] = set(project_path.iterdir())
-    keep: set[pathlib.Path] = {project_path / constants.PROJECT_FILE}
+    keep: set[pathlib.Path] = {
+        project_path / constants.PROJECT_FILE,
+        project_path / constants.LOCK_FILE,
+    }
 
     init_python_project(project_path)
 
     paths: set[pathlib.Path] = set(project_path.iterdir())
     paths_to_remove: set[pathlib.Path] = paths.difference(initials).difference(keep)
-    futils.remove_paths_if_exists(*paths_to_remove)
+    file_utils.remove_paths_if_exists(*paths_to_remove)
 
 
 def init_python_project(project_path: pathlib.Path) -> None:
@@ -201,7 +203,7 @@ def init_python_project(project_path: pathlib.Path) -> None:
     command.extend(runtime_config)
 
     try:
-        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603 - check for execution of untrusted input
+        sp.run(command, cwd=project_path, check=True, text=True)  # noqa: S603
     except sp.CalledProcessError as e:
         raise CommandError(COMMAND_ERR_MSG.format(e)) from e
 
@@ -292,7 +294,7 @@ def execute_command_and_get_output(
     command.extend(runtime_config)
 
     try:
-        result: sp.CompletedProcess = sp.run(  # noqa: S603 - check for execution of untrusted input
+        result: sp.CompletedProcess = sp.run(  # noqa: S603
             command,
             check=False,
             capture_output=True,
@@ -332,7 +334,7 @@ def get_changed_files() -> list[str]:
         "--diff-filter=ACMRTUXB",
     ]
     try:
-        result: sp.CompletedProcess = sp.run(  # noqa: S603 - check for execution of untrusted input
+        result: sp.CompletedProcess = sp.run(  # noqa: S603
             command,
             check=True,
             text=True,
@@ -361,7 +363,7 @@ def get_flags_to_command(**flags: bool | str | list[str]) -> list[str]:
         >>> get_flags_to_command(f=True, name="TIPCommon", files=["1", "2"])
         >>> "-f --name TIPCommon --files 1 2"
 
-    Args:
+    Keyword Args:
         **flags: The flags to parse
 
     Returns:

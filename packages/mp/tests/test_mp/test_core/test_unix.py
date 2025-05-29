@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import sys
 import tomllib
+import unittest.mock
 from typing import TYPE_CHECKING
 
 import pytest
@@ -205,12 +206,16 @@ def test_init_python_project(tmp_path: pathlib.Path) -> None:
         mp.core.unix.init_python_project(tmp_path)
 
 
-def test_init_python_project_if_not_exists(tmp_path: pathlib.Path) -> None:
-    pyproject_toml: pathlib.Path = tmp_path / mp.core.constants.PROJECT_FILE
-    assert not pyproject_toml.exists()
+def test_init_python_project_if_not_exists(
+    mock_get_marketplace_path: str,
+    tmp_path: pathlib.Path,
+) -> None:
+    with unittest.mock.patch(mock_get_marketplace_path, return_value=tmp_path):
+        pyproject_toml: pathlib.Path = tmp_path / mp.core.constants.PROJECT_FILE
+        assert not pyproject_toml.exists()
 
-    mp.core.unix.init_python_project_if_not_exists(tmp_path)
-    assert pyproject_toml.exists()
+        mp.core.unix.init_python_project_if_not_exists(tmp_path)
+        assert pyproject_toml.exists()
 
-    mp.core.unix.init_python_project_if_not_exists(tmp_path)
-    assert pyproject_toml.exists()
+        mp.core.unix.init_python_project_if_not_exists(tmp_path)
+        assert pyproject_toml.exists()

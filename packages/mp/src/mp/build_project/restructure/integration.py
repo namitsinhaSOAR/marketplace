@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 
 import rich
 
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 
 from . import code, dependencies, metadata, scripts
 
@@ -43,7 +43,7 @@ def restructure_integration(
 ) -> None:
     """Restructure an integration to its "out" path.
 
-    The restructure includes metadata, scripts, code and dependencies.
+    The restructure includes metadata, scripts, code, and dependencies.
 
     Args:
         integration_metadata: An integration's meta - built version
@@ -52,7 +52,7 @@ def restructure_integration(
 
     """
     rich.print(f"Restructuring {integration_metadata['metadata']['Identifier']}")
-    if futils.is_non_built(integration_path):
+    if mp.core.file_utils.is_non_built(integration_path):
         rich.print("Restructuring metadata")
         metadata.Metadata(integration_out_path, integration_metadata).restructure()
         rich.print("Restructuring scripts")
@@ -62,6 +62,6 @@ def restructure_integration(
         rich.print("Restructuring dependencies")
         dependencies.Dependencies(integration_path, integration_out_path).restructure()
 
-    elif futils.is_half_built(integration_path):
+    elif mp.core.file_utils.is_half_built(integration_path):
         rich.print("Restructuring dependencies")
         dependencies.Dependencies(integration_path, integration_out_path).restructure()
