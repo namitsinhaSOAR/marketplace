@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import shutil
 import unittest.mock
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -80,6 +80,9 @@ def assert_deconstruct_integration(
         actual_files: set[str] = {p.name for p in out_integration.rglob("*.*")}
         expected_files: set[str] = {p.name for p in non_built_integration.rglob("*.*")}
         assert actual_files == expected_files
+
+        actual: dict[str, Any]
+        expected: dict[str, Any]
         actual, expected = test_mp.common.get_toml_content(
             expected=non_built_integration / mp.core.constants.PROJECT_FILE,
             actual=out_integration / mp.core.constants.PROJECT_FILE,

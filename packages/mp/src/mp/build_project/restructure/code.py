@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING
 
 import mp.core.code_manipulation
 import mp.core.constants
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 
 from .restructurable import Restructurable
 
@@ -46,7 +46,6 @@ class Code(Restructurable):
         self._restructure_jobs_code()
         self._restructure_widget_code()
         self._restructure_managers_code()
-        self._restructure_tests_code()
 
     def _restructure_action_code(self) -> None:
         self._restructure_code(mp.core.constants.OUT_ACTION_SCRIPTS_DIR)
@@ -63,16 +62,15 @@ class Code(Restructurable):
     def _restructure_managers_code(self) -> None:
         self._restructure_code(mp.core.constants.OUT_MANAGERS_SCRIPTS_DIR)
 
-    def _restructure_tests_code(self) -> None:
-        self._restructure_code(mp.core.constants.OUT_TESTS_SCRIPTS_DIR)
-
     def _restructure_code(self, dir_name: str) -> None:
         out_dir: pathlib.Path = self.out_path / dir_name
         if not out_dir.exists():
             return
 
         files: set[pathlib.Path] = {
-            file for file in out_dir.iterdir() if futils.is_python_file(file)
+            file
+            for file in out_dir.iterdir()
+            if mp.core.file_utils.is_python_file(file)
         }
         mp.core.code_manipulation.restructure_scripts_imports(files)
         mp.core.code_manipulation.format_python_files(files)

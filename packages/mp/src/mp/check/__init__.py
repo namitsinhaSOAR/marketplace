@@ -33,7 +33,7 @@ import typer
 
 import mp.core.code_manipulation
 import mp.core.config
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 import mp.core.unix
 
 if TYPE_CHECKING:
@@ -159,7 +159,7 @@ def _get_relevant_source_paths(sources: list[str]) -> set[pathlib.Path]:
     return {
         path
         for source in sources
-        if futils.is_python_file(
+        if mp.core.file_utils.is_python_file(
             path := pathlib.Path(source).resolve().expanduser().absolute(),
         )
         or path.is_dir()

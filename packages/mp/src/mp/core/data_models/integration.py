@@ -20,7 +20,7 @@ import tomllib
 from typing import TYPE_CHECKING, Any
 
 import mp.core.constants
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 import mp.core.utils
 
 from . import abc
@@ -160,7 +160,7 @@ class Integration:
                 release_notes=ReleaseNote.from_built_integration_path(path),
                 custom_families=CustomFamily.from_built_integration_path(path),
                 mapping_rules=MappingRule.from_built_integration_path(path),
-                common_modules=futils.discover_core_modules(path),
+                common_modules=mp.core.file_utils.discover_core_modules(path),
                 actions_metadata={
                     a.file_name: a
                     for a in ActionMetadata.from_built_integration_path(path)
@@ -213,7 +213,7 @@ class Integration:
                 release_notes=ReleaseNote.from_non_built_integration_path(path),
                 custom_families=CustomFamily.from_non_built_integration_path(path),
                 mapping_rules=MappingRule.from_non_built_integration_path(path),
-                common_modules=futils.discover_core_modules(path),
+                common_modules=mp.core.file_utils.discover_core_modules(path),
                 actions_metadata={
                     a.file_name: a
                     for a in ActionMetadata.from_non_built_integration_path(path)

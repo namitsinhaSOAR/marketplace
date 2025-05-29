@@ -27,7 +27,7 @@ import json
 from typing import TYPE_CHECKING, NamedTuple
 
 import mp.core.constants
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 from mp.core.data_models.connector.metadata import ConnectorMetadata
 from mp.core.data_models.release_notes.metadata import ReleaseNote
 
@@ -52,7 +52,7 @@ NEW_NOTIFICATION_DAYS: int = 30
 
 
 class DuplicateIntegrationIdentifierInMarketplaceError(Exception):
-    """When a marketplace (community/commercial) contain duplicate integration IDs."""
+    """When a marketplace (community/commercial) contains duplicate integration IDs."""
 
 
 class ReleaseTimes(NamedTuple):
@@ -76,7 +76,7 @@ def write_marketplace_json(dst: pathlib.Path) -> None:
 
     """
     products: Products[set[pathlib.Path]] = (
-        futils.get_integrations_and_groups_from_paths(dst)
+        mp.core.file_utils.get_integrations_and_groups_from_paths(dst)
     )
     identifiers: set[str] = set()
     duplicates: list[tuple[str, str]] = []

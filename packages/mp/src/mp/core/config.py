@@ -20,6 +20,7 @@ import configparser
 import dataclasses
 import functools
 import pathlib
+import warnings
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import typer
@@ -67,9 +68,18 @@ def get_marketplace_path() -> pathlib.Path:
         MARKETPLACE_PATH_KEY,
         pathlib.Path,
     )
+    msg: str
     if path is None:
-        msg: str = "Got 'None' for marketplace path"
+        msg = "Got 'None' for marketplace path"
         raise ValueError(msg)
+
+    if not path.exists():
+        msg = (
+            f"Marketplace path '{path}' does not exist."
+            " Please use 'mp config --marketplace-path ...' to set it to the repo's"
+            " root directory"
+        )
+        warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
     return path.expanduser().resolve().absolute()
 
@@ -211,18 +221,8 @@ def _add_defaults_to_config(config: configparser.ConfigParser) -> None:
 
 def _create_default_config(config: configparser.ConfigParser) -> None:
     mp_path: pathlib.Path = DEFAULT_MARKETPLACE_PATH.expanduser().resolve().absolute()
-    if not mp_path.exists():
-        msg: str = (
-            f"Marketplace path '{mp_path}' does not exist."
-            " Please use 'mp config --marketplace-path ...' to set it to the repo's"
-            " root directory"
-        )
-        raise ValueError(msg)
-
     config[DEFAULT_SECTION_NAME] = {
-        MARKETPLACE_PATH_KEY: str(
-            DEFAULT_MARKETPLACE_PATH.expanduser().resolve().absolute(),
-        ),
+        MARKETPLACE_PATH_KEY: str(mp_path),
         PROCESSES_NUMBER_KEY: str(DEFAULT_PROCESSES_NUMBER),
     }
 

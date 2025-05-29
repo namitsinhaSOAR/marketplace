@@ -26,7 +26,7 @@ import dataclasses
 from typing import TYPE_CHECKING
 
 import mp.core.constants
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 
 from .restructurable import Restructurable
 
@@ -47,9 +47,6 @@ class Scripts(Restructurable):
         self._restructure_widget_scripts()
         self._restructure_managers_scripts()
         self._restructure_group_scripts()
-        futils.remove_paths_if_exists(
-            self.out_path / mp.core.constants.OUT_TESTS_SCRIPTS_DIR,
-        )
 
     def _restructure_action_scripts(self) -> None:
         self._copy_script_from_dir(
@@ -90,7 +87,7 @@ class Scripts(Restructurable):
         out_dir: pathlib.Path = (
             self.out_path / mp.core.constants.OUT_MANAGERS_SCRIPTS_DIR
         )
-        futils.flatten_dir(script_dir, out_dir)
+        mp.core.file_utils.flatten_dir(script_dir, out_dir)
 
     def _copy_script_from_dir(self, dir_name: str, out_dir_name: str) -> None:
         script_dir: pathlib.Path = self.path / dir_name
@@ -99,9 +96,9 @@ class Scripts(Restructurable):
 
         out_dir: pathlib.Path = self.out_path / out_dir_name
         out_dir.mkdir(exist_ok=True)
-        futils.flatten_dir(script_dir, out_dir)
+        mp.core.file_utils.flatten_dir(script_dir, out_dir)
         if out_dir.exists():
-            futils.remove_files_by_suffix_from_dir(
+            mp.core.file_utils.remove_files_by_suffix_from_dir(
                 out_dir,
                 suffix=mp.core.constants.DEF_FILE_SUFFIX,
             )

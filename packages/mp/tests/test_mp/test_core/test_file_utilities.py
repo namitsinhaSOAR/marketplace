@@ -18,7 +18,7 @@ import unittest.mock
 from typing import TYPE_CHECKING
 
 import mp.core.constants
-import mp.core.file_utilities as futils
+import mp.core.file_utils
 
 if TYPE_CHECKING:
     import pathlib
@@ -38,8 +38,8 @@ def test_discover_managers_built(tmp_path: pathlib.Path) -> None:
     (out_managers_dir / "manager1.py").touch()
     (out_managers_dir / "manager2.py").touch()
 
-    assert futils.is_built(tmp_path)
-    managers: list[str] = futils.discover_core_modules(tmp_path)
+    assert mp.core.file_utils.is_built(tmp_path)
+    managers: list[str] = mp.core.file_utils.discover_core_modules(tmp_path)
     assert set(managers) == {"manager1", "manager2"}
 
 
@@ -51,8 +51,8 @@ def test_discover_managers_not_built(tmp_path: pathlib.Path) -> None:
     (common_scripts_dir / "manager1.py").touch()
     (common_scripts_dir / "manager2.py").touch()
 
-    assert not futils.is_built(tmp_path)
-    managers = futils.discover_core_modules(tmp_path)
+    assert not mp.core.file_utils.is_built(tmp_path)
+    managers = mp.core.file_utils.discover_core_modules(tmp_path)
     assert set(managers) == {"manager1", "manager2"}
 
 
@@ -76,7 +76,9 @@ def test_get_integrations_and_groups_from_paths(tmp_path: pathlib.Path) -> None:
     (community_dir / "group2" / "integration4" / mp.core.constants.PROJECT_FILE).touch()
 
     products: Products[set[pathlib.Path]] = (
-        futils.get_integrations_and_groups_from_paths(commercial_dir, community_dir)
+        mp.core.file_utils.get_integrations_and_groups_from_paths(
+            commercial_dir, community_dir
+        )
     )
 
     assert products.integrations == {
@@ -90,9 +92,9 @@ def test_is_python_file(tmp_path: pathlib.Path) -> None:
     (tmp_path / "test.py").touch()
     (tmp_path / "test.txt").touch()
 
-    assert futils.is_python_file(tmp_path / "test.py")
-    assert not futils.is_python_file(tmp_path / "test.txt")
-    assert not futils.is_python_file(tmp_path / "not_exists")
+    assert mp.core.file_utils.is_python_file(tmp_path / "test.py")
+    assert not mp.core.file_utils.is_python_file(tmp_path / "test.txt")
+    assert not mp.core.file_utils.is_python_file(tmp_path / "not_exists")
 
 
 def test_is_integration(tmp_path: pathlib.Path) -> None:
@@ -108,9 +110,9 @@ def test_is_integration(tmp_path: pathlib.Path) -> None:
     (integration_dir_comm / mp.core.constants.PROJECT_FILE).touch()
     (integration_dir_com / mp.core.constants.PROJECT_FILE).touch()
 
-    assert futils.is_integration(integration_dir_com)
-    assert futils.is_integration(integration_dir_comm)
-    assert not futils.is_integration(tmp_path)
+    assert mp.core.file_utils.is_integration(integration_dir_com)
+    assert mp.core.file_utils.is_integration(integration_dir_comm)
+    assert not mp.core.file_utils.is_integration(tmp_path)
 
 
 def test_is_group(tmp_path: pathlib.Path) -> None:
@@ -129,9 +131,9 @@ def test_is_group(tmp_path: pathlib.Path) -> None:
     (group_dir_commercial / "integration2").mkdir()
     (group_dir_commercial / "integration2" / mp.core.constants.PROJECT_FILE).touch()
 
-    assert futils.is_group(group_dir_commercial)
-    assert futils.is_group(group_dir_community)
-    assert not futils.is_group(tmp_path)
+    assert mp.core.file_utils.is_group(group_dir_commercial)
+    assert mp.core.file_utils.is_group(group_dir_community)
+    assert not mp.core.file_utils.is_group(tmp_path)
 
 
 def test_replace_file_content(tmp_path: pathlib.Path) -> None:
@@ -141,13 +143,13 @@ def test_replace_file_content(tmp_path: pathlib.Path) -> None:
     def replace_fn(content: str) -> str:
         return content.replace("original", "new")
 
-    futils.replace_file_content(test_file, replace_fn)
+    mp.core.file_utils.replace_file_content(test_file, replace_fn)
     assert test_file.read_text(encoding="utf-8") == "new content"
 
     def replace_fn2(content: str) -> str:
         return content.replace("new content", "final content")
 
-    futils.replace_file_content(test_file, replace_fn2)
+    mp.core.file_utils.replace_file_content(test_file, replace_fn2)
     assert test_file.read_text(encoding="utf-8") == "final content"
 
 
@@ -160,11 +162,11 @@ def test_remove_paths_if_exists_can_remove_files(
         test_file.touch()
         assert test_file.exists()
 
-        futils.remove_paths_if_exists(test_file)
+        mp.core.file_utils.remove_paths_if_exists(test_file)
         assert not test_file.exists()
 
         # Check if it fails when a file does not exist
-        futils.remove_paths_if_exists(test_file)
+        mp.core.file_utils.remove_paths_if_exists(test_file)
         assert not test_file.exists()
 
 
@@ -177,11 +179,11 @@ def test_remove_paths_if_exists_can_remove_dirs(
         test_subdir.mkdir()
         assert test_subdir.exists()
 
-        futils.remove_paths_if_exists(test_subdir)
+        mp.core.file_utils.remove_paths_if_exists(test_subdir)
         assert not test_subdir.exists()
 
         # Check if it fails when a folder does not exist
-        futils.remove_paths_if_exists(test_subdir)
+        mp.core.file_utils.remove_paths_if_exists(test_subdir)
         assert not test_subdir.exists()
 
 
@@ -193,12 +195,12 @@ def test_is_built(tmp_path: pathlib.Path) -> None:
         integration_dir.name,
     )
     (integration_dir / def_file_name).touch()
-    assert futils.is_built(integration_dir)
+    assert mp.core.file_utils.is_built(integration_dir)
 
     (integration_dir / def_file_name).unlink()
     (integration_dir / mp.core.constants.PROJECT_FILE).touch()
-    assert not futils.is_built(integration_dir)
-    assert not futils.is_built(tmp_path)
+    assert not mp.core.file_utils.is_built(integration_dir)
+    assert not mp.core.file_utils.is_built(tmp_path)
 
 
 def test_is_half_built(tmp_path: pathlib.Path) -> None:
@@ -210,15 +212,15 @@ def test_is_half_built(tmp_path: pathlib.Path) -> None:
     )
     (integration_dir / mp.core.constants.PROJECT_FILE).touch()
     (integration_dir / def_file_name).touch()
-    assert futils.is_half_built(integration_dir)
+    assert mp.core.file_utils.is_half_built(integration_dir)
 
     (integration_dir / def_file_name).unlink()
-    assert not futils.is_half_built(integration_dir)
+    assert not mp.core.file_utils.is_half_built(integration_dir)
 
     (integration_dir / mp.core.constants.PROJECT_FILE).unlink()
     (integration_dir / def_file_name).touch()
-    assert not futils.is_half_built(integration_dir)
-    assert not futils.is_half_built(tmp_path)
+    assert not mp.core.file_utils.is_half_built(integration_dir)
+    assert not mp.core.file_utils.is_half_built(tmp_path)
 
 
 def test_remove_and_create_dir(
@@ -234,7 +236,7 @@ def test_remove_and_create_dir(
         new_file.touch()
         assert new_file.exists()
 
-        futils.remove_and_create_dir(test_dir)
+        mp.core.file_utils.recreate_dir(test_dir)
 
         assert test_dir.exists()
         assert not new_file.exists()
