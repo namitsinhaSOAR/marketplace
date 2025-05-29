@@ -21,4 +21,3 @@ dev = [
 [tool.uv.sources]
 soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
 integration-testing = { path = "../../../packages/integration_testing" }
-
