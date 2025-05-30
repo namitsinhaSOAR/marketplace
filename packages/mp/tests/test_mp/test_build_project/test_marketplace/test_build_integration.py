@@ -61,6 +61,18 @@ def test_build_built_integration(
         assert_build_integration(built_integration)
 
 
+def test_non_existing_integration_raises_file_not_found_error(
+    tmp_path: pathlib.Path,
+    mock_get_marketplace_path: str,
+    assert_build_integration: Callable[[pathlib.Path], None],
+) -> None:
+    with (
+        unittest.mock.patch(mock_get_marketplace_path, return_value=tmp_path),
+        pytest.raises(FileNotFoundError, match="Invalid integration .*"),
+    ):
+        assert_build_integration(tmp_path / "fake_integration")
+
+
 @pytest.fixture
 def assert_build_integration(
     tmp_path: pathlib.Path,
