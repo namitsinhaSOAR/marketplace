@@ -16,12 +16,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import mp.build_project.post_build.full_details_json
+import mp.core.data_models.integration
 import test_mp.common
-from mp.build_project.post_build.full_details_json import write_full_details
-from mp.core.data_models.integration import BuiltFullDetails, Integration
 
 if TYPE_CHECKING:
     import pathlib
+
+    from mp.core.data_models.integration import BuiltFullDetails, Integration
 
 
 def test_create_full_details_json(
@@ -29,10 +31,15 @@ def test_create_full_details_json(
     built_integration: pathlib.Path,
     full_details: pathlib.Path,
 ) -> None:
-    integration: Integration = Integration.from_built_path(built_integration)
+    integration: Integration = (
+        mp.core.data_models.integration.Integration.from_built_path(built_integration)
+    )
 
     actual_full_details: BuiltFullDetails = integration.to_built_full_details()
-    write_full_details(actual_full_details, tmp_path)
+    mp.build_project.post_build.full_details_json.write_full_details(
+        full_details=actual_full_details,
+        destination=tmp_path,
+    )
 
     actual, expected = test_mp.common.get_json_content(
         actual=tmp_path / full_details.name,

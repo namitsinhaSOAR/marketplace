@@ -20,7 +20,6 @@ Used for things such as path manipulation and file content operations.
 from __future__ import annotations
 
 import pathlib
-import re
 import shutil
 from typing import TYPE_CHECKING, Any
 
@@ -131,16 +130,6 @@ def is_python_file(path: pathlib.Path) -> bool:
     return path.exists() and path.is_file() and path.suffix == ".py"
 
 
-def is_json_file(path: pathlib.Path) -> bool:
-    """Check whether a path is a JSON file.
-
-    Returns:
-        Whether the provided file is of a JSON file
-
-    """
-    return path.is_file() and re.fullmatch(r"\.json|\..*def", path.suffix) is not None
-
-
 def is_integration(path: pathlib.Path, *, group: str = "") -> bool:
     """Check whether a path is an integration.
 
@@ -239,16 +228,6 @@ def is_path_in_marketplace(path: pathlib.Path) -> bool:
 
     """
     return config.get_marketplace_path() in path.parents
-
-
-def is_built_or_half_built(integration: pathlib.Path) -> bool:
-    """Check whether an integration is built or half-built.
-
-    Returns:
-        Whether the integration is in a built or half-built format
-
-    """
-    return is_built(integration) or is_half_built(integration)
 
 
 def is_built(integration: pathlib.Path) -> bool:

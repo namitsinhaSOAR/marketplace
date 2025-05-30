@@ -55,13 +55,13 @@ def restructure_integration(
     if mp.core.file_utils.is_non_built(integration_path):
         rich.print("Restructuring metadata")
         metadata.Metadata(integration_out_path, integration_metadata).restructure()
+
         rich.print("Restructuring scripts")
         scripts.Scripts(integration_path, integration_out_path).restructure()
+
         rich.print("Restructuring code")
         code.Code(integration_out_path).restructure()
-        rich.print("Restructuring dependencies")
-        dependencies.Dependencies(integration_path, integration_out_path).restructure()
 
-    elif mp.core.file_utils.is_half_built(integration_path):
+    if not mp.core.file_utils.is_built(integration_path):
         rich.print("Restructuring dependencies")
         dependencies.Dependencies(integration_path, integration_out_path).restructure()

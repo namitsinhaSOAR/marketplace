@@ -72,5 +72,4 @@ LOCK_FILE: str = "uv.lock"
 PYTHON_VERSION_FILE: str = ".python-version"
 
 MS_IN_SEC: int = 1_000
-MINIMUM_SYSTEM_VERSION: float = 5.3
 ALLOWED_PYTHON_VERSIONS: set[str] = {"3.11", "3.12"}

@@ -16,11 +16,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import mp.build_project.restructure.dependencies
 import mp.core.constants
-from mp.build_project.restructure.dependencies import Dependencies
 
 if TYPE_CHECKING:
     import pathlib
+
+    from mp.build_project.restructure.dependencies import Dependencies
 
 
 TOML_CONTENT: str = """
@@ -42,7 +44,10 @@ def test_restructure(tmp_path: pathlib.Path) -> None:
     integration_path.mkdir()
     integration_out_path = tmp_path / "integration_out"
     integration_out_path.mkdir()
-    dependencies: Dependencies = Dependencies(integration_path, integration_out_path)
+    dependencies: Dependencies = mp.build_project.restructure.dependencies.Dependencies(
+        path=integration_path,
+        out_path=integration_out_path,
+    )
 
     pyproject_path: pathlib.Path = dependencies.path / mp.core.constants.PROJECT_FILE
     pyproject_path.write_text(TOML_CONTENT, encoding="utf-8")

@@ -17,10 +17,9 @@
 
 from __future__ import annotations
 
-import json
 import warnings
 from collections import deque
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import libcst as cst
 import rich
@@ -29,7 +28,7 @@ from . import constants, file_utils, unix
 
 if TYPE_CHECKING:
     import pathlib
-    from collections.abc import Iterable, Mapping
+    from collections.abc import Iterable
 
 
 class LinterWarning(RuntimeWarning):
@@ -44,7 +43,7 @@ class TestWarning(RuntimeWarning):
     """Failed tests."""
 
 
-def test_pre_build_integration(
+def run_script_on_paths(
     script_path: pathlib.Path,
     paths: Iterable[pathlib.Path],
 ) -> None:
@@ -97,33 +96,6 @@ def format_python_files(paths: Iterable[pathlib.Path]) -> None:
     results: str
     _, results = unix.ruff_format(paths)
     rich.print(results)
-
-
-def format_json_files(paths: Iterable[pathlib.Path]) -> None:
-    """Format json files."""
-    paths = [p for p in paths if file_utils.is_json_file(p)]
-    for path in paths:
-        if path.is_file():
-            file_utils.replace_file_content(path, replace_fn=format_json)
-
-        elif path.is_dir():
-            for file in path.rglob("*.*def"):
-                if file_utils.is_json_file(file):
-                    file_utils.replace_file_content(file, replace_fn=format_json)
-
-
-def format_json(str_content: str) -> str:
-    """Format JSON content.
-
-    Args:
-        str_content: the JSON string to format
-
-    Returns:
-        The formatted JSON string.
-
-    """
-    json_content: Mapping[str, Any] = json.loads(str_content)
-    return json.dumps(json_content, indent=4, sort_keys=True)
 
 
 def restructure_scripts_imports(paths: Iterable[pathlib.Path]) -> None:
