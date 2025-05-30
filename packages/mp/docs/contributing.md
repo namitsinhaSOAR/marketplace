@@ -14,7 +14,69 @@ project.
 
 If you or your current employer have already signed the Google CLA (even if it
 was for a different project), you probably don't need to do it again.
+# Contributing to MP
 
+We love your input! We want to make contributing to `mp` as easy and transparent as possible, whether it's:
+
+- Reporting a bug
+- Discussing the current state of the code
+- Submitting a fix
+- Proposing new features
+- Becoming a maintainer
+
+## Development Process
+
+We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
+
+### Pull Requests
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Pull Request Guidelines
+
+- Update the README.md or documentation with details of changes to the interface, if applicable
+- Update the tests to cover your changes
+- Ensure the test suite passes
+- Ensure your code passes static type checking and linting
+- Keep the PR as focused as possible, if you have multiple features, submit multiple PRs
+
+## Code Style
+
+This project uses:
+
+- [Ruff](https://github.com/charliermarsh/ruff) for linting and formatting
+- [MyPy](https://mypy.readthedocs.io/) for static type checking
+
+Before submitting your code, run:
+
+```bash
+mp format
+mp check --static-type-check
+```
+
+## Testing
+
+All new features should include appropriate tests. Run the tests with:
+
+```bash
+python -m pytest
+```
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the project's [Apache 2.0 License](../LICENSE).
+
+## Code of Conduct
+
+This project follows the Google Open Source Community Guidelines. By participating, you are expected to uphold this code.
+
+## Questions?
+
+Feel free to contact the project maintainers with any questions or concerns.
 Visit <https://cla.developers.google.com/> to see your current agreements or to
 sign a new one.
 
