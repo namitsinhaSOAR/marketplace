@@ -17,9 +17,9 @@ from __future__ import annotations
 import shutil
 from typing import TYPE_CHECKING
 
+import mp.build_project.post_build.marketplace_json
 import mp.core.constants
 import test_mp.common
-from mp.build_project.post_build.marketplace_json import write_marketplace_json
 
 if TYPE_CHECKING:
     import pathlib
@@ -33,7 +33,7 @@ def test_write_marketplace_json(
     commercial: pathlib.Path = tmp_path / mp.core.constants.COMMERCIAL_DIR_NAME
     shutil.copytree(built_integration.parent, commercial, dirs_exist_ok=True)
 
-    write_marketplace_json(commercial)
+    mp.build_project.post_build.marketplace_json.write_marketplace_json(commercial)
 
     actual, expected = test_mp.common.get_json_content(
         actual=commercial / marketplace_json.name,

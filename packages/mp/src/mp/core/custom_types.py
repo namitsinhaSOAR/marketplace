@@ -18,25 +18,18 @@ from __future__ import annotations
 
 import dataclasses
 import enum
-from collections.abc import Iterable, MutableMapping
-from typing import Any, Generic, TypeAlias, TypeVar
+from collections.abc import Iterable
+from typing import Generic, TypeAlias, TypeVar
 
 from . import constants
 
-SingleJson: TypeAlias = MutableMapping[
-    str,
-    str | bool | int | float | list[Any] | MutableMapping[str, Any] | None,
-]
-
-Json: TypeAlias = SingleJson | list[SingleJson]
-
-T = TypeVar("T", bound=Iterable)
+_T = TypeVar("_T", bound=Iterable)
 
 
 @dataclasses.dataclass(slots=True)
-class Products(Generic[T]):
-    integrations: T
-    groups: T
+class Products(Generic[_T]):
+    integrations: _T
+    groups: _T
 
 
 ActionName: TypeAlias = str

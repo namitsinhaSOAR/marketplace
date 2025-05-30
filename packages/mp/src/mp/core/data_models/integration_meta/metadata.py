@@ -36,6 +36,9 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 
+MINIMUM_SYSTEM_VERSION: float = 5.3
+
+
 class PythonVersion(mp.core.data_models.abc.RepresentableEnum):
     PY_3_7 = 2
     PY_3_11 = 3
@@ -136,7 +139,7 @@ class IntegrationMetadata(
     is_custom: bool
     is_available_for_community: bool
     is_powerup: bool
-    minimum_system_version: float = mp.core.constants.MINIMUM_SYSTEM_VERSION
+    minimum_system_version: float = MINIMUM_SYSTEM_VERSION
 
     @classmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> Self:

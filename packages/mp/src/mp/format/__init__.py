@@ -1,7 +1,7 @@
 """Package providing code formatting capabilities.
 
 This package offers a command-line interface to automatically format
-Python (`.py`) and JSON (`.json`) files within the project. It allows
+Python (`.py`) files within the project. It allows
 users to specify files or directories for formatting and can also format
 only the files that have been changed according to the Git history. It
 uses external tools and internal modules to ensure consistent code
@@ -44,7 +44,7 @@ __all__: list[str] = ["app"]
 app: typer.Typer = typer.Typer()
 
 
-@app.command(name="format", help="Format '.py' and '.json' files")
+@app.command(name="format", help="Format '.py' files.")
 def format_files(
     file_paths: Annotated[
         list[str] | None,
@@ -94,7 +94,6 @@ def format_files(
     sources: list[str] = _get_source_files(file_paths, changed_file=changed_files)
     paths: set[pathlib.Path] = _get_relevant_source_paths(sources)
     _format_python_files(paths)
-    _format_json_files(paths)
 
 
 def _get_source_files(file_paths: list[str], *, changed_file: bool) -> list[str]:
@@ -115,7 +114,6 @@ def _get_relevant_source_paths(sources: list[str]) -> set[pathlib.Path]:
         if mp.core.file_utils.is_python_file(
             path := pathlib.Path(source).resolve().expanduser().absolute(),
         )
-        or mp.core.file_utils.is_json_file(path)
         or path.is_dir()
     }
     if not paths:
@@ -128,15 +126,3 @@ def _get_relevant_source_paths(sources: list[str]) -> set[pathlib.Path]:
 def _format_python_files(paths: Iterable[pathlib.Path]) -> None:
     rich.print(f"Formatting Python files: {', '.join(p.name for p in paths)}")
     mp.core.code_manipulation.format_python_files(paths)
-
-
-def _format_json_files(paths: Iterable[pathlib.Path]) -> None:
-    json_files: set[pathlib.Path] = {
-        p for p in paths if mp.core.file_utils.is_json_file(p) or p.is_dir()
-    }
-    if json_files:
-        rich.print(f"Formatting JSON files: {', '.join(p.name for p in json_files)}")
-        mp.core.code_manipulation.format_json_files(json_files)
-
-    else:
-        rich.print("No JSON files found")

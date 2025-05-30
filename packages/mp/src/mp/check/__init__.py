@@ -166,12 +166,7 @@ def _get_relevant_source_paths(sources: list[str]) -> set[pathlib.Path]:
     }
 
 
-def _check_paths(
-    paths: Iterable[pathlib.Path],
-    names: str,
-    *,
-    fix: bool,
-) -> None:
+def _check_paths(paths: Iterable[pathlib.Path], names: str, *, fix: bool) -> None:
     rich.print(f"Checking Python files: {names}")
     if fix:
         mp.core.code_manipulation.lint_and_fix_python_files(paths)

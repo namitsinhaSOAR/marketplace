@@ -204,7 +204,7 @@ def _test_integrations(
             f" the {marketplace_path.name} marketplace:"
             f" {', '.join(valid_integration_names)}"
         )
-        mp.core.code_manipulation.test_pre_build_integration(
+        mp.core.code_manipulation.run_script_on_paths(
             script_path=RUN_PRE_BUILD_TESTS_PATH,
             paths=valid_integrations_,
         )
