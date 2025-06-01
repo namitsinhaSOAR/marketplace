@@ -3,7 +3,7 @@ name: EclecticIQ
 version: 3.0
 parameters:
 -   name: EclecticIQ URL
-    value: http://eclecticiq.local
+    default_value: http://eclecticiq.local
     type: ip
     description: Host URL
     is_mandatory: true
@@ -14,7 +14,7 @@ parameters:
     is_mandatory: true
     integration_identifier: EclecticIQ
 -   name: Verify SSL
-    value: 'true'
+    default_value: 'true'
     type: boolean
     description: Verify SSL
     is_mandatory: false

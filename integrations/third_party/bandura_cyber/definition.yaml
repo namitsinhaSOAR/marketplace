@@ -3,13 +3,13 @@ name: Bandura Cyber
 version: 5.0
 parameters:
 -   name: API Root
-    value: https://gmc.banduracyber.com/api/v1
+    default_value: https://gmc.banduracyber.com/api/v1
     type: string
     description: API Root
     is_mandatory: true
     integration_identifier: Bandura Cyber
 -   name: Username
-    value: danield@siemplify.co
+    default_value: danield@siemplify.co
     type: string
     description: Username
     is_mandatory: true
@@ -20,7 +20,7 @@ parameters:
     is_mandatory: true
     integration_identifier: Bandura Cyber
 -   name: Verify SSL
-    value: 'true'
+    default_value: 'true'
     type: boolean
     description: verify SSL
     is_mandatory: false

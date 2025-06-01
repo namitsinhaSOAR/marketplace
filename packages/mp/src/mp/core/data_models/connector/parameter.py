@@ -18,6 +18,7 @@ from typing import Annotated, NotRequired, TypedDict
 
 import pydantic
 
+import mp.core.constants
 import mp.core.data_models.abc
 import mp.core.utils
 from mp.core.data_models.script.parameter import ScriptParamType
@@ -40,7 +41,7 @@ class BuiltConnectorParameter(TypedDict):
 
 class NonBuiltConnectorParameter(TypedDict):
     name: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    description: str
     is_mandatory: bool
     is_advanced: bool
     type: str
@@ -54,13 +55,22 @@ class ConnectorParameter(
         NonBuiltConnectorParameter,
     ],
 ):
-    name: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.SHORT_DESCRIPTION_MAX_LENGTH),
+    ]
     is_mandatory: bool
     is_advanced: bool
     type_: ScriptParamType
     mode: ParamMode
-    default_value: str | float | bool | int | None
+    default_value: str | bool | float | int | None
 
     @classmethod
     def _from_built(cls, built: BuiltConnectorParameter) -> ConnectorParameter:

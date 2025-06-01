@@ -3,13 +3,13 @@ name: Vectra RUX
 version: 2.0
 parameters:
 -   name: API Root
-    value: https://<address>:<port>
+    default_value: https://<address>:<port>
     type: string
     description: The base URL of the API, used as the entry point for all API requests.
     is_mandatory: true
     integration_identifier: VectraRUX
 -   name: Client ID
-    value: '12345'
+    default_value: '12345'
     type: string
     description: A unique identifier assigned to each client to authenticate and authorize
         API requests.

@@ -3,13 +3,13 @@ name: Azure DevOps
 version: 6.0
 parameters:
 -   name: Project
-    value: project_name
+    default_value: project_name
     type: string
     description: The project name
     is_mandatory: true
     integration_identifier: Azure DevOps
 -   name: Organization
-    value: organization_name
+    default_value: organization_name
     type: string
     description: The organization name
     is_mandatory: true
@@ -20,7 +20,7 @@ parameters:
     is_mandatory: true
     integration_identifier: Azure DevOps
 -   name: Base URL
-    value: https://dev.azure
+    default_value: https://dev.azure
     type: string
     description: "For exmaple: \nhttps://dev.azure"
     is_mandatory: true

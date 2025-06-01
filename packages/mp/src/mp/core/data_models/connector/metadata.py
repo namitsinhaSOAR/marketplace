@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 class BuiltConnectorMetadata(TypedDict):
     Creator: str
     Description: str
-    DocumentationLink: str
+    DocumentationLink: str | None
     Integration: str
     IsConnectorRulesSupported: bool
     IsCustom: bool
@@ -48,8 +48,11 @@ class BuiltConnectorMetadata(TypedDict):
 
 class NonBuiltConnectorMetadata(TypedDict):
     creator: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
-    documentation_link: str
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH),
+    ]
+    documentation_link: str | None
     integration: str
     is_connector_rules_supported: bool
     is_custom: NotRequired[bool]
@@ -68,14 +71,26 @@ class ConnectorMetadata(
 ):
     file_name: str
     creator: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
-    documentation_link: str
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH),
+    ]
+    documentation_link: pydantic.HttpUrl | pydantic.FileUrl | None
     integration: str
     is_connector_rules_supported: bool
     is_custom: bool
     is_enabled: bool
-    name: str
-    parameters: list[ConnectorParameter]
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    parameters: Annotated[
+        list[ConnectorParameter],
+        pydantic.Field(max_length=mp.core.constants.MAX_PARAMETERS_LENGTH),
+    ]
     rules: list[ConnectorRule]
     version: float
 
@@ -152,7 +167,7 @@ class ConnectorMetadata(
             file_name=file_name,
             creator=non_built["creator"],
             description=non_built["description"],
-            documentation_link=non_built["documentation_link"],
+            documentation_link=non_built.get("documentation_link"),
             integration=non_built["integration"],
             is_connector_rules_supported=non_built["is_connector_rules_supported"],
             is_custom=non_built.get("is_custom", False),
@@ -176,7 +191,11 @@ class ConnectorMetadata(
         return BuiltConnectorMetadata(
             Creator=self.creator,
             Description=self.description,
-            DocumentationLink=self.documentation_link,
+            DocumentationLink=(
+                str(self.documentation_link) or None
+                if self.documentation_link is not None
+                else None
+            ),
             Integration=self.integration,
             IsConnectorRulesSupported=self.is_connector_rules_supported,
             IsCustom=self.is_custom,
@@ -199,7 +218,11 @@ class ConnectorMetadata(
             parameters=[param.to_non_built() for param in self.parameters],
             description=self.description,
             integration=self.integration,
-            documentation_link=self.documentation_link,
+            documentation_link=(
+                str(self.documentation_link) or None
+                if self.documentation_link is not None
+                else None
+            ),
             rules=[rule.to_non_built() for rule in self.rules],
             is_connector_rules_supported=self.is_connector_rules_supported,
             creator=self.creator,

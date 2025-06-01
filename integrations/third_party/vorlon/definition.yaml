@@ -3,13 +3,13 @@ name: Vorlon
 version: 4.0
 parameters:
 -   name: API Root
-    value: https://<your_domain>.vorlon.io
+    default_value: https://<your_domain>.vorlon.io
     type: string
     description: Vorlon URL
     is_mandatory: true
     integration_identifier: Vorlon
 -   name: Client ID
-    value: ' '
+    default_value: ' '
     type: string
     description: ''
     is_mandatory: true

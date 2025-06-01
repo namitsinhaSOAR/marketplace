@@ -20,13 +20,13 @@ import mp.core.data_models.abc
 
 
 class BuiltDynamicResultsMetadata(TypedDict):
-    ResultExample: str
+    ResultExample: str | None
     ResultName: str
     ShowResult: bool
 
 
 class NonBuiltDynamicResultsMetadata(TypedDict):
-    result_example: str
+    result_example: str | None
     result_name: str
     show_result: bool
 
@@ -37,7 +37,7 @@ class DynamicResultsMetadata(
         NonBuiltDynamicResultsMetadata,
     ],
 ):
-    result_example: str
+    result_example: str | None
     result_name: str
     show_result: bool
 

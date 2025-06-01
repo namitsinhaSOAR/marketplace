@@ -40,7 +40,6 @@ parameters:
     mode: regular
 description: The connector pulls events from the Pagerduty API https://developer.pagerduty.com/api-reference/9d0b4b12e36f9-list-incidents.
 integration: PagerDuty
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: d29f584f-9e6b-498a-b6a6-f8fae0e97a8b

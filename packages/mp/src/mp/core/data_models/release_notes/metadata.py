@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import decimal
 from typing import TYPE_CHECKING, Annotated, NotRequired, TypedDict
 
 import pydantic
@@ -55,7 +56,10 @@ class NonBuiltReleaseNote(TypedDict):
 class ReleaseNote(
     mp.core.data_models.abc.SequentialMetadata[BuiltReleaseNote, NonBuiltReleaseNote],
 ):
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH),
+    ]
     deprecated: bool
     new: bool
     item_name: str
@@ -64,7 +68,7 @@ class ReleaseNote(
     regressive: bool
     removed: bool
     ticket: str | None
-    version: float
+    version: Annotated[decimal.Decimal, pydantic.Field(decimal_places=1)]
 
     @classmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[ReleaseNote]:
@@ -105,7 +109,7 @@ class ReleaseNote(
         return cls(
             description=built["ChangeDescription"],
             deprecated=built["Deprecated"],
-            version=built["IntroducedInIntegrationVersion"],
+            version=decimal.Decimal.from_float(built["IntroducedInIntegrationVersion"]),
             item_name=built["ItemName"],
             item_type=built["ItemType"],
             new=built["New"],
@@ -120,7 +124,7 @@ class ReleaseNote(
         return cls(
             description=non_built["description"],
             deprecated=non_built["deprecated"],
-            version=non_built["integration_version"],
+            version=decimal.Decimal.from_float(non_built["integration_version"]),
             item_name=non_built["item_name"],
             item_type=non_built["item_type"],
             new=non_built["new"],
@@ -140,7 +144,7 @@ class ReleaseNote(
         return BuiltReleaseNote(
             ChangeDescription=self.description,
             Deprecated=self.deprecated,
-            IntroducedInIntegrationVersion=self.version,
+            IntroducedInIntegrationVersion=float(self.version),
             ItemName=self.item_name,
             ItemType=self.item_type,
             New=self.new,
@@ -159,7 +163,7 @@ class ReleaseNote(
         """
         non_built: NonBuiltReleaseNote = NonBuiltReleaseNote(
             description=self.description,
-            integration_version=self.version,
+            integration_version=float(self.version),
             item_name=self.item_name,
             item_type=self.item_type,
             publish_time=self.publish_time,

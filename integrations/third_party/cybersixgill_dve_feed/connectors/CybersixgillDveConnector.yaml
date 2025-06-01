@@ -51,7 +51,6 @@ description: The Cybersixgill Dynamic Vulnerability Exploit (DVE) Score is based
     as irrelevant and have a higher probability of being exploited - directly from
     the Siemplify dashboard.
 integration: Cybersixgill DVE Feed
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

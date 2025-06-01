@@ -77,7 +77,6 @@ parameters:
 description: Allows for easy monitoring of Secure Score. Set a threshold and you will
     be alerted when the score drops below.
 integration: MicrosoftGraphSecurityTools
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: daniel.harvey

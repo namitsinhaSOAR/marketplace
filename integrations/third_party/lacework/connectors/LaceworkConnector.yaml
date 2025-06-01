@@ -64,7 +64,6 @@ parameters:
 description: 'The connector pulls events from the Events API. Note: by default, the
     connector pulls events with severity 3 or above (3, 2, 1).'
 integration: Lacework
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: 0d989d8c-9b9b-4fd3-bb09-bfd590d26d60

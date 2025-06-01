@@ -3,19 +3,19 @@ name: SupernaZeroTrust
 version: 4.0
 parameters:
 -   name: eyeglass_ip
-    value: 1.1.1.1
+    default_value: 1.1.1.1
     type: ip
     description: ''
     is_mandatory: true
     integration_identifier: SupernaZeroTrust
 -   name: api_token
-    value: '1234'
+    default_value: '1234'
     type: string
     description: api token
     is_mandatory: true
     integration_identifier: SupernaZeroTrust
 -   name: Verify SSL
-    value: 'false'
+    default_value: 'false'
     type: boolean
     description: Verify SSL
     is_mandatory: true

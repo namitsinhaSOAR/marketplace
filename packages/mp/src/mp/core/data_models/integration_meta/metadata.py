@@ -80,7 +80,7 @@ class BuiltIntegrationMetadata(TypedDict):
     Identifier: str
     PythonVersion: int
     DocumentationLink: str | None
-    ImageBase64: str
+    ImageBase64: str | None
     IntegrationProperties: list[BuiltIntegrationParameter]
     ShouldInstalledInSystem: bool
     IsAvailableForCommunity: bool
@@ -101,7 +101,7 @@ class NonBuiltIntegrationMetadata(TypedDict):
     identifier: str
     python_version: str
     documentation_link: NotRequired[str | None]
-    image_base64: str
+    image_base64: str | None
     parameters: list[NonBuiltIntegrationParameter]
     should_install_in_system: NotRequired[bool]
     svg_image: str | None
@@ -117,14 +117,32 @@ class IntegrationMetadata(
     ]
 ):
     categories: list[str]
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH),
+    ]
     feature_tags: FeatureTags | None
-    name: str
-    identifier: str
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    identifier: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
     python_version: PythonVersion
     documentation_link: pydantic.HttpUrl | pydantic.FileUrl | None
-    image_base64: pydantic.Base64Bytes
-    parameters: list[IntegrationParameter]
+    image_base64: pydantic.Base64Bytes | None
+    parameters: Annotated[
+        list[IntegrationParameter],
+        pydantic.Field(max_length=mp.core.constants.MAX_PARAMETERS_LENGTH),
+    ]
     should_install_in_system: bool = False
     svg_image: str | None
     version: Annotated[decimal.Decimal, pydantic.Field(decimal_places=1)]
@@ -265,7 +283,11 @@ class IntegrationMetadata(
                 self.feature_tags.to_built() if self.feature_tags is not None else None
             ),
             Identifier=self.identifier,
-            ImageBase64=base64.b64encode(self.image_base64).decode(),
+            ImageBase64=(
+                base64.b64encode(self.image_base64).decode()
+                if self.image_base64 is not None
+                else None
+            ),
             IntegrationProperties=[p.to_built() for p in self.parameters],
             IsAvailableForCommunity=True,
             MarketingDisplayName=self.name,
@@ -301,7 +323,11 @@ class IntegrationMetadata(
             ),
             categories=self.categories,
             svg_image=self.svg_image,
-            image_base64=base64.b64encode(self.image_base64).decode(),
+            image_base64=(
+                base64.b64encode(self.image_base64).decode()
+                if self.image_base64 is not None
+                else None
+            ),
         )
 
         if self.feature_tags is not None:

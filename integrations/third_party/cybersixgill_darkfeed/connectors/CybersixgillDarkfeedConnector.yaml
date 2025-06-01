@@ -49,7 +49,6 @@ description: Powered by the broadest, automated collection from the deep and dar
     and delivered in real-time, and it is actionable, allowing Siemplify customers
     to receive and preemptively block items that threaten their organization.
 integration: Cybersixgill Darkfeed
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

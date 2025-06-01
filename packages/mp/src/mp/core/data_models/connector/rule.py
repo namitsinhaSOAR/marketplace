@@ -14,8 +14,11 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Annotated, TypedDict
 
+import pydantic
+
+import mp.core.constants
 import mp.core.data_models.abc
 
 
@@ -37,7 +40,13 @@ class NonBuiltConnectorRule(TypedDict):
 class ConnectorRule(
     mp.core.data_models.abc.Buildable[BuiltConnectorRule, NonBuiltConnectorRule],
 ):
-    rule_name: str
+    rule_name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
     rule_type: ConnectorRuleType
 
     @classmethod

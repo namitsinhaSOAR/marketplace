@@ -43,7 +43,7 @@
     item_name: GreyNoise
     item_type: Integration
     publish_time: 1693317109
-    ticket_number: 294803051
+    ticket_number: '294803051'
     new: false
     regressive: false
     deprecated: false

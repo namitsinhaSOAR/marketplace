@@ -18,6 +18,7 @@ from typing import Annotated, NotRequired, TypedDict
 
 import pydantic
 
+import mp.core.constants
 import mp.core.data_models.abc
 import mp.core.utils
 from mp.core.data_models.script.parameter import ScriptParamType
@@ -35,7 +36,7 @@ class BuiltIntegrationParameter(TypedDict):
 
 class NonBuiltIntegrationParameter(TypedDict):
     name: str
-    value: NotRequired[str | bool | float | int | None]
+    default_value: NotRequired[str | bool | float | int | None]
     description: str
     is_mandatory: bool
     type: str
@@ -48,11 +49,25 @@ class IntegrationParameter(
         NonBuiltIntegrationParameter,
     ],
 ):
-    name: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    description: Annotated[
+        str, pydantic.Field(max_length=mp.core.constants.SHORT_DESCRIPTION_MAX_LENGTH)
+    ]
     is_mandatory: bool
     type_: ScriptParamType
-    integration_identifier: str
+    integration_identifier: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
     default_value: str | bool | float | int | None
 
     @classmethod
@@ -73,7 +88,7 @@ class IntegrationParameter(
     ) -> IntegrationParameter:
         return cls(
             name=non_built["name"],
-            default_value=non_built.get("value"),
+            default_value=non_built.get("default_value"),
             description=non_built["description"],
             is_mandatory=non_built["is_mandatory"],
             type_=ScriptParamType.from_string(non_built["type"]),
@@ -106,7 +121,7 @@ class IntegrationParameter(
         """
         non_built: NonBuiltIntegrationParameter = NonBuiltIntegrationParameter(
             name=self.name,
-            value=self.default_value,
+            default_value=self.default_value,
             type=self.type_.to_string(),
             description=self.description,
             is_mandatory=self.is_mandatory,

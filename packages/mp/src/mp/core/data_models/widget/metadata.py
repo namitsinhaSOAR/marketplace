@@ -72,11 +72,25 @@ class WidgetMetadata(
     mp.core.data_models.abc.ScriptMetadata[BuiltWidgetMetadata, NonBuiltWidgetMetadata],
 ):
     file_name: str
-    title: str
+    title: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
     type_: WidgetType
     scope: WidgetScope
-    action_identifier: str | None
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    action_identifier: Annotated[
+        str | None,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    description: Annotated[
+        str, pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH)
+    ]
     data_definition: WidgetDataDefinition
     condition_group: ConditionGroup
     default_size: WidgetSize

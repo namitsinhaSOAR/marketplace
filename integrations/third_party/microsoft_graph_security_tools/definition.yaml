@@ -9,7 +9,7 @@ parameters:
     is_mandatory: false
     integration_identifier: MicrosoftGraphSecurityTools
 -   name: Client ID
-    value: clientIdhere
+    default_value: clientIdhere
     type: string
     description: Client ID from Azure
     is_mandatory: true
@@ -20,7 +20,7 @@ parameters:
     is_mandatory: false
     integration_identifier: MicrosoftGraphSecurityTools
 -   name: Tenant ID
-    value: tenantidhere
+    default_value: tenantidhere
     type: string
     description: Tenant ID from Azure here
     is_mandatory: true

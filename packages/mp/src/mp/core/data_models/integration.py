@@ -515,11 +515,11 @@ class Integration:
     def _get_full_details_release_notes(self) -> list[FullDetailsReleaseNoteJson]:
         version_to_rns: itertools.groupby[float, ReleaseNote] = itertools.groupby(
             self.release_notes,
-            lambda rn: rn.version,
+            lambda rn: float(rn.version),
         )
         release_notes: list[FullDetailsReleaseNoteJson] = []
         for version, items in version_to_rns:
-            # casting done to prevent generator exhaustion after first iteration
+            # casting done to prevent generator exhaustion after the first iteration
             rns: list[ReleaseNote] = list(items)
             max_publish_time: int = max(
                 rn.publish_time if rn.publish_time is not None else 0 for rn in rns

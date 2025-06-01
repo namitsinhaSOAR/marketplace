@@ -77,14 +77,32 @@ class ActionMetadata(
     mp.core.data_models.abc.ScriptMetadata[BuiltActionMetadata, NonBuiltActionMetadata],
 ):
     file_name: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH),
+    ]
     dynamic_results_metadata: list[DynamicResultsMetadata]
-    integration_identifier: str
+    integration_identifier: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
     is_async: bool
     is_custom: bool
     is_enabled: bool
-    name: str
-    parameters: list[ActionParameter]
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    parameters: Annotated[
+        list[ActionParameter],
+        pydantic.Field(max_length=mp.core.constants.MAX_PARAMETERS_LENGTH),
+    ]
     default_result_value: str | None
     creator: str
     script_result_name: str

@@ -59,12 +59,30 @@ class JobMetadata(
 ):
     file_name: str
     creator: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
-    integration: str
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH),
+    ]
+    integration: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
     is_custom: Annotated[bool, pydantic.Field(default=False)]
     is_enabled: Annotated[bool, pydantic.Field(default=True)]
-    name: str
-    parameters: list[JobParameter]
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    parameters: Annotated[
+        list[JobParameter],
+        pydantic.Field(max_length=mp.core.constants.MAX_PARAMETERS_LENGTH),
+    ]
     run_interval_in_seconds: int
     version: Annotated[decimal.Decimal, pydantic.Field(decimal_places=1, default=1.0)]
 

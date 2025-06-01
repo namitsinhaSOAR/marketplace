@@ -3,7 +3,7 @@ name: Google Sheets
 version: 13.0
 parameters:
 -   name: Credentials Json
-    value: '{}'
+    default_value: '{}'
     type: password
     description: 'View the guide on how to create auth json credentials (service account)
 

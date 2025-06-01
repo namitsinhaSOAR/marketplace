@@ -55,7 +55,6 @@ description: 'A custom connector created to trigger playbooks by a given alert p
     name and type and enables to edit the parameters according to your specific use
     case. '
 integration: Connectors
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

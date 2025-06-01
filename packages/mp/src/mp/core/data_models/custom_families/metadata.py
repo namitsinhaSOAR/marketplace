@@ -48,7 +48,10 @@ class CustomFamily(
     mp.core.data_models.abc.SequentialMetadata[BuiltCustomFamily, NonBuiltCustomFamily],
 ):
     family: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH),
+    ]
     image_base64: pydantic.Base64Bytes
     is_custom: bool
     rules: list[CustomFamilyRule]

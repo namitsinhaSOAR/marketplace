@@ -21,27 +21,27 @@ import mp.core.data_models.abc
 
 class BuiltCustomFamilyRule(TypedDict):
     PrimarySource: str
-    SecondarySource: str
-    ThirdSource: str
-    FourthSource: str
+    SecondarySource: str | None
+    ThirdSource: str | None
+    FourthSource: str | None
     RelationType: str
     PrimaryDestination: str
-    SecondaryDestination: str
-    ThirdDestination: str
-    FourthDestination: str
+    SecondaryDestination: str | None
+    ThirdDestination: str | None
+    FourthDestination: str | None
     VisualFamily: str
 
 
 class NonBuiltCustomFamilyRule(TypedDict):
     primary_source: str
-    secondary_source: str
-    third_source: str
-    fourth_source: str
+    secondary_source: str | None
+    third_source: str | None
+    fourth_source: str | None
     relation_type: str
     primary_destination: str
-    secondary_destination: str
-    third_destination: str
-    fourth_destination: str
+    secondary_destination: str | None
+    third_destination: str | None
+    fourth_destination: str | None
     visual_family: str
 
 
@@ -49,14 +49,14 @@ class CustomFamilyRule(
     mp.core.data_models.abc.Buildable[BuiltCustomFamilyRule, NonBuiltCustomFamilyRule],
 ):
     primary_source: str
-    secondary_source: str
-    third_source: str
-    fourth_source: str
+    secondary_source: str | None
+    third_source: str | None
+    fourth_source: str | None
     relation_type: str
     primary_destination: str
-    secondary_destination: str
-    third_destination: str
-    fourth_destination: str
+    secondary_destination: str | None
+    third_destination: str | None
+    fourth_destination: str | None
     visual_family: str
 
     @classmethod

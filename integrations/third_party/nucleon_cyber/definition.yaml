@@ -3,7 +3,7 @@ name: NucleonCyber
 version: 4.0
 parameters:
 -   name: Username
-    value: Username
+    default_value: Username
     type: string
     description: Username received  from NucleonCyber
     is_mandatory: true
@@ -14,7 +14,7 @@ parameters:
     is_mandatory: true
     integration_identifier: NucleonCyber
 -   name: client name
-    value: client name
+    default_value: client name
     type: string
     description: client name received  from NucleonCyber
     is_mandatory: true

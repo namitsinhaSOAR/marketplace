@@ -18,6 +18,7 @@ from typing import Annotated, NotRequired, TypedDict
 
 import pydantic
 
+import mp.core.constants
 import mp.core.data_models.abc
 import mp.core.utils
 
@@ -66,12 +67,21 @@ class NonBuiltActionParameter(TypedDict):
 class ActionParameter(
     mp.core.data_models.abc.Buildable[BuiltActionParameter, NonBuiltActionParameter],
 ):
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.SHORT_DESCRIPTION_MAX_LENGTH),
+    ]
     is_mandatory: bool
-    name: str
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
     optional_values: list[str] | None
     type_: ActionParamType
-    value: str | bool | int | float | None
+    default_value: str | bool | float | int | None
 
     @classmethod
     def _from_built(cls, built: BuiltActionParameter) -> ActionParameter:
@@ -90,7 +100,7 @@ class ActionParameter(
             name=built["Name"],
             optional_values=built.get("OptionalValues"),
             type_=ActionParamType(int(built["Type"])),
-            value=built.get("Value", built.get("DefaultValue")),
+            default_value=built.get("Value", built.get("DefaultValue")),
         )
 
     @classmethod
@@ -110,7 +120,7 @@ class ActionParameter(
             name=non_built["name"],
             optional_values=non_built.get("optional_values"),
             type_=ActionParamType.from_string(non_built["type"]),
-            value=non_built.get("default_value"),
+            default_value=non_built.get("default_value"),
         )
 
     def to_built(self) -> BuiltActionParameter:
@@ -121,12 +131,12 @@ class ActionParameter(
 
         """
         results: BuiltActionParameter = BuiltActionParameter(
-            DefaultValue=self.value,
+            DefaultValue=self.default_value,
             Description=self.description,
             IsMandatory=self.is_mandatory,
             Name=self.name,
             Type=self.type_.value,
-            Value=self.value,
+            Value=self.default_value,
         )
         if self.optional_values is not None:
             results["OptionalValues"] = self.optional_values
@@ -142,7 +152,7 @@ class ActionParameter(
         """
         non_built: NonBuiltActionParameter = NonBuiltActionParameter(
             name=self.name,
-            default_value=self.value,
+            default_value=self.default_value,
             type=self.type_.to_string(),
             description=self.description,
             is_mandatory=self.is_mandatory,

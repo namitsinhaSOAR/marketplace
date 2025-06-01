@@ -41,7 +41,6 @@ description: This connector is used to connect to a Slack Channel that has been 
     to receive PerimeterX Code Defender alerts. Any alerts discovered on the channel
     are imported into Siemplify via this connector.
 integration: PerimeterX
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

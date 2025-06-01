@@ -92,7 +92,6 @@ parameters:
     mode: script
 description: The Connector ingests records from a given table in Airtable
 integration: AirTable
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

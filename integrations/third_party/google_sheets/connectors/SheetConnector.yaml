@@ -71,7 +71,6 @@ parameters:
     mode: script
 description: The connector pulls each row in a Google Sheet form
 integration: Google Sheets
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: use-cases

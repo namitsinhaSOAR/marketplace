@@ -3,19 +3,19 @@ name: Marketo
 version: 16.0
 parameters:
 -   name: Client Secret
-    value: Client Secret
+    default_value: Client Secret
     type: string
     description: ' The client secret of the Marketo account'
     is_mandatory: true
     integration_identifier: Marketo
 -   name: Client Id
-    value: Client Id
+    default_value: Client Id
     type: string
     description: ' The client id of the Marketo account'
     is_mandatory: true
     integration_identifier: Marketo
 -   name: Munchkin Id
-    value: Munchkin Id
+    default_value: Munchkin Id
     type: string
     description: '  The Munchkin Id of the Marketo account'
     is_mandatory: true

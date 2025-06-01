@@ -53,7 +53,6 @@ parameters:
 description: This connector facilitates data retrieval from outgoing feeds configured
     by users via  parameters
 integration: EclecticIQ
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: 02d62532-046f-494f-8c5f-6541026a07d1

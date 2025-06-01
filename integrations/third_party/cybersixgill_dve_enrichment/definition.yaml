@@ -3,7 +3,7 @@ name: Cybersixgill DVE Enrichment
 version: 5.0
 parameters:
 -   name: Client Id
-    value: Client_Id
+    default_value: Client_Id
     type: string
     description: Client ID
     is_mandatory: true

@@ -29,7 +29,7 @@ parameters:
         is_mandatory: true
         name: Mock Parameter
         type: password
-        value: ''
+        default_value: ''
 python_version: '3.11'
 svg_image: <?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25"><path d="M23.8,11.73L18.8Z" fill-rule="evenodd"/></svg>
 version: 2.0

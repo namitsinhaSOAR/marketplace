@@ -8,13 +8,13 @@ parameters:
     is_mandatory: true
     integration_identifier: Bitdefender GravityZone
 -   name: Access URL
-    value: https://cloud.gravityzone.bitdefender.com/api
+    default_value: https://cloud.gravityzone.bitdefender.com/api
     type: string
     description: Access URL for Control Center API
     is_mandatory: true
     integration_identifier: Bitdefender GravityZone
 -   name: Verify SSL
-    value: 'false'
+    default_value: 'false'
     type: boolean
     description: Verify SSL when making requests
     is_mandatory: false

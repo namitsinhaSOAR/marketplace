@@ -3,7 +3,7 @@ name: DUO
 version: 3.0
 parameters:
 -   name: API Hostname
-    value: api-XXXXXXXX.duosecurity.com
+    default_value: api-XXXXXXXX.duosecurity.com
     type: string
     description: 'API hostname for your tenant: api-XXXXXXXX.duosecurity.com.'
     is_mandatory: true

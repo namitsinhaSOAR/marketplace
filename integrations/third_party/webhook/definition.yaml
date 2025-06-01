@@ -3,7 +3,7 @@ name: Webhook
 version: 6.0
 parameters:
 -   name: URL
-    value: https://webhook.site
+    default_value: https://webhook.site
     type: string
     description: URL for webhook.site
     is_mandatory: false

@@ -3,7 +3,7 @@ name: Google Docs
 version: 6.0
 parameters:
 -   name: Credentials Json
-    value: '{}'
+    default_value: '{}'
     type: string
     description: 'View the guide on how to create auth json credentials (service account)
         - provide access for Google Docs

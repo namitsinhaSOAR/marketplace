@@ -19,6 +19,7 @@ from typing import Annotated, NotRequired, TypedDict
 
 import pydantic
 
+import mp.core.constants
 import mp.core.data_models.abc
 import mp.core.utils
 from mp.core.data_models.script.parameter import ScriptParamType
@@ -37,17 +38,25 @@ class NonBuiltJobParameter(TypedDict):
     description: str
     is_mandatory: bool
     type: str
-    default_value: NotRequired[str | float | bool | int]
+    default_value: NotRequired[str | float | bool | int | None]
 
 
 class JobParameter(
     mp.core.data_models.abc.Buildable[BuiltJobParameter, NonBuiltJobParameter],
 ):
-    name: str
-    description: Annotated[str, pydantic.Field(max_length=256)]
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    description: Annotated[
+        str, pydantic.Field(max_length=mp.core.constants.SHORT_DESCRIPTION_MAX_LENGTH)
+    ]
     is_mandatory: bool
     type_: ScriptParamType
-    default_value: str | float | bool | int
+    default_value: str | bool | float | int | None
 
     @classmethod
     def _from_built(cls, built: BuiltJobParameter) -> JobParameter:

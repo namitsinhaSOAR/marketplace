@@ -83,7 +83,6 @@ parameters:
 description: Alert on negative changes to user MFA registration. Use the allowlist
     to prevent alerts for legacy service accounts that don't support MFA, etc.
 integration: MicrosoftGraphSecurityTools
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: daniel.harvey
