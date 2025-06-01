@@ -3,7 +3,7 @@ name: ArcannaAI
 version: 7.0
 parameters:
 -   name: Url
-    value: https://your-arcanna.url
+    default_value: https://your-arcanna.url
     type: string
     description: ''
     is_mandatory: true
@@ -14,7 +14,7 @@ parameters:
     is_mandatory: true
     integration_identifier: ArcannaAI
 -   name: SSL Verification
-    value: 'false'
+    default_value: 'false'
     type: boolean
     description: ''
     is_mandatory: false

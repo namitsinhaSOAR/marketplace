@@ -58,7 +58,6 @@ description: 'Creates cases from last X days of DUO Trust Monitor Events.
 
     https://duo.com/docs/adminapi#trust-monitor'
 integration: DUO
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: John

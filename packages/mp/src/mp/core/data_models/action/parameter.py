@@ -14,14 +14,13 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING, NotRequired
+from typing import Annotated, NotRequired, TypedDict
 
+import pydantic
+
+import mp.core.constants
 import mp.core.data_models.abc
 import mp.core.utils
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
 
 
 class ActionParamType(mp.core.data_models.abc.RepresentableEnum):
@@ -46,35 +45,43 @@ class ActionParamType(mp.core.data_models.abc.RepresentableEnum):
     NULL = -1
 
 
-class BuiltActionParameter(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltActionParameter(TypedDict):
     Description: str
     IsMandatory: bool
     Name: str
-    OptionalValues: NotRequired[Sequence[str]]
+    OptionalValues: NotRequired[list[str]]
     Type: int
     Value: str | bool | int | float | None
     DefaultValue: str | bool | int | float | None
 
 
-class NonBuiltActionParameter(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltActionParameter(TypedDict):
     description: str
     is_mandatory: bool
     name: str
-    optional_values: NotRequired[Sequence[str]]
+    optional_values: NotRequired[list[str]]
     type: str
-    default_value: NotRequired[str | bool | int | float]
+    default_value: NotRequired[str | bool | int | float | None]
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class ActionParameter(
     mp.core.data_models.abc.Buildable[BuiltActionParameter, NonBuiltActionParameter],
 ):
-    description: str
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.SHORT_DESCRIPTION_MAX_LENGTH),
+    ]
     is_mandatory: bool
-    name: str
-    optional_values: Sequence[str] | None
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    optional_values: list[str] | None
     type_: ActionParamType
-    value: str | bool | int | float | None
+    default_value: str | bool | float | int | None
 
     @classmethod
     def _from_built(cls, built: BuiltActionParameter) -> ActionParameter:
@@ -93,7 +100,7 @@ class ActionParameter(
             name=built["Name"],
             optional_values=built.get("OptionalValues"),
             type_=ActionParamType(int(built["Type"])),
-            value=built.get("Value", built.get("DefaultValue")),
+            default_value=built.get("Value", built.get("DefaultValue")),
         )
 
     @classmethod
@@ -113,7 +120,7 @@ class ActionParameter(
             name=non_built["name"],
             optional_values=non_built.get("optional_values"),
             type_=ActionParamType.from_string(non_built["type"]),
-            value=non_built.get("default_value"),
+            default_value=non_built.get("default_value"),
         )
 
     def to_built(self) -> BuiltActionParameter:
@@ -123,14 +130,14 @@ class ActionParameter(
             A built version of the action parameter dict
 
         """
-        results: BuiltActionParameter = {
-            "DefaultValue": self.value,
-            "Description": self.description,
-            "IsMandatory": self.is_mandatory,
-            "Name": self.name,
-            "Type": self.type_.value,
-            "Value": self.value,
-        }
+        results: BuiltActionParameter = BuiltActionParameter(
+            DefaultValue=self.default_value,
+            Description=self.description,
+            IsMandatory=self.is_mandatory,
+            Name=self.name,
+            Type=self.type_.value,
+            Value=self.default_value,
+        )
         if self.optional_values is not None:
             results["OptionalValues"] = self.optional_values
 
@@ -143,12 +150,12 @@ class ActionParameter(
             A non-built version of the action parameter dict
 
         """
-        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
-            {
-                "name": self.name,
-                "default_value": self.value,
-                "type": self.type_.to_string(),
-                "description": self.description,
-                "is_mandatory": self.is_mandatory,
-            },
+        non_built: NonBuiltActionParameter = NonBuiltActionParameter(
+            name=self.name,
+            default_value=self.default_value,
+            type=self.type_.to_string(),
+            description=self.description,
+            is_mandatory=self.is_mandatory,
         )
+        mp.core.utils.remove_none_entries_from_mapping(non_built)
+        return non_built

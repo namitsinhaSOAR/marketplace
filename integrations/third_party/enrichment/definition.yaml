@@ -8,7 +8,7 @@ parameters:
     is_mandatory: false
     integration_identifier: Enrichment
 -   name: Verify SSL
-    value: false
+    default_value: false
     type: boolean
     description: Verify SSL Certificates when executing requests to Chronicle SOAR
         instance.

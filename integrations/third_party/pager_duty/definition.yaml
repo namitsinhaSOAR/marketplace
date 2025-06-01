@@ -3,13 +3,13 @@ name: PagerDuty
 version: 17.0
 parameters:
 -   name: api_key
-    value: key
+    default_value: key
     type: string
     description: ''
     is_mandatory: true
     integration_identifier: PagerDuty
 -   name: Services
-    value: service
+    default_value: service
     type: string
     description: ''
     is_mandatory: true

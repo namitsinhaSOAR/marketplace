@@ -3,7 +3,7 @@ name: TeamCymruScout
 version: 3.0
 parameters:
 -   name: Authentication Type
-    value: 'true'
+    default_value: 'true'
     type: boolean
     description: 'Type of Authentication to use:
 
@@ -32,7 +32,7 @@ parameters:
     is_mandatory: false
     integration_identifier: TeamCymruScout
 -   name: Verify SSL
-    value: 'false'
+    default_value: 'false'
     type: boolean
     description: Determines if SSL certificates should be verified or not.
     is_mandatory: false

@@ -14,8 +14,10 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING, NotRequired
+import decimal
+from typing import TYPE_CHECKING, Annotated, NotRequired, TypedDict
+
+import pydantic
 
 import mp.core.constants
 import mp.core.data_models.abc
@@ -25,7 +27,7 @@ if TYPE_CHECKING:
     import pathlib
 
 
-class BuiltReleaseNote(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltReleaseNote(TypedDict):
     ChangeDescription: str
     Deprecated: bool
     New: bool
@@ -38,24 +40,26 @@ class BuiltReleaseNote(mp.core.data_models.abc.BaseBuiltTypedDict):
     IntroducedInIntegrationVersion: float
 
 
-class NonBuiltReleaseNote(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltReleaseNote(TypedDict):
     description: str
     deprecated: bool
     integration_version: float
     item_name: str
     item_type: str
-    publish_time: NotRequired[int]
+    publish_time: NotRequired[int | None]
     regressive: bool
     removed: bool
-    ticket_number: NotRequired[str]
+    ticket_number: NotRequired[str | None]
     new: bool
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class ReleaseNote(
     mp.core.data_models.abc.SequentialMetadata[BuiltReleaseNote, NonBuiltReleaseNote],
 ):
-    description: str
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.LONG_DESCRIPTION_MAX_LENGTH),
+    ]
     deprecated: bool
     new: bool
     item_name: str
@@ -64,7 +68,7 @@ class ReleaseNote(
     regressive: bool
     removed: bool
     ticket: str | None
-    version: float
+    version: Annotated[decimal.Decimal, pydantic.Field(decimal_places=1)]
 
     @classmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[ReleaseNote]:
@@ -105,7 +109,7 @@ class ReleaseNote(
         return cls(
             description=built["ChangeDescription"],
             deprecated=built["Deprecated"],
-            version=built["IntroducedInIntegrationVersion"],
+            version=decimal.Decimal.from_float(built["IntroducedInIntegrationVersion"]),
             item_name=built["ItemName"],
             item_type=built["ItemType"],
             new=built["New"],
@@ -120,7 +124,7 @@ class ReleaseNote(
         return cls(
             description=non_built["description"],
             deprecated=non_built["deprecated"],
-            version=non_built["integration_version"],
+            version=decimal.Decimal.from_float(non_built["integration_version"]),
             item_name=non_built["item_name"],
             item_type=non_built["item_type"],
             new=non_built["new"],
@@ -137,18 +141,18 @@ class ReleaseNote(
             A built version of the release note metadata dict
 
         """
-        return {
-            "ChangeDescription": self.description,
-            "Deprecated": self.deprecated,
-            "IntroducedInIntegrationVersion": self.version,
-            "ItemName": self.item_name,
-            "ItemType": self.item_type,
-            "New": self.new,
-            "Regressive": self.regressive,
-            "Removed": self.removed,
-            "TicketNumber": self.ticket,
-            "PublishTime": self.publish_time,
-        }
+        return BuiltReleaseNote(
+            ChangeDescription=self.description,
+            Deprecated=self.deprecated,
+            IntroducedInIntegrationVersion=float(self.version),
+            ItemName=self.item_name,
+            ItemType=self.item_type,
+            New=self.new,
+            Regressive=self.regressive,
+            Removed=self.removed,
+            TicketNumber=self.ticket,
+            PublishTime=self.publish_time,
+        )
 
     def to_non_built(self) -> NonBuiltReleaseNote:
         """Create a non-built release note metadata dict.
@@ -157,17 +161,17 @@ class ReleaseNote(
             A non-built version of the release note metadata dict
 
         """
-        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
-            {
-                "description": self.description,
-                "integration_version": self.version,
-                "item_name": self.item_name,
-                "item_type": self.item_type,
-                "publish_time": self.publish_time,
-                "ticket_number": self.ticket,
-                "new": self.new,
-                "regressive": self.regressive,
-                "deprecated": self.deprecated,
-                "removed": self.removed,
-            },
+        non_built: NonBuiltReleaseNote = NonBuiltReleaseNote(
+            description=self.description,
+            integration_version=float(self.version),
+            item_name=self.item_name,
+            item_type=self.item_type,
+            publish_time=self.publish_time,
+            ticket_number=self.ticket,
+            new=self.new,
+            regressive=self.regressive,
+            deprecated=self.deprecated,
+            removed=self.removed,
         )
+        mp.core.utils.remove_none_entries_from_mapping(non_built)
+        return non_built

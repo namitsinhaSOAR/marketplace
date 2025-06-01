@@ -44,7 +44,6 @@ description: 'Telegram Connector- pulls messages from channels and supergroups t
 
     https://api.telegram.org/bot<bot_token>/setWebhook?url= '
 integration: Telegram
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: TehilaGourary

@@ -70,7 +70,6 @@ parameters:
     mode: regular
 description: ''
 integration: Vorlon
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: fe5f742c-a69e-4116-ad38-b1d7c5194541

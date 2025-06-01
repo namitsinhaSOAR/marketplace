@@ -8,7 +8,7 @@ parameters:
     is_mandatory: true
     integration_identifier: AWS - EC2
 -   name: Default Region
-    value: us-east-1
+    default_value: us-east-1
     type: string
     description: 'Default Region.
 

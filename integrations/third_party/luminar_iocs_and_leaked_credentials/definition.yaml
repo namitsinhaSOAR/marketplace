@@ -3,7 +3,7 @@ name: Luminar IOCs and Leaked Credentials
 version: 3.0
 parameters:
 -   name: Luminar Base URL
-    value: https://demo.cyberluminar.com
+    default_value: https://demo.cyberluminar.com
     type: string
     description: Please enter valid Luminar Base URL
     is_mandatory: true
@@ -42,9 +42,7 @@ description: 'Cognyte is a global leader in security analytics software that emp
 
 
     “Luminar IOCs and Leaked Credentials” App allows integration of intelligence-based
-    IOC data and customer-related leaked records identified by Luminar.
-
-    '
+    IOC data and customer-related leaked records identified by Luminar.'
 python_version: '3.11'
 categories:
 - Threat Intelligence

@@ -89,7 +89,6 @@ parameters:
     mode: script
 description: Ingest events from DataDog by given filters(e.g. tags, priority)
 integration: DataDog
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

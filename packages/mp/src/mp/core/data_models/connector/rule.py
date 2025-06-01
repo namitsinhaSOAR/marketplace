@@ -14,8 +14,11 @@
 
 from __future__ import annotations
 
-import dataclasses
+from typing import Annotated, TypedDict
 
+import pydantic
+
+import mp.core.constants
 import mp.core.data_models.abc
 
 
@@ -24,21 +27,26 @@ class ConnectorRuleType(mp.core.data_models.abc.RepresentableEnum):
     DISALLOW_LIST = 1
 
 
-class BuiltConnectorRule(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltConnectorRule(TypedDict):
     RuleName: str
     RuleType: int
 
 
-class NonBuiltConnectorRule(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltConnectorRule(TypedDict):
     rule_name: str
     rule_type: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class ConnectorRule(
     mp.core.data_models.abc.Buildable[BuiltConnectorRule, NonBuiltConnectorRule],
 ):
-    rule_name: str
+    rule_name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
     rule_type: ConnectorRuleType
 
     @classmethod
@@ -62,10 +70,10 @@ class ConnectorRule(
             The "built" representation of the object
 
         """
-        return {
-            "RuleName": self.rule_name,
-            "RuleType": self.rule_type.value,
-        }
+        return BuiltConnectorRule(
+            RuleName=self.rule_name,
+            RuleType=self.rule_type.value,
+        )
 
     def to_non_built(self) -> NonBuiltConnectorRule:
         """Turn the buildable object into a "non-built" typed dict.
@@ -74,7 +82,7 @@ class ConnectorRule(
             The "non-built" representation of the object
 
         """
-        return {
-            "rule_name": self.rule_name,
-            "rule_type": self.rule_type.to_string(),
-        }
+        return NonBuiltConnectorRule(
+            rule_name=self.rule_name,
+            rule_type=self.rule_type.to_string(),
+        )

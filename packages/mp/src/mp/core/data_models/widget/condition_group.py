@@ -14,15 +14,11 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING
+from typing import TypedDict
 
 import mp.core.data_models.abc
 
 from .condition import BuiltCondition, Condition, NonBuiltCondition
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
 
 
 class LogicalOperator(mp.core.data_models.abc.RepresentableEnum):
@@ -30,21 +26,20 @@ class LogicalOperator(mp.core.data_models.abc.RepresentableEnum):
     OR = 1
 
 
-class BuiltConditionGroup(mp.core.data_models.abc.BaseBuiltTypedDict):
-    conditions: Sequence[BuiltCondition]
-    logicalOperator: int  # noqa: N815
+class BuiltConditionGroup(TypedDict):
+    conditions: list[BuiltCondition]
+    logicalOperator: int
 
 
-class NonBuiltConditionGroup(mp.core.data_models.abc.BaseNonBuiltTypedDict):
-    conditions: Sequence[NonBuiltCondition]
+class NonBuiltConditionGroup(TypedDict):
+    conditions: list[NonBuiltCondition]
     logical_operator: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class ConditionGroup(
     mp.core.data_models.abc.Buildable[BuiltConditionGroup, NonBuiltConditionGroup],
 ):
-    conditions: Sequence[Condition]
+    conditions: list[Condition]
     logical_operator: LogicalOperator
 
     @classmethod
@@ -83,10 +78,10 @@ class ConditionGroup(
             The "built" representation of the object.
 
         """
-        return {
-            "conditions": [condition.to_built() for condition in self.conditions],
-            "logicalOperator": self.logical_operator.value,
-        }
+        return BuiltConditionGroup(
+            conditions=[condition.to_built() for condition in self.conditions],
+            logicalOperator=self.logical_operator.value,
+        )
 
     def to_non_built(self) -> NonBuiltConditionGroup:
         """Turn the buildable object into a "non-built" typed dict.
@@ -95,7 +90,7 @@ class ConditionGroup(
             The "non-built" representation of the object
 
         """
-        return {
-            "conditions": [condition.to_non_built() for condition in self.conditions],
-            "logical_operator": self.logical_operator.to_string(),
-        }
+        return NonBuiltConditionGroup(
+            conditions=[condition.to_non_built() for condition in self.conditions],
+            logical_operator=self.logical_operator.to_string(),
+        )

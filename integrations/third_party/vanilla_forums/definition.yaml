@@ -8,7 +8,7 @@ parameters:
     is_mandatory: true
     integration_identifier: VanillaForums
 -   name: URL
-    value: https://vanillaforums.com/api
+    default_value: https://vanillaforums.com/api
     type: string
     description: Community URL
     is_mandatory: true

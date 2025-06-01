@@ -65,7 +65,7 @@ def _update_pyproject_from_integration_meta(
         {
             "name": integration_meta.identifier.replace(" ", "-"),
             "description": integration_meta.description,
-            "version": str(integration_meta.version),
+            "version": str(float(integration_meta.version)),
             "requires-python": f">={py_version}",
         },
     )
@@ -83,10 +83,6 @@ class DeconstructIntegration:
         Initializes a project by setting up a Python environment, updating the
         project configuration, and optionally adding dependencies based on a
         'requirements.txt' file.
-
-        Raises:
-            mp.core.unix.CommandError: If an error occurs while adding dependencies
-                to the project's configuration from the 'requirements.txt' file.
 
         """
         mp.core.unix.init_python_project_if_not_exists(self.out_path)

@@ -73,3 +73,9 @@ PYTHON_VERSION_FILE: str = ".python-version"
 
 MS_IN_SEC: int = 1_000
 ALLOWED_PYTHON_VERSIONS: set[str] = {"3.11", "3.12"}
+LONG_DESCRIPTION_MAX_LENGTH: int = 2_200
+SHORT_DESCRIPTION_MAX_LENGTH: int = 400
+DISPLAY_NAME_MAX_LENGTH: int = 150
+MAX_PARAMETERS_LENGTH: int = 50
+# language=regexp
+DISPLAY_NAME_REGEX: str = r"^[a-zA-Z0-9-_,()?'/\s]+$"

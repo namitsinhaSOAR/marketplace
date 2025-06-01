@@ -3,13 +3,13 @@ name: PhilipsHUE
 version: 4.0
 parameters:
 -   name: Bridge IP
-    value: 0.0.0.0
+    default_value: 0.0.0.0
     type: string
     description: The IP address of the bridge for the Philips HUE product.
     is_mandatory: true
     integration_identifier: PhilipsHUE
 -   name: Authorized Username
-    value: '111'
+    default_value: '111'
     type: string
     description: An authorized username for the bridge to access the product's attributes.
     is_mandatory: true

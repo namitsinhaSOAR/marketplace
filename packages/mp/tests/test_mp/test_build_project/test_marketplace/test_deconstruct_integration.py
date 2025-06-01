@@ -68,7 +68,7 @@ def test_non_existing_integration_raises_file_not_found_error(
 ) -> None:
     with (
         unittest.mock.patch(mock_get_marketplace_path, return_value=tmp_path),
-        pytest.raises(FileNotFoundError, match="Invalid integration .*"),
+        pytest.raises(FileNotFoundError, match=r"Invalid integration .*"),
     ):
         assert_deconstruct_integration(tmp_path / "fake_integration")
 

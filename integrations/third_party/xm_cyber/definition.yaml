@@ -3,20 +3,20 @@ name: XMCyber
 version: 2.0
 parameters:
 -   name: Base URL
-    value: https://<base_url>
+    default_value: https://<base_url>
     type: string
     description: 'Base URL of the XMCyber instance. NOTE: Must include ''https://'''
     is_mandatory: true
     integration_identifier: XMCyber
 -   name: API Key
-    value: ''
+    default_value: ''
     type: password
     description: The API Key using which the API calls would be made to the XMCyber
         instance
     is_mandatory: true
     integration_identifier: XMCyber
 -   name: Access Token Based Authentication
-    value: 'true'
+    default_value: 'true'
     type: boolean
     description: 'Type of authentication. Check: For Access Token Based Authentication.
         Uncheck : For API Key Based Authentication'

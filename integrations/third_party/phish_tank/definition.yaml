@@ -3,7 +3,7 @@ name: PhishTank
 version: 9.0
 parameters:
 -   name: Service Url
-    value: https://checkurl.phishtank.com/checkurl/
+    default_value: https://checkurl.phishtank.com/checkurl/
     type: string
     description: Service Url
     is_mandatory: true

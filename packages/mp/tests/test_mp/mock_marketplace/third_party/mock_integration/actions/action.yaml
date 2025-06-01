@@ -101,4 +101,4 @@ parameters:
         is_mandatory: true
         name: API Root
         type: string
-        value: ''
+        default_value: ''

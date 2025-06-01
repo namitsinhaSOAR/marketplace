@@ -14,9 +14,11 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import NotRequired
+from typing import Annotated, NotRequired, TypedDict
 
+import pydantic
+
+import mp.core.constants
 import mp.core.data_models.abc
 import mp.core.utils
 from mp.core.data_models.script.parameter import ScriptParamType
@@ -27,7 +29,7 @@ class ParamMode(mp.core.data_models.abc.RepresentableEnum):
     SCRIPT = 2
 
 
-class BuiltConnectorParameter(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltConnectorParameter(TypedDict):
     Name: str
     Description: str
     IsMandatory: bool
@@ -37,30 +39,38 @@ class BuiltConnectorParameter(mp.core.data_models.abc.BaseBuiltTypedDict):
     DefaultValue: str | float | bool | int | None
 
 
-class NonBuiltConnectorParameter(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltConnectorParameter(TypedDict):
     name: str
     description: str
     is_mandatory: bool
     is_advanced: bool
     type: str
     mode: str
-    default_value: NotRequired[str | float | bool | int]
+    default_value: NotRequired[str | float | bool | int | None]
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class ConnectorParameter(
     mp.core.data_models.abc.Buildable[
         BuiltConnectorParameter,
         NonBuiltConnectorParameter,
     ],
 ):
-    name: str
-    description: str
+    name: Annotated[
+        str,
+        pydantic.Field(
+            max_length=mp.core.constants.DISPLAY_NAME_MAX_LENGTH,
+            pattern=mp.core.constants.DISPLAY_NAME_REGEX,
+        ),
+    ]
+    description: Annotated[
+        str,
+        pydantic.Field(max_length=mp.core.constants.SHORT_DESCRIPTION_MAX_LENGTH),
+    ]
     is_mandatory: bool
     is_advanced: bool
     type_: ScriptParamType
     mode: ParamMode
-    default_value: str | float | bool | int | None
+    default_value: str | bool | float | int | None
 
     @classmethod
     def _from_built(cls, built: BuiltConnectorParameter) -> ConnectorParameter:
@@ -96,15 +106,15 @@ class ConnectorParameter(
             The BuiltConnectorParameter typed dict representation of the object
 
         """
-        return {
-            "Name": self.name,
-            "Description": self.description,
-            "IsMandatory": self.is_mandatory,
-            "IsAdvanced": self.is_advanced,
-            "Type": self.type_.value,
-            "DefaultValue": self.default_value,
-            "Mode": self.mode.value,
-        }
+        return BuiltConnectorParameter(
+            Name=self.name,
+            Description=self.description,
+            IsMandatory=self.is_mandatory,
+            IsAdvanced=self.is_advanced,
+            Type=self.type_.value,
+            DefaultValue=self.default_value,
+            Mode=self.mode.value,
+        )
 
     def to_non_built(self) -> NonBuiltConnectorParameter:
         """Turn the object into a NonBuiltConnectorParameter.
@@ -113,14 +123,14 @@ class ConnectorParameter(
             The NonBuiltConnectorParameter typed dict representation of the object
 
         """
-        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
-            {
-                "name": self.name,
-                "default_value": self.default_value,
-                "type": self.type_.to_string(),
-                "description": self.description,
-                "is_mandatory": self.is_mandatory,
-                "is_advanced": self.is_advanced,
-                "mode": self.mode.to_string(),
-            },
+        non_built: NonBuiltConnectorParameter = NonBuiltConnectorParameter(
+            name=self.name,
+            default_value=self.default_value,
+            type=self.type_.to_string(),
+            description=self.description,
+            is_mandatory=self.is_mandatory,
+            is_advanced=self.is_advanced,
+            mode=self.mode.to_string(),
         )
+        mp.core.utils.remove_none_entries_from_mapping(non_built)
+        return non_built

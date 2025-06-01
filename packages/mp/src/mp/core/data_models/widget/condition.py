@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-import dataclasses
+from typing import TypedDict
 
 import mp.core.data_models.abc
 
@@ -31,19 +31,18 @@ class MatchType(mp.core.data_models.abc.RepresentableEnum):
     IS_NOT_EMPTY = 8
 
 
-class BuiltCondition(mp.core.data_models.abc.BaseBuiltTypedDict):
-    fieldName: str  # noqa: N815
+class BuiltCondition(TypedDict):
+    fieldName: str
     value: str
-    matchType: int  # noqa: N815
+    matchType: int
 
 
-class NonBuiltCondition(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltCondition(TypedDict):
     field_name: str
     value: str
     match_type: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class Condition(mp.core.data_models.abc.Buildable[BuiltCondition, NonBuiltCondition]):
     field_name: str
     value: str
@@ -72,11 +71,11 @@ class Condition(mp.core.data_models.abc.Buildable[BuiltCondition, NonBuiltCondit
             The "built" representation of the object.
 
         """
-        return {
-            "fieldName": self.field_name,
-            "value": self.value,
-            "matchType": self.match_type.value,
-        }
+        return BuiltCondition(
+            fieldName=self.field_name,
+            value=self.value,
+            matchType=self.match_type.value,
+        )
 
     def to_non_built(self) -> NonBuiltCondition:
         """Turn the buildable object into a "non-built" typed dict.
@@ -85,8 +84,8 @@ class Condition(mp.core.data_models.abc.Buildable[BuiltCondition, NonBuiltCondit
             The "non-built" representation of the object
 
         """
-        return {
-            "field_name": self.field_name,
-            "value": self.value,
-            "match_type": self.match_type.to_string(),
-        }
+        return NonBuiltCondition(
+            field_name=self.field_name,
+            value=self.value,
+            match_type=self.match_type.to_string(),
+        )

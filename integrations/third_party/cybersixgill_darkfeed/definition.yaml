@@ -3,7 +3,7 @@ name: Cybersixgill Darkfeed
 version: 6.0
 parameters:
 -   name: Client Id
-    value: Client_id
+    default_value: Client_id
     type: string
     description: Client Id
     is_mandatory: true

@@ -14,25 +14,21 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import Literal
+from typing import Literal, TypedDict
 
 import mp.core.data_models.abc
 
 
-class BuiltIntegrationVisibilityProperty(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltIntegrationVisibilityProperty(TypedDict):
     Kind: Literal["SystemMode", "FeatureFlag"]
     Value: Literal["Nexus", "featEnableFederationSecondary"]
 
 
-class NonBuiltIntegrationVisibilityProperty(
-    mp.core.data_models.abc.BaseNonBuiltTypedDict,
-):
+class NonBuiltIntegrationVisibilityProperty(TypedDict):
     kind: Literal["SystemMode", "FeatureFlag"]
     value: Literal["Nexus", "featEnableFederationSecondary"]
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class IntegrationVisibilityProperty(
     mp.core.data_models.abc.Buildable[
         BuiltIntegrationVisibilityProperty,
@@ -69,10 +65,7 @@ class IntegrationVisibilityProperty(
             The "built" representation of the object.
 
         """
-        return {
-            "Kind": self.kind,
-            "Value": self.value,
-        }
+        return BuiltIntegrationVisibilityProperty(Kind=self.kind, Value=self.value)
 
     def to_non_built(self) -> NonBuiltIntegrationVisibilityProperty:
         """Turn the buildable object into a "non-built" typed dict.
@@ -81,7 +74,4 @@ class IntegrationVisibilityProperty(
            The "non-built" representation of the object
 
         """
-        return {
-            "kind": self.kind,
-            "value": self.value,
-        }
+        return NonBuiltIntegrationVisibilityProperty(kind=self.kind, value=self.value)

@@ -3,14 +3,14 @@ name: GitSync
 version: 28.0
 parameters:
 -   name: Repo URL
-    value: ''
+    default_value: ''
     type: string
     description: Repository URL. The URL must start with 'https' for HTTPS+Token or
         'git@' for SSH+Cert.
     is_mandatory: true
     integration_identifier: GitSync
 -   name: Branch
-    value: ''
+    default_value: ''
     type: string
     description: Target branch
     is_mandatory: true
@@ -21,25 +21,25 @@ parameters:
     is_mandatory: true
     integration_identifier: GitSync
 -   name: Git Username
-    value: ''
+    default_value: ''
     type: string
     description: Git Username
     is_mandatory: false
     integration_identifier: GitSync
 -   name: Commit Author
-    value: ''
+    default_value: ''
     type: string
     description: 'Commit Author. Must be in the following format: ''James Bond <james.bond@gmail.com>'''
     is_mandatory: false
     integration_identifier: GitSync
 -   name: Siemplify Verify SSL
-    value: 'true'
+    default_value: 'true'
     type: boolean
     description: Siemplify Verify SSL
     is_mandatory: true
     integration_identifier: GitSync
 -   name: Git Verify SSL
-    value: 'true'
+    default_value: 'true'
     type: boolean
     description: Git Verify SSL
     is_mandatory: true

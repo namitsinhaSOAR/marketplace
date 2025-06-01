@@ -93,7 +93,6 @@ description: The connector retrieves entities and detections from the Vectra RUX
     the Source Grouping Identifier to attach the updated alert to the same case, and
     the grouping limit should be set to the maximum possible value.
 integration: VectraRUX
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

@@ -3,7 +3,7 @@ name: Cybersixgill Darkfeed Enrichment
 version: 4.0
 parameters:
 -   name: Client Id
-    value: clientid
+    default_value: clientid
     type: string
     description: description
     is_mandatory: true

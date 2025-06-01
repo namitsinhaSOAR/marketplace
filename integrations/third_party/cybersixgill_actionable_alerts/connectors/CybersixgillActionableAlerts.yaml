@@ -63,7 +63,6 @@ parameters:
     mode: script
 description: ''
 integration: Cybersixgill Actionable Alerts
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

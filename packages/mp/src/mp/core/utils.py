@@ -17,10 +17,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, TypeVar
-
-_KT = TypeVar("_KT")
-_VT = TypeVar("_VT")
+from typing import TypedDict
 
 SNAKE_PATTERN_1 = re.compile(r"(.)([A-Z][a-z]+)")
 SNAKE_PATTERN_2 = re.compile(r"([a-z0-9])([A-Z])")
@@ -54,20 +51,20 @@ def get_python_version_from_version_string(version: str) -> str:
     return ".".join(map(str, lowest_version))
 
 
-def copy_mapping_without_none_values(
-    d: dict[_KT, _VT | None] | Any,  # noqa: ANN401
-    /,
-) -> dict[_KT, _VT] | Any:  # noqa: ANN401
-    """Copy a mapping and remove all the keys that have `None` value.
+class _TypedDictType(TypedDict):
+    """Wrapper for TypedDicts to allow for attribute access."""
+
+
+def remove_none_entries_from_mapping(d: _TypedDictType, /) -> None:
+    """Remove all the keys that have `None` value in place.
 
     Args:
         d: the mapping to remove keys that have `None` as the value
 
-    Returns:
-        A copy mapping without keys that have `None values`
-
     """
-    return {k: v for k, v in d.items() if v is not None}
+    keys_to_remove: list[str] = [k for k, v in d.items() if v is None]
+    for k in keys_to_remove:
+        del d[k]  # type: ignore[misc]
 
 
 def str_to_snake_case(s: str) -> str:

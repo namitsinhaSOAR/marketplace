@@ -49,7 +49,6 @@ description: Provide a GNQL to generate alerts from.  Recommended to run once da
     from the query will create an Alert. Consumes 1 Search for each IP returned by
     the query.
 integration: GreyNoise
-documentation_link: null
 rules: []
 is_connector_rules_supported: true
 creator: Admin

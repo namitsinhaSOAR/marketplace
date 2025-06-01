@@ -8,13 +8,13 @@ parameters:
     is_mandatory: true
     integration_identifier: beSECURE
 -   name: URL
-    value: https://
+    default_value: https://
     type: string
     description: API root of the bSecure server
     is_mandatory: true
     integration_identifier: beSECURE
--   name: Verify SSL Ceritifcate?
-    value: 'true'
+-   name: Verify SSL Certificate
+    default_value: 'true'
     type: boolean
     description: Should use SSL verification or not
     is_mandatory: false

@@ -3,7 +3,7 @@ name: RecordedFutureIntelligence
 version: 6.0
 parameters:
 -   name: ApiUrl
-    value: https://api.recordedfuture.com
+    default_value: https://api.recordedfuture.com
     type: string
     description: ''
     is_mandatory: true
@@ -14,7 +14,7 @@ parameters:
     is_mandatory: true
     integration_identifier: RecordedFutureIntelligence
 -   name: SandboxApiUrl
-    value: https://sandbox.recordedfuture.com
+    default_value: https://sandbox.recordedfuture.com
     type: string
     description: ''
     is_mandatory: false
@@ -25,13 +25,13 @@ parameters:
     is_mandatory: false
     integration_identifier: RecordedFutureIntelligence
 -   name: Verify SSL
-    value: 'True'
+    default_value: 'True'
     type: boolean
     description: ''
     is_mandatory: false
     integration_identifier: RecordedFutureIntelligence
 -   name: CollectiveInsights
-    value: 'True'
+    default_value: 'True'
     type: boolean
     description: ''
     is_mandatory: true

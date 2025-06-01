@@ -3,7 +3,7 @@ name: FileUtilities
 version: 17.0
 parameters:
 -   name: Verify SSL
-    value: false
+    default_value: false
     type: boolean
     description: Verify SSL Certificates when executing requests to Chronicle SOAR
         instance.

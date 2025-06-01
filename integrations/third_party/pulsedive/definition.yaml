@@ -3,7 +3,7 @@ name: Pulsedive
 version: 4.0
 parameters:
 -   name: API Root
-    value: https://pulsedive.com
+    default_value: https://pulsedive.com
     type: string
     description: API Root that is used to access Pulsedive API
     is_mandatory: true
@@ -14,7 +14,7 @@ parameters:
     is_mandatory: false
     integration_identifier: Pulsedive
 -   name: Verify SSL
-    value: 'true'
+    default_value: 'true'
     type: boolean
     description: Verify SSL
     is_mandatory: false
