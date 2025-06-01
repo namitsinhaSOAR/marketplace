@@ -14,8 +14,9 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING, NotRequired, Self
+from typing import TYPE_CHECKING, Annotated, NotRequired, Self, TypedDict
+
+import pydantic
 
 import mp.core.constants
 import mp.core.data_models.abc
@@ -29,10 +30,9 @@ from .rule import BuiltConnectorRule, ConnectorRule, NonBuiltConnectorRule
 
 if TYPE_CHECKING:
     import pathlib
-    from collections.abc import Sequence
 
 
-class BuiltConnectorMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltConnectorMetadata(TypedDict):
     Creator: str
     Description: str
     DocumentationLink: str
@@ -41,26 +41,25 @@ class BuiltConnectorMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
     IsCustom: bool
     IsEnabled: bool
     Name: str
-    Parameters: Sequence[BuiltConnectorParameter]
-    Rules: Sequence[BuiltConnectorRule]
+    Parameters: list[BuiltConnectorParameter]
+    Rules: list[BuiltConnectorRule]
     Version: float
 
 
-class NonBuiltConnectorMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltConnectorMetadata(TypedDict):
     creator: str
-    description: str
+    description: Annotated[str, pydantic.Field(max_length=256)]
     documentation_link: str
     integration: str
     is_connector_rules_supported: bool
     is_custom: NotRequired[bool]
     is_enabled: NotRequired[bool]
     name: str
-    parameters: Sequence[NonBuiltConnectorParameter]
-    rules: Sequence[NonBuiltConnectorRule]
+    parameters: list[NonBuiltConnectorParameter]
+    rules: list[NonBuiltConnectorRule]
     version: NotRequired[float]
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class ConnectorMetadata(
     mp.core.data_models.abc.ScriptMetadata[
         BuiltConnectorMetadata,
@@ -69,22 +68,15 @@ class ConnectorMetadata(
 ):
     file_name: str
     creator: str
-    description: str
+    description: Annotated[str, pydantic.Field(max_length=256)]
     documentation_link: str
     integration: str
     is_connector_rules_supported: bool
     is_custom: bool
     is_enabled: bool
     name: str
-    parameters: Sequence[
-        mp.core.data_models.abc.Buildable[
-            BuiltConnectorParameter,
-            NonBuiltConnectorParameter,
-        ]
-    ]
-    rules: Sequence[
-        mp.core.data_models.abc.Buildable[BuiltConnectorRule, NonBuiltConnectorRule]
-    ]
+    parameters: list[ConnectorParameter]
+    rules: list[ConnectorRule]
     version: float
 
     @classmethod
@@ -95,7 +87,7 @@ class ConnectorMetadata(
             path: the path to the built integration
 
         Returns:
-            A sequence of `ConnectorMetadata` objects
+            A list of `ConnectorMetadata` objects
 
         """
         meta_path: pathlib.Path = path / mp.core.constants.OUT_CONNECTORS_META_DIR
@@ -115,7 +107,7 @@ class ConnectorMetadata(
             path: the path to the non-built integration
 
         Returns:
-            A sequence of `ConnectorMetadata` objects
+            A list of `ConnectorMetadata` objects
 
         """
         meta_path: pathlib.Path = path / mp.core.constants.CONNECTORS_DIR
@@ -181,19 +173,19 @@ class ConnectorMetadata(
             A built version of the connector metadata dict
 
         """
-        return {
-            "Creator": self.creator,
-            "Description": self.description,
-            "DocumentationLink": self.documentation_link,
-            "Integration": self.integration,
-            "IsConnectorRulesSupported": self.is_connector_rules_supported,
-            "IsCustom": self.is_custom,
-            "IsEnabled": self.is_enabled,
-            "Name": self.name,
-            "Parameters": [param.to_built() for param in self.parameters],
-            "Rules": [rule.to_built() for rule in self.rules],
-            "Version": self.version,
-        }
+        return BuiltConnectorMetadata(
+            Creator=self.creator,
+            Description=self.description,
+            DocumentationLink=self.documentation_link,
+            Integration=self.integration,
+            IsConnectorRulesSupported=self.is_connector_rules_supported,
+            IsCustom=self.is_custom,
+            IsEnabled=self.is_enabled,
+            Name=self.name,
+            Parameters=[param.to_built() for param in self.parameters],
+            Rules=[rule.to_built() for rule in self.rules],
+            Version=self.version,
+        )
 
     def to_non_built(self) -> NonBuiltConnectorMetadata:
         """Create a non-built connector metadata dict.
@@ -202,13 +194,13 @@ class ConnectorMetadata(
             A non-built version of the connector metadata dict
 
         """
-        return {
-            "name": self.name,
-            "parameters": [param.to_non_built() for param in self.parameters],
-            "description": self.description,
-            "integration": self.integration,
-            "documentation_link": self.documentation_link,
-            "rules": [rule.to_non_built() for rule in self.rules],
-            "is_connector_rules_supported": self.is_connector_rules_supported,
-            "creator": self.creator,
-        }
+        return NonBuiltConnectorMetadata(
+            name=self.name,
+            parameters=[param.to_non_built() for param in self.parameters],
+            description=self.description,
+            integration=self.integration,
+            documentation_link=self.documentation_link,
+            rules=[rule.to_non_built() for rule in self.rules],
+            is_connector_rules_supported=self.is_connector_rules_supported,
+            creator=self.creator,
+        )

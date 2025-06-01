@@ -28,8 +28,11 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import mp.core.constants
 import mp.core.file_utils
+import mp.core.utils
 from mp.core.data_models.connector.metadata import ConnectorMetadata
 from mp.core.data_models.release_notes.metadata import ReleaseNote
+
+from .data_models import FullDetailsExtraAttrs
 
 if TYPE_CHECKING:
     import pathlib
@@ -38,11 +41,7 @@ if TYPE_CHECKING:
     from mp.core.custom_types import Products
     from mp.core.data_models.action.metadata import BuiltActionMetadata
 
-    from .data_models import (
-        BuiltFullDetailsIntegrationMetadata,
-        BuiltSupportedAction,
-        FullDetailsExtraAttrs,
-    )
+    from .data_models import BuiltFullDetailsIntegrationMetadata, BuiltSupportedAction
 
 
 SECONDS_IN_MINUTE: int = 60
@@ -132,26 +131,23 @@ class MarketplaceJsonDefinition:
         metadata: BuiltFullDetailsIntegrationMetadata = json.loads(
             def_file_path.read_text(encoding="utf-8"),
         )
-        attrs: FullDetailsExtraAttrs = self._get_full_details_attrs(metadata)
-        metadata.update(attrs)
-        return mp.core.utils.copy_mapping_without_none_values(metadata)  # type: ignore[return-value]
+        self._update_full_details_with_extra_attrs(metadata)
+        return metadata
 
-    def _get_full_details_attrs(
+    def _update_full_details_with_extra_attrs(
         self,
-        integration_metadata: BuiltFullDetailsIntegrationMetadata,
-    ) -> FullDetailsExtraAttrs:
-        release_times: ReleaseTimes = self._get_integration_release_time(
-            integration_metadata,
+        metadata: BuiltFullDetailsIntegrationMetadata,
+    ) -> None:
+        release_times: ReleaseTimes = self._get_integration_release_time(metadata)
+        extra_attrs: FullDetailsExtraAttrs = FullDetailsExtraAttrs(
+            HasConnectors=self._has_connectors(),
+            SupportedActions=self._get_supported_actions(),
+            LatestReleasePublishTimeUnixTime=release_times.latest_release,
+            UpdateNotificationExpired=release_times.update_notification,
+            NewNotificationExpired=release_times.new_notification,
         )
-        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
-            {
-                "HasConnectors": self._has_connectors(),
-                "SupportedActions": self._get_supported_actions(),
-                "LatestReleasePublishTimeUnixTime": release_times.latest_release,
-                "UpdateNotificationExpired": release_times.update_notification,
-                "NewNotificationExpired": release_times.new_notification,
-            },
-        )
+        metadata.update(extra_attrs)  # type: ignore[typeddict-item]
+        mp.core.utils.remove_none_entries_from_mapping(metadata)
 
     def _get_integration_release_time(
         self,

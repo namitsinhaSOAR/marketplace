@@ -14,8 +14,9 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING, NotRequired, Self
+from typing import TYPE_CHECKING, Annotated, NotRequired, Self, TypedDict
+
+import pydantic
 
 import mp.core.constants
 import mp.core.data_models.abc
@@ -45,29 +46,28 @@ class WidgetSize(mp.core.data_models.abc.RepresentableEnum):
     TWO_THIRDS_WIDTH = 4
 
 
-class BuiltWidgetMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltWidgetMetadata(TypedDict):
     title: str
     type: int
     scope: int
-    actionIdentifier: str | None  # noqa: N815
+    actionIdentifier: str | None
     description: str
-    dataDefinition: BuiltWidgetDataDefinition  # noqa: N815
-    conditionsGroup: BuiltConditionGroup  # noqa: N815
-    defaultSize: int  # noqa: N815
+    dataDefinition: BuiltWidgetDataDefinition
+    conditionsGroup: BuiltConditionGroup
+    defaultSize: int
 
 
-class NonBuiltWidgetMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltWidgetMetadata(TypedDict):
     title: str
     type: str
     scope: str
-    action_identifier: NotRequired[str]
+    action_identifier: NotRequired[str | None]
     description: str
     data_definition: NonBuiltWidgetDataDefinition
     condition_group: NonBuiltConditionGroup
     default_size: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class WidgetMetadata(
     mp.core.data_models.abc.ScriptMetadata[BuiltWidgetMetadata, NonBuiltWidgetMetadata],
 ):
@@ -76,15 +76,9 @@ class WidgetMetadata(
     type_: WidgetType
     scope: WidgetScope
     action_identifier: str | None
-    description: str
-    data_definition: mp.core.data_models.abc.Buildable[
-        BuiltWidgetDataDefinition,
-        NonBuiltWidgetDataDefinition,
-    ]
-    condition_group: mp.core.data_models.abc.Buildable[
-        BuiltConditionGroup,
-        NonBuiltConditionGroup,
-    ]
+    description: Annotated[str, pydantic.Field(max_length=256)]
+    data_definition: WidgetDataDefinition
+    condition_group: ConditionGroup
     default_size: WidgetSize
 
     @classmethod
@@ -170,16 +164,16 @@ class WidgetMetadata(
             A built version of the widget metadata dict
 
         """
-        return {
-            "title": self.title,
-            "type": self.type_.value,
-            "scope": self.scope.value,
-            "actionIdentifier": self.action_identifier,
-            "description": self.description,
-            "dataDefinition": self.data_definition.to_built(),
-            "conditionsGroup": self.condition_group.to_built(),
-            "defaultSize": self.default_size.value,
-        }
+        return BuiltWidgetMetadata(
+            title=self.title,
+            type=self.type_.value,
+            scope=self.scope.value,
+            actionIdentifier=self.action_identifier,
+            description=self.description,
+            dataDefinition=self.data_definition.to_built(),
+            conditionsGroup=self.condition_group.to_built(),
+            defaultSize=self.default_size.value,
+        )
 
     def to_non_built(self) -> NonBuiltWidgetMetadata:
         """Create a non-built widget metadata dict.
@@ -188,15 +182,15 @@ class WidgetMetadata(
             A non-built version of the widget metadata dict
 
         """
-        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
-            {
-                "title": self.title,
-                "type": self.type_.to_string(),
-                "scope": self.scope.to_string(),
-                "action_identifier": self.action_identifier,
-                "description": self.description,
-                "data_definition": self.data_definition.to_non_built(),
-                "condition_group": self.condition_group.to_non_built(),
-                "default_size": self.default_size.to_string(),
-            },
+        non_built: NonBuiltWidgetMetadata = NonBuiltWidgetMetadata(
+            title=self.title,
+            type=self.type_.to_string(),
+            scope=self.scope.to_string(),
+            action_identifier=self.action_identifier,
+            description=self.description,
+            data_definition=self.data_definition.to_non_built(),
+            condition_group=self.condition_group.to_non_built(),
+            default_size=self.default_size.to_string(),
         )
+        mp.core.utils.remove_none_entries_from_mapping(non_built)
+        return non_built

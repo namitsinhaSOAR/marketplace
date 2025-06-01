@@ -14,8 +14,10 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING, NotRequired, Self
+import decimal
+from typing import TYPE_CHECKING, Annotated, NotRequired, Self, TypedDict
+
+import pydantic
 
 import mp.core.constants
 import mp.core.data_models.abc
@@ -34,21 +36,20 @@ from .parameter import (
 
 if TYPE_CHECKING:
     import pathlib
-    from collections.abc import Sequence
 
 DEFAULT_SCRIPT_RESULT_NAME: str = "is_success"
 DEFAULT_SIMULATION_DATA: str = '{"Entities": []}'
 
 
-class BuiltActionMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltActionMetadata(TypedDict):
     Description: str
-    DynamicResultsMetadata: Sequence[BuiltDynamicResultsMetadata]
+    DynamicResultsMetadata: list[BuiltDynamicResultsMetadata]
     IntegrationIdentifier: str
     IsAsync: bool
     IsCustom: bool
     IsEnabled: bool
     Name: str
-    Parameters: Sequence[BuiltActionParameter]
+    Parameters: list[BuiltActionParameter]
     Creator: str
     ScriptResultName: str
     SimulationDataJson: NotRequired[str]
@@ -56,15 +57,15 @@ class BuiltActionMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
     Version: float
 
 
-class NonBuiltActionMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltActionMetadata(TypedDict):
     description: str
-    dynamic_results_metadata: Sequence[NonBuiltDynamicResultsMetadata]
+    dynamic_results_metadata: list[NonBuiltDynamicResultsMetadata]
     integration_identifier: str
     is_async: NotRequired[bool]
     is_custom: NotRequired[bool]
     is_enabled: NotRequired[bool]
     name: str
-    parameters: Sequence[NonBuiltActionParameter]
+    parameters: list[NonBuiltActionParameter]
     creator: NotRequired[str]
     script_result_name: NotRequired[str]
     simulation_data_json: NotRequired[str]
@@ -72,31 +73,23 @@ class NonBuiltActionMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict):
     version: NotRequired[float]
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class ActionMetadata(
     mp.core.data_models.abc.ScriptMetadata[BuiltActionMetadata, NonBuiltActionMetadata],
 ):
     file_name: str
-    description: str
-    dynamic_results_metadata: Sequence[
-        mp.core.data_models.abc.Buildable[
-            BuiltDynamicResultsMetadata,
-            NonBuiltDynamicResultsMetadata,
-        ]
-    ]
+    description: Annotated[str, pydantic.Field(max_length=256)]
+    dynamic_results_metadata: list[DynamicResultsMetadata]
     integration_identifier: str
     is_async: bool
     is_custom: bool
     is_enabled: bool
     name: str
-    parameters: Sequence[
-        mp.core.data_models.abc.Buildable[BuiltActionParameter, NonBuiltActionParameter]
-    ]
+    parameters: list[ActionParameter]
     default_result_value: str | None
     creator: str
     script_result_name: str
     simulation_data_json: str
-    version: float
+    version: Annotated[decimal.Decimal, pydantic.Field(decimal_places=1)]
 
     @classmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[Self]:
@@ -106,7 +99,7 @@ class ActionMetadata(
             path: the path to the built integration
 
         Returns:
-            A sequence of `ActionMetadata` objects
+            A list of `ActionMetadata` objects
 
         """
         meta_path: pathlib.Path = path / mp.core.constants.OUT_ACTIONS_META_DIR
@@ -126,7 +119,7 @@ class ActionMetadata(
             path: the path to the non-built integration
 
         Returns:
-            A sequence of `ActionMetadata` objects
+            A list of `ActionMetadata` objects
 
         """
         meta_path: pathlib.Path = path / mp.core.constants.ACTIONS_DIR
@@ -167,7 +160,7 @@ class ActionMetadata(
             script_result_name=built.get("ScriptResultName", "is_success"),
             simulation_data_json=built.get("SimulationDataJson", '{"Entities": []}'),
             default_result_value=built.get("DefaultResultValue"),
-            version=built.get("Version", 1.0),
+            version=decimal.Decimal(built.get("Version", 1.0)),
         )
 
     @classmethod
@@ -208,7 +201,7 @@ class ActionMetadata(
                 '{"Entities": []}',
             ),
             default_result_value=non_built.get("default_result_value"),
-            version=non_built.get("version", 1.0),
+            version=decimal.Decimal(non_built.get("version", 1.0)),
         )
 
     def to_built(self) -> BuiltActionMetadata:
@@ -218,25 +211,25 @@ class ActionMetadata(
             A built version of the action metadata dict
 
         """
-        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
-            {
-                "Creator": self.creator,
-                "Description": self.description,
-                "DynamicResultsMetadata": [
-                    m.to_built() for m in self.dynamic_results_metadata
-                ],
-                "IntegrationIdentifier": self.integration_identifier,
-                "IsAsync": self.is_async,
-                "IsCustom": self.is_custom,
-                "IsEnabled": self.is_enabled,
-                "Name": self.name,
-                "Parameters": [p.to_built() for p in self.parameters],
-                "ScriptResultName": self.script_result_name,
-                "SimulationDataJson": self.simulation_data_json,
-                "DefaultResultValue": self.default_result_value,
-                "Version": self.version,
-            },
+        built: BuiltActionMetadata = BuiltActionMetadata(
+            Creator=self.creator,
+            Description=self.description,
+            DynamicResultsMetadata=[
+                m.to_built() for m in self.dynamic_results_metadata
+            ],
+            IntegrationIdentifier=self.integration_identifier,
+            IsAsync=self.is_async,
+            IsCustom=self.is_custom,
+            IsEnabled=self.is_enabled,
+            Name=self.name,
+            Parameters=[p.to_built() for p in self.parameters],
+            ScriptResultName=self.script_result_name,
+            SimulationDataJson=self.simulation_data_json,
+            DefaultResultValue=self.default_result_value,
+            Version=float(self.version),
         )
+        mp.core.utils.remove_none_entries_from_mapping(built)
+        return built
 
     def to_non_built(self) -> NonBuiltActionMetadata:
         """Create a non-built action metadata dict.
@@ -245,17 +238,17 @@ class ActionMetadata(
             A non-built version of the action metadata dict
 
         """
-        non_built: NonBuiltActionMetadata = {
-            "name": self.name,
-            "description": self.description,
-            "integration_identifier": self.integration_identifier,
-            "parameters": [p.to_non_built() for p in self.parameters],
-            "dynamic_results_metadata": [
+        non_built: NonBuiltActionMetadata = NonBuiltActionMetadata(
+            name=self.name,
+            description=self.description,
+            integration_identifier=self.integration_identifier,
+            parameters=[p.to_non_built() for p in self.parameters],
+            dynamic_results_metadata=[
                 m.to_non_built() for m in self.dynamic_results_metadata
             ],
-            "default_result_value": self.default_result_value,
-            "creator": self.creator,
-        }
+            default_result_value=self.default_result_value,
+            creator=self.creator,
+        )
         if self.is_async:
             non_built["is_async"] = self.is_async
 
@@ -265,4 +258,5 @@ class ActionMetadata(
         if self.script_result_name != DEFAULT_SCRIPT_RESULT_NAME:
             non_built["script_result_name"] = self.script_result_name
 
-        return mp.core.utils.copy_mapping_without_none_values(non_built)  # type: ignore[return-value]
+        mp.core.utils.remove_none_entries_from_mapping(non_built)
+        return non_built

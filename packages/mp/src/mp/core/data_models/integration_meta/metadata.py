@@ -14,10 +14,12 @@
 
 from __future__ import annotations
 
-import dataclasses
+import base64
+import decimal
 import json
-from typing import TYPE_CHECKING, NotRequired, Self
+from typing import TYPE_CHECKING, Annotated, NotRequired, Self, TypedDict
 
+import pydantic
 import yaml
 
 import mp.core.constants
@@ -33,7 +35,6 @@ from .parameter import (
 
 if TYPE_CHECKING:
     import pathlib
-    from collections.abc import Sequence
 
 
 MINIMUM_SYSTEM_VERSION: float = 5.3
@@ -45,7 +46,7 @@ class PythonVersion(mp.core.data_models.abc.RepresentableEnum):
 
     @classmethod
     def from_string(cls, s: str, /) -> PythonVersion:
-        """Create PythonVersion from string representation.
+        """Create a PythonVersion from string representation.
 
         Returns:
             The PythonVersion object
@@ -71,37 +72,37 @@ class PythonVersion(mp.core.data_models.abc.RepresentableEnum):
         return enum_to_str[self]
 
 
-class BuiltIntegrationMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
-    Categories: Sequence[str]
+class BuiltIntegrationMetadata(TypedDict):
+    Categories: list[str]
     Description: str
-    FeatureTags: NotRequired[BuiltFeatureTags]
+    FeatureTags: NotRequired[BuiltFeatureTags | None]
     DisplayName: str
     Identifier: str
     PythonVersion: int
     DocumentationLink: str | None
     ImageBase64: str
-    IntegrationProperties: Sequence[BuiltIntegrationParameter]
+    IntegrationProperties: list[BuiltIntegrationParameter]
     ShouldInstalledInSystem: bool
     IsAvailableForCommunity: bool
     MarketingDisplayName: str
     MinimumSystemVersion: float
-    SVGImage: str
-    SvgImage: NotRequired[str]
+    SVGImage: str | None
+    SvgImage: NotRequired[str | None]
     Version: float
     IsCustom: bool
     IsPowerUp: bool
 
 
-class NonBuiltIntegrationMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict):
-    categories: Sequence[str]
+class NonBuiltIntegrationMetadata(TypedDict):
+    categories: list[str]
     description: str
-    feature_tags: NotRequired[NonBuiltFeatureTags]
+    feature_tags: NotRequired[NonBuiltFeatureTags | None]
     name: str
     identifier: str
     python_version: str
     documentation_link: NotRequired[str | None]
     image_base64: str
-    parameters: Sequence[NonBuiltIntegrationParameter]
+    parameters: list[NonBuiltIntegrationParameter]
     should_install_in_system: NotRequired[bool]
     svg_image: str | None
     version: float
@@ -110,36 +111,30 @@ class NonBuiltIntegrationMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict)
     is_powerup: NotRequired[bool]
 
 
-@dataclasses.dataclass(slots=True)
 class IntegrationMetadata(
     mp.core.data_models.abc.Buildable[
-        BuiltIntegrationMetadata,
-        NonBuiltIntegrationMetadata,
-    ],
+        BuiltIntegrationMetadata, NonBuiltIntegrationMetadata
+    ]
 ):
-    categories: Sequence[str]
-    description: str
-    feature_tags: (
-        mp.core.data_models.abc.Buildable[BuiltFeatureTags, NonBuiltFeatureTags] | None
-    )
+    categories: list[str]
+    description: Annotated[str, pydantic.Field(max_length=256)]
+    feature_tags: FeatureTags | None
     name: str
     identifier: str
     python_version: PythonVersion
-    documentation_link: str | None
-    image_base64: str
-    parameters: Sequence[
-        mp.core.data_models.abc.Buildable[
-            BuiltIntegrationParameter,
-            NonBuiltIntegrationParameter,
-        ]
-    ]
-    should_install_in_system: bool
+    documentation_link: pydantic.HttpUrl | pydantic.FileUrl | None
+    image_base64: pydantic.Base64Bytes
+    parameters: list[IntegrationParameter]
+    should_install_in_system: bool = False
     svg_image: str | None
-    version: float
-    is_custom: bool
-    is_available_for_community: bool
-    is_powerup: bool
-    minimum_system_version: float = MINIMUM_SYSTEM_VERSION
+    version: Annotated[decimal.Decimal, pydantic.Field(decimal_places=1)]
+    is_custom: bool = False
+    is_available_for_community: bool = True
+    is_powerup: bool = False
+    minimum_system_version: Annotated[
+        decimal.Decimal,
+        pydantic.Field(ge=MINIMUM_SYSTEM_VERSION, max_digits=2, decimal_places=1),
+    ] = decimal.Decimal(MINIMUM_SYSTEM_VERSION)
 
     @classmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> Self:
@@ -194,10 +189,7 @@ class IntegrationMetadata(
 
     @classmethod
     def _from_built(cls, built: BuiltIntegrationMetadata) -> Self:
-        feature_tags: (
-            mp.core.data_models.abc.Buildable[BuiltFeatureTags, NonBuiltFeatureTags]
-            | None
-        ) = None
+        feature_tags: FeatureTags | None = None
         raw_feature_tags: BuiltFeatureTags | None = built.get("FeatureTags")
         if raw_feature_tags is not None:
             feature_tags = FeatureTags.from_built(raw_feature_tags)
@@ -217,7 +209,7 @@ class IntegrationMetadata(
             ],
             should_install_in_system=built["ShouldInstalledInSystem"],
             svg_image=built.get("SVGImage", built.get("SvgImage")),
-            version=built["Version"],
+            version=decimal.Decimal(built["Version"]),
             is_custom=built.get("IsCustom", False),
             is_available_for_community=built.get("IsAvailableForCommunity", True),
             is_powerup=built.get("IsPowerUp", False),
@@ -225,10 +217,7 @@ class IntegrationMetadata(
 
     @classmethod
     def _from_non_built(cls, non_built: NonBuiltIntegrationMetadata) -> Self:
-        feature_tags: (
-            mp.core.data_models.abc.Buildable[BuiltFeatureTags, NonBuiltFeatureTags]
-            | None
-        ) = None
+        feature_tags: FeatureTags | None = None
         raw_feature_tags: NonBuiltFeatureTags | None = non_built.get("feature_tags")
         if raw_feature_tags is not None:
             feature_tags = FeatureTags.from_non_built(raw_feature_tags)
@@ -248,7 +237,7 @@ class IntegrationMetadata(
             should_install_in_system=non_built.get("should_install_in_system", False),
             is_custom=non_built.get("is_custom", False),
             svg_image=non_built.get("svg_image"),
-            version=non_built["version"],
+            version=decimal.Decimal(non_built["version"]),
             is_available_for_community=non_built.get(
                 "is_available_for_community",
                 True,
@@ -263,31 +252,33 @@ class IntegrationMetadata(
             The "built" TypedDict version of the integration's metadata.
 
         """
-        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
-            {
-                "Categories": self.categories,
-                "Description": self.description,
-                "DisplayName": self.name,
-                "DocumentationLink": self.documentation_link,
-                "FeatureTags": (
-                    self.feature_tags.to_built()
-                    if self.feature_tags is not None
-                    else None
-                ),
-                "Identifier": self.identifier,
-                "ImageBase64": self.image_base64,
-                "IntegrationProperties": [p.to_built() for p in self.parameters],
-                "IsAvailableForCommunity": True,
-                "MarketingDisplayName": self.name,
-                "MinimumSystemVersion": self.minimum_system_version,
-                "PythonVersion": self.python_version.value,
-                "SVGImage": self.svg_image,
-                "ShouldInstalledInSystem": self.should_install_in_system,
-                "Version": self.version,
-                "IsCustom": self.is_custom,
-                "IsPowerUp": self.is_powerup,
-            },
+        built: BuiltIntegrationMetadata = BuiltIntegrationMetadata(
+            Categories=self.categories,
+            Description=self.description,
+            DisplayName=self.name,
+            DocumentationLink=(
+                str(self.documentation_link) or None
+                if self.documentation_link is not None
+                else None
+            ),
+            FeatureTags=(
+                self.feature_tags.to_built() if self.feature_tags is not None else None
+            ),
+            Identifier=self.identifier,
+            ImageBase64=base64.b64encode(self.image_base64).decode(),
+            IntegrationProperties=[p.to_built() for p in self.parameters],
+            IsAvailableForCommunity=True,
+            MarketingDisplayName=self.name,
+            MinimumSystemVersion=float(self.minimum_system_version),
+            PythonVersion=self.python_version.value,
+            SVGImage=self.svg_image,
+            ShouldInstalledInSystem=self.should_install_in_system,
+            Version=float(self.version),
+            IsCustom=self.is_custom,
+            IsPowerUp=self.is_powerup,
         )
+        mp.core.utils.remove_none_entries_from_mapping(built)
+        return built
 
     def to_non_built(self) -> NonBuiltIntegrationMetadata:
         """Create the "non-built" TypedDict version of the integration's metadata.
@@ -296,18 +287,22 @@ class IntegrationMetadata(
             The "non-built" TypedDict version of the integration's metadata.
 
         """
-        non_built: NonBuiltIntegrationMetadata = {
-            "identifier": self.identifier,
-            "name": self.name,
-            "version": self.version,
-            "parameters": [p.to_non_built() for p in self.parameters],
-            "description": self.description,
-            "python_version": self.python_version.to_string(),
-            "documentation_link": self.documentation_link,
-            "categories": self.categories,
-            "svg_image": self.svg_image,
-            "image_base64": self.image_base64,
-        }
+        non_built: NonBuiltIntegrationMetadata = NonBuiltIntegrationMetadata(
+            identifier=self.identifier,
+            name=self.name,
+            version=float(self.version),
+            parameters=[p.to_non_built() for p in self.parameters],
+            description=self.description,
+            python_version=self.python_version.to_string(),
+            documentation_link=(
+                str(self.documentation_link)
+                if self.documentation_link is not None
+                else None
+            ),
+            categories=self.categories,
+            svg_image=self.svg_image,
+            image_base64=base64.b64encode(self.image_base64).decode(),
+        )
 
         if self.feature_tags is not None:
             non_built["feature_tags"] = self.feature_tags.to_non_built()
@@ -321,4 +316,5 @@ class IntegrationMetadata(
         if self.is_powerup is True:
             non_built["is_powerup"] = self.is_powerup
 
-        return mp.core.utils.copy_mapping_without_none_values(non_built)  # type: ignore[return-value]
+        mp.core.utils.remove_none_entries_from_mapping(non_built)
+        return non_built

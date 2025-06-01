@@ -17,24 +17,13 @@ from __future__ import annotations
 import abc
 import enum
 import json
-from typing import TYPE_CHECKING, Generic, Self, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
+import pydantic
 import yaml
 
 if TYPE_CHECKING:
     import pathlib
-
-
-class BaseBuiltTypedDict(TypedDict):
-    """Used for type checking Built TypedDict objects."""
-
-
-class BaseNonBuiltTypedDict(TypedDict):
-    """Used for type checking NonBuilt TypedDict objects."""
-
-
-_BT = TypeVar("_BT", bound=BaseBuiltTypedDict)
-_NBT = TypeVar("_NBT", bound=BaseNonBuiltTypedDict)
 
 
 class RepresentableEnum(enum.Enum):
@@ -62,7 +51,11 @@ class RepresentableEnum(enum.Enum):
         return self.name.casefold()
 
 
-class Buildable(abc.ABC, Generic[_BT, _NBT]):
+_BT = TypeVar("_BT")
+_NBT = TypeVar("_NBT")
+
+
+class Buildable(pydantic.BaseModel, abc.ABC, Generic[_BT, _NBT]):
     @classmethod
     @abc.abstractmethod
     def _from_built(cls, built: _BT) -> Self:
@@ -152,7 +145,7 @@ class Buildable(abc.ABC, Generic[_BT, _NBT]):
             return metadata
 
 
-class BuildableScript(abc.ABC, Generic[_BT, _NBT]):
+class BuildableScript(pydantic.BaseModel, abc.ABC, Generic[_BT, _NBT]):
     @classmethod
     @abc.abstractmethod
     def _from_built(cls, file_name: str, built: _BT) -> Self:
@@ -246,7 +239,7 @@ class BuildableScript(abc.ABC, Generic[_BT, _NBT]):
             return metadata
 
 
-class ScriptMetadata(BuildableScript[_BT, _NBT], abc.ABC, Generic[_BT, _NBT]):
+class ScriptMetadata(BuildableScript, abc.ABC, Generic[_BT, _NBT]):
     @classmethod
     @abc.abstractmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[Self]:
@@ -325,7 +318,7 @@ class ScriptMetadata(BuildableScript[_BT, _NBT], abc.ABC, Generic[_BT, _NBT]):
             return non_built
 
 
-class SequentialMetadata(Buildable[_BT, _NBT], abc.ABC, Generic[_BT, _NBT]):
+class SequentialMetadata(Buildable, abc.ABC, Generic[_BT, _NBT]):
     @classmethod
     @abc.abstractmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[Self]:

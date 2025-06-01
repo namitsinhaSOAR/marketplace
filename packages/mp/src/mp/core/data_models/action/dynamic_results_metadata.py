@@ -14,24 +14,23 @@
 
 from __future__ import annotations
 
-import dataclasses
+from typing import TypedDict
 
 import mp.core.data_models.abc
 
 
-class BuiltDynamicResultsMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltDynamicResultsMetadata(TypedDict):
     ResultExample: str
     ResultName: str
     ShowResult: bool
 
 
-class NonBuiltDynamicResultsMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltDynamicResultsMetadata(TypedDict):
     result_example: str
     result_name: str
     show_result: bool
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class DynamicResultsMetadata(
     mp.core.data_models.abc.Buildable[
         BuiltDynamicResultsMetadata,
@@ -86,11 +85,11 @@ class DynamicResultsMetadata(
             A built version of the dynamic results metadata dict
 
         """
-        return {
-            "ResultExample": self.result_example,
-            "ResultName": self.result_name,
-            "ShowResult": self.show_result,
-        }
+        return BuiltDynamicResultsMetadata(
+            ResultExample=self.result_example,
+            ResultName=self.result_name,
+            ShowResult=self.show_result,
+        )
 
     def to_non_built(self) -> NonBuiltDynamicResultsMetadata:
         """Create a non-built dynamic results metadata dict.
@@ -99,8 +98,8 @@ class DynamicResultsMetadata(
             A non-built version of the dynamic results metadata dict
 
         """
-        return {
-            "result_name": self.result_name,
-            "show_result": self.show_result,
-            "result_example": self.result_example,
-        }
+        return NonBuiltDynamicResultsMetadata(
+            result_name=self.result_name,
+            show_result=self.show_result,
+            result_example=self.result_example,
+        )

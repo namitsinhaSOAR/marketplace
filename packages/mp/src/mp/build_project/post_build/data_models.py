@@ -39,9 +39,9 @@ class BuiltSupportedAction(TypedDict):
 
 
 class FullDetailsExtraAttrs(TypedDict):
-    LatestReleasePublishTimeUnixTime: NotRequired[int]
-    UpdateNotificationExpired: NotRequired[int]
-    NewNotificationExpired: NotRequired[int]
+    LatestReleasePublishTimeUnixTime: NotRequired[int | None]
+    UpdateNotificationExpired: NotRequired[int | None]
+    NewNotificationExpired: NotRequired[int | None]
     HasConnectors: bool
     SupportedActions: Sequence[BuiltSupportedAction]
 

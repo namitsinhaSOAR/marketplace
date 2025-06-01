@@ -14,12 +14,12 @@
 
 from __future__ import annotations
 
-import dataclasses
+from typing import TypedDict
 
 import mp.core.data_models.abc
 
 
-class BuiltCustomFamilyRule(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltCustomFamilyRule(TypedDict):
     PrimarySource: str
     SecondarySource: str
     ThirdSource: str
@@ -32,7 +32,7 @@ class BuiltCustomFamilyRule(mp.core.data_models.abc.BaseBuiltTypedDict):
     VisualFamily: str
 
 
-class NonBuiltCustomFamilyRule(mp.core.data_models.abc.BaseBuiltTypedDict):
+class NonBuiltCustomFamilyRule(TypedDict):
     primary_source: str
     secondary_source: str
     third_source: str
@@ -45,7 +45,6 @@ class NonBuiltCustomFamilyRule(mp.core.data_models.abc.BaseBuiltTypedDict):
     visual_family: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class CustomFamilyRule(
     mp.core.data_models.abc.Buildable[BuiltCustomFamilyRule, NonBuiltCustomFamilyRule],
 ):
@@ -97,18 +96,18 @@ class CustomFamilyRule(
             The "non-built" representation of the object.
 
         """
-        return {
-            "PrimarySource": self.primary_source,
-            "SecondarySource": self.secondary_source,
-            "ThirdSource": self.third_source,
-            "FourthSource": self.fourth_source,
-            "RelationType": self.relation_type,
-            "PrimaryDestination": self.primary_destination,
-            "SecondaryDestination": self.secondary_destination,
-            "ThirdDestination": self.third_destination,
-            "FourthDestination": self.fourth_destination,
-            "VisualFamily": self.visual_family,
-        }
+        return BuiltCustomFamilyRule(
+            PrimarySource=self.primary_source,
+            SecondarySource=self.secondary_source,
+            ThirdSource=self.third_source,
+            FourthSource=self.fourth_source,
+            RelationType=self.relation_type,
+            PrimaryDestination=self.primary_destination,
+            SecondaryDestination=self.secondary_destination,
+            ThirdDestination=self.third_destination,
+            FourthDestination=self.fourth_destination,
+            VisualFamily=self.visual_family,
+        )
 
     def to_non_built(self) -> NonBuiltCustomFamilyRule:
         """Turn the buildable object into a "non-built" typed dict.
@@ -117,15 +116,15 @@ class CustomFamilyRule(
             The "built" representation of the object
 
         """
-        return {
-            "primary_source": self.primary_source,
-            "secondary_source": self.secondary_source,
-            "third_source": self.third_source,
-            "fourth_source": self.fourth_source,
-            "relation_type": self.relation_type,
-            "primary_destination": self.primary_destination,
-            "secondary_destination": self.secondary_destination,
-            "third_destination": self.third_destination,
-            "fourth_destination": self.fourth_destination,
-            "visual_family": self.visual_family,
-        }
+        return NonBuiltCustomFamilyRule(
+            primary_source=self.primary_source,
+            secondary_source=self.secondary_source,
+            third_source=self.third_source,
+            fourth_source=self.fourth_source,
+            relation_type=self.relation_type,
+            primary_destination=self.primary_destination,
+            secondary_destination=self.secondary_destination,
+            third_destination=self.third_destination,
+            fourth_destination=self.fourth_destination,
+            visual_family=self.visual_family,
+        )

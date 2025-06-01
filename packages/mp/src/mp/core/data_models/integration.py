@@ -15,15 +15,15 @@
 from __future__ import annotations
 
 import dataclasses
+import decimal
 import itertools
 import tomllib
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypedDict
 
 import mp.core.constants
 import mp.core.file_utils
 import mp.core.utils
 
-from . import abc
 from .action.metadata import ActionMetadata
 from .connector.metadata import ConnectorMetadata
 from .custom_families.metadata import CustomFamily
@@ -59,7 +59,7 @@ if TYPE_CHECKING:
     from .widget.metadata import BuiltWidgetMetadata, NonBuiltWidgetMetadata
 
 
-class BuiltIntegration(abc.BaseBuiltTypedDict):
+class BuiltIntegration(TypedDict):
     metadata: BuiltIntegrationMetadata
     release_notes: Sequence[BuiltReleaseNote]
     mapping_rules: Sequence[BuiltMappingRule]
@@ -71,7 +71,7 @@ class BuiltIntegration(abc.BaseBuiltTypedDict):
     widgets: Mapping[WidgetName, BuiltWidgetMetadata]
 
 
-class NonBuiltIntegration(abc.BaseNonBuiltTypedDict):
+class NonBuiltIntegration(TypedDict):
     metadata: NonBuiltIntegrationMetadata
     release_notes: Sequence[NonBuiltReleaseNote]
     mapping_rules: Sequence[NonBuiltMappingRule]
@@ -83,17 +83,17 @@ class NonBuiltIntegration(abc.BaseNonBuiltTypedDict):
     widgets: Mapping[WidgetName, NonBuiltWidgetMetadata]
 
 
-class IntegrationPyProjectToml(abc.BaseNonBuiltTypedDict):
+class IntegrationPyProjectToml(TypedDict):
     project: MutableMapping[str, Any]
 
 
-class FullDetailsReleaseNoteJson(abc.BaseBuiltTypedDict):
+class FullDetailsReleaseNoteJson(TypedDict):
     Items: Sequence[str]
     Version: float
     PublishTimeUnixTime: int
 
 
-class BuiltFullDetails(abc.BaseBuiltTypedDict):
+class BuiltFullDetails(TypedDict):
     Identifier: str
     PackageName: str
     DisplayName: str
@@ -425,29 +425,29 @@ class Integration:
             The "built" representation of the object.
 
         """
-        return {
-            "metadata": self.metadata.to_built(),
-            "release_notes": [rn.to_built() for rn in self.release_notes],
-            "custom_families": [cf.to_built() for cf in self.custom_families],
-            "mapping_rules": [mr.to_built() for mr in self.mapping_rules],
-            "common_modules": self.common_modules,
-            "actions": {
+        return BuiltIntegration(
+            metadata=self.metadata.to_built(),
+            release_notes=[rn.to_built() for rn in self.release_notes],
+            custom_families=[cf.to_built() for cf in self.custom_families],
+            mapping_rules=[mr.to_built() for mr in self.mapping_rules],
+            common_modules=self.common_modules,
+            actions={
                 name: metadata.to_built()
                 for name, metadata in self.actions_metadata.items()
             },
-            "connectors": {
+            connectors={
                 name: metadata.to_built()
                 for name, metadata in self.connectors_metadata.items()
             },
-            "jobs": {
+            jobs={
                 name: metadata.to_built()
                 for name, metadata in self.jobs_metadata.items()
             },
-            "widgets": {
+            widgets={
                 name: metadata.to_built()
                 for name, metadata in self.widgets_metadata.items()
             },
-        }
+        )
 
     def to_non_built(self) -> NonBuiltIntegration:
         """Turn the buildable object into a "non-built" typed dict.
@@ -456,29 +456,29 @@ class Integration:
             The "non-built" representation of the object
 
         """
-        return {
-            "metadata": self.metadata.to_non_built(),
-            "release_notes": [rn.to_non_built() for rn in self.release_notes],
-            "custom_families": [cf.to_non_built() for cf in self.custom_families],
-            "mapping_rules": [mr.to_non_built() for mr in self.mapping_rules],
-            "common_modules": self.common_modules,
-            "actions": {
+        return NonBuiltIntegration(
+            metadata=self.metadata.to_non_built(),
+            release_notes=[rn.to_non_built() for rn in self.release_notes],
+            custom_families=[cf.to_non_built() for cf in self.custom_families],
+            mapping_rules=[mr.to_non_built() for mr in self.mapping_rules],
+            common_modules=self.common_modules,
+            actions={
                 name: metadata.to_non_built()
                 for name, metadata in self.actions_metadata.items()
             },
-            "connectors": {
+            connectors={
                 name: metadata.to_non_built()
                 for name, metadata in self.connectors_metadata.items()
             },
-            "jobs": {
+            jobs={
                 name: metadata.to_non_built()
                 for name, metadata in self.jobs_metadata.items()
             },
-            "widgets": {
+            widgets={
                 name: metadata.to_non_built()
                 for name, metadata in self.widgets_metadata.items()
             },
-        }
+        )
 
     def to_built_full_details(self) -> BuiltFullDetails:
         """Turn the integration into a `.fulldetails` JSON form.
@@ -487,26 +487,30 @@ class Integration:
             The `.fulldetails` JSON form of the integration.
 
         """
-        return {
-            "Identifier": self.metadata.identifier,
-            "PackageName": self.metadata.name,
-            "DisplayName": self.metadata.name,
-            "Description": self.metadata.description,
-            "DocumentationLink": self.metadata.documentation_link,
-            "MinimumSystemVersion": self.metadata.minimum_system_version,
-            "IntegrationProperties": [p.to_built() for p in self.metadata.parameters],
-            "Actions": [am.name for am in self.actions_metadata.values()],
-            "Jobs": [jm.name for jm in self.jobs_metadata.values()],
-            "Connectors": [cm.name for cm in self.connectors_metadata.values()],
-            "Managers": self.common_modules,
-            "CustomFamilies": [cf.family for cf in self.custom_families],
-            "MappingRules": ["Default mapping rules"] if self.mapping_rules else [],
-            "Widgets": [wm.title for wm in self.widgets_metadata.values()],
-            "Version": self.metadata.version,
-            "IsCustom": False,
-            "ExampleUseCases": [],
-            "ReleaseNotes": self._get_full_details_release_notes(),
-        }
+        return BuiltFullDetails(
+            Identifier=self.metadata.identifier,
+            PackageName=self.metadata.name,
+            DisplayName=self.metadata.name,
+            Description=self.metadata.description,
+            DocumentationLink=(
+                str(self.metadata.documentation_link)
+                if self.metadata.documentation_link is not None
+                else None
+            ),
+            MinimumSystemVersion=float(self.metadata.minimum_system_version),
+            IntegrationProperties=[p.to_built() for p in self.metadata.parameters],
+            Actions=[am.name for am in self.actions_metadata.values()],
+            Jobs=[jm.name for jm in self.jobs_metadata.values()],
+            Connectors=[cm.name for cm in self.connectors_metadata.values()],
+            Managers=self.common_modules,
+            CustomFamilies=[cf.family for cf in self.custom_families],
+            MappingRules=["Default mapping rules"] if self.mapping_rules else [],
+            Widgets=[wm.title for wm in self.widgets_metadata.values()],
+            Version=float(self.metadata.version),
+            IsCustom=False,
+            ExampleUseCases=[],
+            ReleaseNotes=self._get_full_details_release_notes(),
+        )
 
     def _get_full_details_release_notes(self) -> list[FullDetailsReleaseNoteJson]:
         version_to_rns: itertools.groupby[float, ReleaseNote] = itertools.groupby(
@@ -546,4 +550,6 @@ def _update_integration_meta_form_pyproject(
     )
     integration_meta.python_version = PythonVersion.from_string(pyv)
     integration_meta.description = pyproject_toml["project"]["description"]
-    integration_meta.version = float(pyproject_toml["project"]["version"])
+    integration_meta.version = decimal.Decimal(
+        float(pyproject_toml["project"]["version"])
+    )

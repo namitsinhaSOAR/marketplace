@@ -14,8 +14,10 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING, NotRequired, Self
+import decimal
+from typing import TYPE_CHECKING, Annotated, NotRequired, Self, TypedDict
+
+import pydantic
 
 import mp.core.constants
 import mp.core.data_models.abc
@@ -24,61 +26,57 @@ from .parameter import BuiltJobParameter, JobParameter, NonBuiltJobParameter
 
 if TYPE_CHECKING:
     import pathlib
-    from collections.abc import Sequence
 
 DEFAULT_RUNTIME_INTERVAL: int = 900
 
 
-class BuiltJobMetadata(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltJobMetadata(TypedDict):
     Creator: str
     Description: str
     Integration: str
     IsCustom: bool
     IsEnabled: bool
     Name: str
-    Parameters: Sequence[BuiltJobParameter]
+    Parameters: list[BuiltJobParameter]
     RunIntervalInSeconds: int
     Version: float
 
 
-class NonBuiltJobMetadata(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltJobMetadata(TypedDict):
     creator: str
     description: str
     integration: str
     is_custom: NotRequired[bool]
     is_enabled: NotRequired[bool]
     name: str
-    parameters: Sequence[NonBuiltJobParameter]
+    parameters: list[NonBuiltJobParameter]
     run_interval_in_seconds: NotRequired[int]
     version: NotRequired[float]
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class JobMetadata(
     mp.core.data_models.abc.ScriptMetadata[BuiltJobMetadata, NonBuiltJobMetadata],
 ):
     file_name: str
     creator: str
-    description: str
+    description: Annotated[str, pydantic.Field(max_length=256)]
     integration: str
-    is_custom: bool
-    is_enabled: bool
+    is_custom: Annotated[bool, pydantic.Field(default=False)]
+    is_enabled: Annotated[bool, pydantic.Field(default=True)]
     name: str
-    parameters: Sequence[
-        mp.core.data_models.abc.Buildable[BuiltJobParameter, NonBuiltJobParameter]
-    ]
+    parameters: list[JobParameter]
     run_interval_in_seconds: int
-    version: float
+    version: Annotated[decimal.Decimal, pydantic.Field(decimal_places=1, default=1.0)]
 
     @classmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[Self]:
-        """Create based on the metadata files found in the built-integration path.
+        """Create based on the metadata files found in the 'built' integration path.
 
         Args:
             path: the path to the built integration
 
         Returns:
-            A sequence of `JobMetadata` objects
+            A list of `JobMetadata` objects
 
         """
         meta_path: pathlib.Path = path / mp.core.constants.OUT_JOBS_META_DIR
@@ -98,7 +96,7 @@ class JobMetadata(
             path: the path to the non-built integration
 
         Returns:
-            A sequence of `JobMetadata` objects
+            A list of `JobMetadata` objects
 
         """
         meta_path: pathlib.Path = path / mp.core.constants.JOBS_DIR
@@ -124,7 +122,7 @@ class JobMetadata(
                 JobParameter.from_built(param) for param in built["Parameters"]
             ],
             run_interval_in_seconds=built["RunIntervalInSeconds"],
-            version=built.get("Version", 1.0),
+            version=decimal.Decimal(built.get("Version", 1.0)),
         )
 
     @classmethod
@@ -148,7 +146,7 @@ class JobMetadata(
                 "run_interval_in_seconds",
                 DEFAULT_RUNTIME_INTERVAL,
             ),
-            version=non_built.get("version", 1.0),
+            version=decimal.Decimal(non_built.get("version", 1.0)),
         )
 
     def to_built(self) -> BuiltJobMetadata:
@@ -158,17 +156,17 @@ class JobMetadata(
             A built version of the job metadata dict
 
         """
-        return {
-            "Creator": self.creator,
-            "Description": self.description,
-            "Integration": self.integration,
-            "IsCustom": self.is_custom,
-            "IsEnabled": self.is_enabled,
-            "Name": self.name,
-            "Parameters": [param.to_built() for param in self.parameters],
-            "RunIntervalInSeconds": self.run_interval_in_seconds,
-            "Version": self.version,
-        }
+        return BuiltJobMetadata(
+            Creator=self.creator,
+            Description=self.description,
+            Integration=self.integration,
+            IsCustom=self.is_custom,
+            IsEnabled=self.is_enabled,
+            Name=self.name,
+            Parameters=[param.to_built() for param in self.parameters],
+            RunIntervalInSeconds=self.run_interval_in_seconds,
+            Version=float(self.version),
+        )
 
     def to_non_built(self) -> NonBuiltJobMetadata:
         """Create a non-built job metadata dict.
@@ -177,13 +175,13 @@ class JobMetadata(
             A non-built version of the job metadata dict
 
         """
-        non_built: NonBuiltJobMetadata = {
-            "name": self.name,
-            "parameters": [param.to_non_built() for param in self.parameters],
-            "description": self.description,
-            "integration": self.integration,
-            "creator": self.creator,
-        }
+        non_built: NonBuiltJobMetadata = NonBuiltJobMetadata(
+            name=self.name,
+            parameters=[param.to_non_built() for param in self.parameters],
+            description=self.description,
+            integration=self.integration,
+            creator=self.creator,
+        )
 
         if self.run_interval_in_seconds != DEFAULT_RUNTIME_INTERVAL:
             non_built["run_interval_in_seconds"] = self.run_interval_in_seconds

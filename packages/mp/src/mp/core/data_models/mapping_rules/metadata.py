@@ -14,8 +14,7 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING, NotRequired
+from typing import TYPE_CHECKING, NotRequired, TypedDict
 
 import mp.core.constants
 import mp.core.data_models.abc
@@ -59,7 +58,7 @@ class ExtractionFunction(mp.core.data_models.abc.RepresentableEnum):
     DELIMITER = 2
 
 
-class BuiltMappingRule(mp.core.data_models.abc.BaseBuiltTypedDict):
+class BuiltMappingRule(TypedDict):
     Source: str
     Product: str | None
     EventName: str | None
@@ -77,25 +76,24 @@ class BuiltMappingRule(mp.core.data_models.abc.BaseBuiltTypedDict):
     ExtractionFunction: int
 
 
-class NonBuiltMappingRule(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltMappingRule(TypedDict):
     source: str
-    product: NotRequired[str]
-    event_name: NotRequired[str]
+    product: NotRequired[str | None]
+    event_name: NotRequired[str | None]
     security_event_file_name: str
     transformation_function: str
-    transformation_function_param: NotRequired[str]
+    transformation_function_param: NotRequired[str | None]
     raw_data_primary_field_match_term: NotRequired[str]
     raw_data_primary_field_comparison_type: NotRequired[str]
-    raw_data_secondary_field_match_term: NotRequired[str]
+    raw_data_secondary_field_match_term: NotRequired[str | None]
     raw_data_secondary_field_comparison_type: NotRequired[str]
-    raw_data_third_field_match_term: NotRequired[str]
+    raw_data_third_field_match_term: NotRequired[str | None]
     raw_data_third_field_comparison_type: NotRequired[str]
     is_artifact: bool
-    extract_function_param: NotRequired[str]
+    extract_function_param: NotRequired[str | None]
     extract_function: NotRequired[str]
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class MappingRule(
     mp.core.data_models.abc.SequentialMetadata[BuiltMappingRule, NonBuiltMappingRule],
 ):
@@ -238,29 +236,29 @@ class MappingRule(
             A built version of the mapping rule metadata dict
 
         """
-        return {
-            "Source": self.source,
-            "Product": self.product,
-            "EventName": self.event_name,
-            "SecurityEventFieldName": self.security_event_file_name,
-            "TransformationFunction": self.transformation_function.value,
-            "TransformationFunctionParam": self.transformation_function_param,
-            "RawDataPrimaryFieldMatchTerm": self.raw_data_primary_field_match_term,
-            "RawDataPrimaryFieldComparisonType": (
+        return BuiltMappingRule(
+            Source=self.source,
+            Product=self.product,
+            EventName=self.event_name,
+            SecurityEventFieldName=self.security_event_file_name,
+            TransformationFunction=self.transformation_function.value,
+            TransformationFunctionParam=self.transformation_function_param,
+            RawDataPrimaryFieldMatchTerm=self.raw_data_primary_field_match_term,
+            RawDataPrimaryFieldComparisonType=(
                 self.raw_data_primary_field_comparison_type.value
             ),
-            "RawDataSecondaryFieldMatchTerm": self.raw_data_secondary_field_match_term,
-            "RawDataSecondaryFieldComparisonType": (
+            RawDataSecondaryFieldMatchTerm=self.raw_data_secondary_field_match_term,
+            RawDataSecondaryFieldComparisonType=(
                 self.raw_data_secondary_field_comparison_type.value
             ),
-            "RawDataThirdFieldMatchTerm": self.raw_data_third_field_match_term,
-            "RawDataThirdFieldComparisonType": (
+            RawDataThirdFieldMatchTerm=self.raw_data_third_field_match_term,
+            RawDataThirdFieldComparisonType=(
                 self.raw_data_third_field_comparison_type.value
             ),
-            "IsArtifact": self.is_artifact,
-            "ExtractionFunctionParam": self.extract_function_param,
-            "ExtractionFunction": self.extract_function.value,
-        }
+            IsArtifact=self.is_artifact,
+            ExtractionFunctionParam=self.extract_function_param,
+            ExtractionFunction=self.extract_function.value,
+        )
 
     def to_non_built(self) -> NonBuiltMappingRule:
         """Create a non-built mapping rule metadata dict.
@@ -269,32 +267,30 @@ class MappingRule(
             A non-built version of the mapping rule metadata dict
 
         """
-        return mp.core.utils.copy_mapping_without_none_values(  # type: ignore[return-value]
-            {
-                "source": self.source,
-                "product": self.product,
-                "event_name": self.event_name,
-                "security_event_file_name": self.security_event_file_name,
-                "transformation_function": self.transformation_function.to_string(),
-                "transformation_function_param": self.transformation_function_param,
-                "raw_data_primary_field_match_term": (
-                    self.raw_data_primary_field_match_term
-                ),
-                "raw_data_primary_field_comparison_type": (
-                    self.raw_data_primary_field_comparison_type.to_string()
-                ),
-                "raw_data_secondary_field_match_term": (
-                    self.raw_data_secondary_field_match_term
-                ),
-                "raw_data_secondary_field_comparison_type": (
-                    self.raw_data_secondary_field_comparison_type.to_string()
-                ),
-                "raw_data_third_field_match_term": self.raw_data_third_field_match_term,
-                "raw_data_third_field_comparison_type": (
-                    self.raw_data_third_field_comparison_type.to_string()
-                ),
-                "is_artifact": self.is_artifact,
-                "extract_function_param": self.extract_function_param,
-                "extract_function": self.extract_function.to_string(),
-            },
+        non_built: NonBuiltMappingRule = NonBuiltMappingRule(
+            source=self.source,
+            product=self.product,
+            event_name=self.event_name,
+            security_event_file_name=self.security_event_file_name,
+            transformation_function=self.transformation_function.to_string(),
+            transformation_function_param=self.transformation_function_param,
+            raw_data_primary_field_match_term=(self.raw_data_primary_field_match_term),
+            raw_data_primary_field_comparison_type=(
+                self.raw_data_primary_field_comparison_type.to_string()
+            ),
+            raw_data_secondary_field_match_term=(
+                self.raw_data_secondary_field_match_term
+            ),
+            raw_data_secondary_field_comparison_type=(
+                self.raw_data_secondary_field_comparison_type.to_string()
+            ),
+            raw_data_third_field_match_term=self.raw_data_third_field_match_term,
+            raw_data_third_field_comparison_type=(
+                self.raw_data_third_field_comparison_type.to_string()
+            ),
+            is_artifact=self.is_artifact,
+            extract_function_param=self.extract_function_param,
+            extract_function=self.extract_function.to_string(),
         )
+        mp.core.utils.remove_none_entries_from_mapping(non_built)
+        return non_built

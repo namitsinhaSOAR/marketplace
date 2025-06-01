@@ -1,6 +1,6 @@
 [project]
 name = "mp"
-version = "0.2.10"
+version = "0.2.11"
 description = "General Purpose CLI tool for Google SecOps Marketplace"
 readme = "README.md"
 authors = [
@@ -20,12 +20,13 @@ dependencies = [
     "libcst>=1.8.0",
     "mypy>=1.16.0",
     "pip>=25.1.1",
+    "pydantic>=2.11.5",
     "pyyaml>=6.0.2",
     "rich>=14.0.0",
     "ruff>=0.11.12",
     "toml>=0.10.2",
     "typer>=0.16.0",
-    "uv>=0.7.8",
+    "uv>=0.7.9",
 ]
 
 [dependency-groups]
@@ -45,6 +46,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.mypy]
+plugins = ['pydantic.mypy']
 exclude = [
     '\.?venv',
     'build',

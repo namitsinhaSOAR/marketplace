@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-import dataclasses
+from typing import TypedDict
 
 import mp.core.data_models.abc
 
@@ -50,21 +50,20 @@ class WidgetDefinitionScope(mp.core.data_models.abc.RepresentableEnum):
     BOTH = 2
 
 
-class BuiltWidgetDataDefinition(mp.core.data_models.abc.BaseBuiltTypedDict):
-    htmlHeight: int  # noqa: N815
-    safeRendering: bool  # noqa: N815
+class BuiltWidgetDataDefinition(TypedDict):
+    htmlHeight: int
+    safeRendering: bool
     type: int
-    widgetDefinitionScope: int  # noqa: N815
+    widgetDefinitionScope: int
 
 
-class NonBuiltWidgetDataDefinition(mp.core.data_models.abc.BaseNonBuiltTypedDict):
+class NonBuiltWidgetDataDefinition(TypedDict):
     html_height: int
     safe_rendering: bool
     type: str
     widget_definition_scope: str
 
 
-@dataclasses.dataclass(slots=True, frozen=True)
 class WidgetDataDefinition(
     mp.core.data_models.abc.Buildable[
         BuiltWidgetDataDefinition,
@@ -108,12 +107,12 @@ class WidgetDataDefinition(
             The "built" representation of the object.
 
         """
-        return {
-            "htmlHeight": self.html_height,
-            "safeRendering": self.safe_rendering,
-            "widgetDefinitionScope": self.widget_definition_scope.value,
-            "type": self.type.value,
-        }
+        return BuiltWidgetDataDefinition(
+            htmlHeight=self.html_height,
+            safeRendering=self.safe_rendering,
+            widgetDefinitionScope=self.widget_definition_scope.value,
+            type=self.type.value,
+        )
 
     def to_non_built(self) -> NonBuiltWidgetDataDefinition:
         """Turn the buildable object into a "non-built" typed dict.
@@ -122,9 +121,9 @@ class WidgetDataDefinition(
             The "non-built" representation of the object
 
         """
-        return {
-            "html_height": self.html_height,
-            "safe_rendering": self.safe_rendering,
-            "widget_definition_scope": self.widget_definition_scope.to_string(),
-            "type": self.type.to_string(),
-        }
+        return NonBuiltWidgetDataDefinition(
+            html_height=self.html_height,
+            safe_rendering=self.safe_rendering,
+            widget_definition_scope=self.widget_definition_scope.to_string(),
+            type=self.type.to_string(),
+        )

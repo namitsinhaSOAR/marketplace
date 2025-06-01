@@ -14,8 +14,7 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import TYPE_CHECKING
+from typing import TypedDict
 
 import mp.core.data_models.abc
 
@@ -25,28 +24,19 @@ from .visibility_property import (
     NonBuiltIntegrationVisibilityProperty,
 )
 
-if TYPE_CHECKING:
-    from collections.abc import Sequence
+
+class BuiltFeatureTags(TypedDict):
+    IntegrationVisibilityProperties: list[BuiltIntegrationVisibilityProperty]
 
 
-class BuiltFeatureTags(mp.core.data_models.abc.BaseBuiltTypedDict):
-    IntegrationVisibilityProperties: Sequence[BuiltIntegrationVisibilityProperty]
+class NonBuiltFeatureTags(TypedDict):
+    integration_visibility_properties: list[NonBuiltIntegrationVisibilityProperty]
 
 
-class NonBuiltFeatureTags(mp.core.data_models.abc.BaseNonBuiltTypedDict):
-    integration_visibility_properties: Sequence[NonBuiltIntegrationVisibilityProperty]
-
-
-@dataclasses.dataclass(slots=True, frozen=True)
 class FeatureTags(
     mp.core.data_models.abc.Buildable[BuiltFeatureTags, NonBuiltFeatureTags],
 ):
-    integration_visibility_properties: Sequence[
-        mp.core.data_models.abc.Buildable[
-            BuiltIntegrationVisibilityProperty,
-            NonBuiltIntegrationVisibilityProperty,
-        ]
-    ]
+    integration_visibility_properties: list[IntegrationVisibilityProperty]
 
     @classmethod
     def _from_built(cls, built: BuiltFeatureTags) -> FeatureTags:
@@ -73,11 +63,11 @@ class FeatureTags(
             The "built" representation of the object.
 
         """
-        return {
-            "IntegrationVisibilityProperties": [
+        return BuiltFeatureTags(
+            IntegrationVisibilityProperties=[
                 p.to_built() for p in self.integration_visibility_properties
-            ],
-        }
+            ]
+        )
 
     def to_non_built(self) -> NonBuiltFeatureTags:
         """Turn the buildable object into a "non-built" typed dict.
@@ -86,8 +76,8 @@ class FeatureTags(
             The "non-built" representation of the object
 
         """
-        return {
-            "integration_visibility_properties": [
+        return NonBuiltFeatureTags(
+            integration_visibility_properties=[
                 p.to_non_built() for p in self.integration_visibility_properties
-            ],
-        }
+            ]
+        )
