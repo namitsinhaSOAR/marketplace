@@ -46,7 +46,7 @@ def write_full_details(
 
     """
     rich.print("Writing full details file to integration")
-    details_json_name: str = mp.core.constants.INTEGRATION_FULLDETAILS_FILE.format(
+    details_json_name: str = mp.core.constants.INTEGRATION_FULL_DETAILS_FILE.format(
         full_details["Identifier"],
     )
     details_json_path: pathlib.Path = destination / details_json_name

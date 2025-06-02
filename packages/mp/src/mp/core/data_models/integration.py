@@ -147,7 +147,7 @@ class Integration:
             The integration objet
 
         Raises:
-            ValueError: when the built integration was failed to load
+            ValueError: when the built integration failed to load
 
         """
         try:
@@ -193,7 +193,7 @@ class Integration:
             The integration objet
 
         Raises:
-            ValueError: when the non-built integration was failed to load
+            ValueError: when the non-built integration failed to load
 
         """
         project_file_path: pathlib.Path = path / mp.core.constants.PROJECT_FILE
@@ -481,10 +481,10 @@ class Integration:
         )
 
     def to_built_full_details(self) -> BuiltFullDetails:
-        """Turn the integration into a `.fulldetails` JSON form.
+        """Turn the integration into a `full-details` JSON form.
 
         Returns:
-            The `.fulldetails` JSON form of the integration.
+            The `full-details` JSON form of the integration.
 
         """
         return BuiltFullDetails(

@@ -79,8 +79,8 @@ def mock_commercial(mock_marketplace: pathlib.Path) -> pathlib.Path:
 
 @pytest.fixture
 def full_details(built_integration: pathlib.Path) -> pathlib.Path:
-    """Path to a mock `.fulldetails` file."""
-    return built_integration / mp.core.constants.INTEGRATION_FULLDETAILS_FILE.format(
+    """Path to a mock `full-details` file."""
+    return built_integration / mp.core.constants.INTEGRATION_FULL_DETAILS_FILE.format(
         INTEGRATION_NAME,
     )
 

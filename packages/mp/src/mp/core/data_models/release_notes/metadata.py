@@ -72,7 +72,7 @@ class ReleaseNote(
 
     @classmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[ReleaseNote]:
-        """Create based on the metadata files found in the built-integration path.
+        """Create based on the metadata files found in the 'built' integration path.
 
         Args:
             path: the path to the built integration

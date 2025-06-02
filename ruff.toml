@@ -102,3 +102,7 @@ docstring-code-line-length = "dynamic"
 "**/integrations/**" = [
     "TID252",
 ]
+"**/integrations/third_party" = [
+    "CPY001",
+]
+

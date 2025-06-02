@@ -124,13 +124,13 @@ def assert_build_integration(
         actual, expected = test_mp.common.get_json_content(
             expected=(
                 built_integration
-                / mp.core.constants.INTEGRATION_FULLDETAILS_FILE.format(
+                / mp.core.constants.INTEGRATION_FULL_DETAILS_FILE.format(
                     built_integration.name,
                 )
             ),
             actual=(
                 out_integration
-                / mp.core.constants.INTEGRATION_FULLDETAILS_FILE.format(
+                / mp.core.constants.INTEGRATION_FULL_DETAILS_FILE.format(
                     built_integration.name,
                 )
             ),
