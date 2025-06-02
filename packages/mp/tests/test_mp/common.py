@@ -31,7 +31,7 @@ def get_toml_content(
     """Compare two TOML files.
 
     Args:
-        expected: path to the expected TOML file
+        expected: the path to the expected TOML file
         actual: path to the actual TOML file
 
     Returns:
@@ -50,7 +50,7 @@ def get_yaml_content(
     """Compare two YAML files.
 
     Args:
-        expected: path to the expected YAML file
+        expected: the path to the expected YAML file
         actual: path to the actual YAML file
 
     Returns:

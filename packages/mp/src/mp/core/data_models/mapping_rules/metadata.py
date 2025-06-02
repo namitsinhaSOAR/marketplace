@@ -274,7 +274,7 @@ class MappingRule(
             security_event_file_name=self.security_event_file_name,
             transformation_function=self.transformation_function.to_string(),
             transformation_function_param=self.transformation_function_param,
-            raw_data_primary_field_match_term=(self.raw_data_primary_field_match_term),
+            raw_data_primary_field_match_term=self.raw_data_primary_field_match_term,
             raw_data_primary_field_comparison_type=(
                 self.raw_data_primary_field_comparison_type.to_string()
             ),
