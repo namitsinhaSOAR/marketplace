@@ -19,11 +19,11 @@ from __future__ import annotations
 import dataclasses
 import enum
 from collections.abc import Iterable
-from typing import Generic, TypeAlias, TypeVar
+from typing import Any, Generic, TypeAlias, TypeVar
 
 from . import constants
 
-_T = TypeVar("_T", bound=Iterable)
+_T = TypeVar("_T", bound=Iterable[Any])
 
 
 @dataclasses.dataclass(slots=True)

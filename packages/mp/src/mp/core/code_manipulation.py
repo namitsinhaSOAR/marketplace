@@ -22,7 +22,6 @@ from collections import deque
 from typing import TYPE_CHECKING
 
 import libcst as cst
-import rich
 
 from . import constants, file_utils, unix
 
@@ -39,6 +38,10 @@ class TypeCheckerWarning(RuntimeWarning):
     """Found type check issues."""
 
 
+class FormatterWarning(RuntimeWarning):
+    """Found formatting issues."""
+
+
 class TestWarning(RuntimeWarning):
     """Failed tests."""
 
@@ -49,53 +52,35 @@ def run_script_on_paths(
 ) -> None:
     """Run prebuilt integration tests."""
     paths = [p for p in paths if p.is_dir()]
-    status_code: int
-    test_results: str
-    status_code, test_results = unix.run_script_on_paths(script_path, paths)
-    rich.print(test_results)
+    status_code: int = unix.run_script_on_paths(script_path, paths)
     if status_code != 0:
         warnings.warn("Failed Tests", TestWarning, stacklevel=1)
 
 
-def lint_python_files(paths: Iterable[pathlib.Path]) -> None:
-    """Run a linter on python files."""
+def lint_python_files(
+    paths: Iterable[pathlib.Path], *, fix: bool, unsafe_fixes: bool
+) -> None:
+    """Run a linter on python files and fix all unsafe issues."""
     paths = [p for p in paths if p.is_dir() or file_utils.is_python_file(p)]
-    ruff_status: int
-    ruff_message: str
-    ruff_status, ruff_message = unix.ruff_check(paths, fix=True)
-    rich.print(ruff_message)
-    if ruff_status != 0:
-        warnings.warn("Found linting issues", LinterWarning, stacklevel=1)
-
-
-def lint_and_fix_python_files(paths: Iterable[pathlib.Path]) -> None:
-    """Run a linter on python files and fix the fixable issues."""
-    paths = [p for p in paths if p.is_dir() or file_utils.is_python_file(p)]
-    ruff_status: int
-    ruff_message: str
-    ruff_status, ruff_message = unix.ruff_check(paths, fix=False)
-    rich.print(ruff_message)
-    if ruff_status != 0:
+    status_code: int = unix.ruff_check(paths, fix=fix, unsafe_fixes=unsafe_fixes)
+    if status_code != 0:
         warnings.warn("Found linting issues", LinterWarning, stacklevel=1)
 
 
 def static_type_check_python_files(paths: Iterable[pathlib.Path]) -> None:
     """Run a type checker on python files."""
     paths = [p for p in paths if p.is_dir() or file_utils.is_python_file(p)]
-    mypy_status: int
-    mypy_message: str
-    mypy_status, mypy_message = unix.mypy(paths)
-    rich.print(mypy_message)
-    if mypy_status != 0:
+    status_code: int = unix.mypy(paths)
+    if status_code != 0:
         warnings.warn("Found type check issues", TypeCheckerWarning, stacklevel=1)
 
 
 def format_python_files(paths: Iterable[pathlib.Path]) -> None:
     """Format python files."""
     paths = [p for p in paths if p.is_dir() or file_utils.is_python_file(p)]
-    results: str
-    _, results = unix.ruff_format(paths)
-    rich.print(results)
+    status_code: int = unix.ruff_format(paths)
+    if status_code != 0:
+        warnings.warn("Found format issues", FormatterWarning, stacklevel=1)
 
 
 def restructure_scripts_imports(paths: Iterable[pathlib.Path]) -> None:
@@ -127,7 +112,7 @@ def restructure_script_imports(code_string: str) -> str:
 
 
 class ImportTransformer(cst.CSTTransformer):
-    def leave_ImportFrom(  # noqa: D102, N802
+    def leave_ImportFrom(  # noqa: D102, N802, PLR6301
         self,
         original_node: cst.ImportFrom,
         updated_node: cst.ImportFrom,

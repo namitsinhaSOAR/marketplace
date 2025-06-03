@@ -62,6 +62,8 @@ unfixable = []
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
+preview = true
+
 [format]
 # Like Black, use double quotes for strings.
 quote-style = "double"
@@ -89,6 +91,8 @@ docstring-code-format = true
 # enabled.
 docstring-code-line-length = "dynamic"
 
+preview = true
+
 [lint.per-file-ignores]
 "**/[Tt]ests/**" = [
     "S101",
@@ -102,7 +106,6 @@ docstring-code-line-length = "dynamic"
 "**/integrations/**" = [
     "TID252",
 ]
-"**/integrations/third_party" = [
+"**/integrations/third_party/**" = [
     "CPY001",
 ]
-

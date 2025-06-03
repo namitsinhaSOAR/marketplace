@@ -95,7 +95,7 @@ def run_pre_build_tests(  # noqa: PLR0913
         ),
     ] = False,
 ) -> None:
-    """`mp test`.
+    """Run the `mp test` command.
 
     Args:
         repository: the repository to build

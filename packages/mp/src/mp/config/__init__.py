@@ -60,7 +60,7 @@ def config(
         ),
     ] = False,
 ) -> None:
-    """`mp config`.
+    """Run the `mp config` command.
 
     Args:
         marketplace_path: the path to the marketplace repository root directory

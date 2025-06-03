@@ -16,15 +16,15 @@
 
 from __future__ import annotations
 
-import subprocess as sp
+import subprocess as sp  # noqa: S404
 import sys
-from typing import TYPE_CHECKING
+from typing import IO, TYPE_CHECKING
 
 from . import config, constants, file_utils
 
 if TYPE_CHECKING:
     import pathlib
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Iterator
 
 COMMAND_ERR_MSG: str = "Error happened while executing a command: {0}"
 
@@ -208,41 +208,33 @@ def init_python_project(project_path: pathlib.Path) -> None:
         raise CommandError(COMMAND_ERR_MSG.format(e)) from e
 
 
-def ruff_check(
-    paths: Iterable[pathlib.Path],
-    /,
-    **flags: bool | str,
-) -> tuple[int, str]:
+def ruff_check(paths: Iterable[pathlib.Path], /, **flags: bool | str) -> int:
     """Run `ruff check` on the provided paths.
 
     Returns:
-        A tuple of the status code and output
+        The status code
 
     """
     command: list[str] = [sys.executable, "-m", "ruff", "check"]
     return execute_command_and_get_output(command, paths, **flags)
 
 
-def ruff_format(
-    paths: Iterable[pathlib.Path],
-    /,
-    **flags: bool | str,
-) -> tuple[int, str]:
+def ruff_format(paths: Iterable[pathlib.Path], /, **flags: bool | str) -> int:
     """Run `ruff format` on the provided paths.
 
     Returns:
-        A tuple of the status code and output
+        The status code
 
     """
     command: list[str] = [sys.executable, "-m", "ruff", "format"]
     return execute_command_and_get_output(command, paths, **flags)
 
 
-def mypy(paths: Iterable[pathlib.Path], /, **flags: bool | str) -> tuple[int, str]:
+def mypy(paths: Iterable[pathlib.Path], /, **flags: bool | str) -> int:
     """Run `mypy --strict` on the provided paths.
 
     Returns:
-        A tuple of the status code and output
+        The status code
 
     """
     command: list[str] = [sys.executable, "-m", "mypy", "--strict"]
@@ -252,7 +244,7 @@ def mypy(paths: Iterable[pathlib.Path], /, **flags: bool | str) -> tuple[int, st
 def run_script_on_paths(
     script_path: pathlib.Path,
     test_paths: Iterable[pathlib.Path],
-) -> tuple[int, str]:
+) -> int:
     """Run a custom script on the provided paths.
 
     Returns:
@@ -270,7 +262,7 @@ def execute_command_and_get_output(
     command: list[str],
     paths: Iterable[pathlib.Path],
     **flags: bool | str,
-) -> tuple[int, str]:
+) -> int:
     """Execute a command and capture its output and status code.
 
     Args:
@@ -279,7 +271,7 @@ def execute_command_and_get_output(
         **flags: any command flags as keyword arguments
 
     Returns:
-        A tuple of the status code and output
+        The status code of the process
 
     Raises:
         CommandError: if a project is already initialized
@@ -294,25 +286,30 @@ def execute_command_and_get_output(
     command.extend(runtime_config)
 
     try:
-        result: sp.CompletedProcess = sp.run(  # noqa: S603
-            command,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
+        process: sp.Popen[bytes] = sp.Popen(command)  # noqa: S603
+        for line in _stream_process_output(process):
+            sys.stdout.write(str(line))
+
+        return process.wait()
 
     except sp.CalledProcessError as e:
         raise CommandError(COMMAND_ERR_MSG.format(e)) from e
 
-    else:
-        output: str = ""
-        if result.stdout:
-            output += f"STDOUT: {result.stdout}\n"
 
-        if result.stderr:
-            output += f"STDERR: {result.stderr}"
+def _stream_process_output(process: sp.Popen[bytes]) -> Iterator[bytes]:
+    while True:
+        buffer: IO[bytes] | None = process.stdout
+        if process.stdout is None:
+            buffer = process.stderr
 
-        return result.returncode, output
+        if buffer is None:
+            break
+
+        line: bytes = buffer.readline()
+        if not line:
+            break
+
+        yield line
 
 
 def get_changed_files() -> list[str]:
@@ -334,13 +331,14 @@ def get_changed_files() -> list[str]:
         "--diff-filter=ACMRTUXB",
     ]
     try:
-        result: sp.CompletedProcess = sp.run(  # noqa: S603
+        result: sp.CompletedProcess[str] = sp.run(  # noqa: S603
             command,
             check=True,
             text=True,
             capture_output=True,
         )
         return result.stdout.split()
+
     except sp.CalledProcessError as e:
         raise CommandError(COMMAND_ERR_MSG.format(e)) from e
 
