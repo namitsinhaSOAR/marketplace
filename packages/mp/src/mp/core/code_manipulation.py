@@ -54,7 +54,8 @@ def run_script_on_paths(
     paths = [p for p in paths if p.is_dir()]
     status_code: int = unix.run_script_on_paths(script_path, paths)
     if status_code != 0:
-        warnings.warn("Failed Tests", TestWarning, stacklevel=1)
+        msg: str = "Failed Tests"
+        warnings.warn(msg, TestWarning, stacklevel=1)
 
 
 def lint_python_files(
@@ -64,7 +65,12 @@ def lint_python_files(
     paths = [p for p in paths if p.is_dir() or file_utils.is_python_file(p)]
     status_code: int = unix.ruff_check(paths, fix=fix, unsafe_fixes=unsafe_fixes)
     if status_code != 0:
-        warnings.warn("Found linting issues", LinterWarning, stacklevel=1)
+        msg: str = (
+            "Found linting issues. Consider running `mp check --fix` "
+            "and/or `mp check --fix --unsafe-fixes` to try and resolve them"
+            " automatically."
+        )
+        warnings.warn(msg, LinterWarning, stacklevel=1)
 
 
 def static_type_check_python_files(paths: Iterable[pathlib.Path]) -> None:
@@ -72,7 +78,8 @@ def static_type_check_python_files(paths: Iterable[pathlib.Path]) -> None:
     paths = [p for p in paths if p.is_dir() or file_utils.is_python_file(p)]
     status_code: int = unix.mypy(paths)
     if status_code != 0:
-        warnings.warn("Found type check issues", TypeCheckerWarning, stacklevel=1)
+        msg: str = "Found type check issues"
+        warnings.warn(msg, TypeCheckerWarning, stacklevel=1)
 
 
 def format_python_files(paths: Iterable[pathlib.Path]) -> None:
@@ -80,7 +87,8 @@ def format_python_files(paths: Iterable[pathlib.Path]) -> None:
     paths = [p for p in paths if p.is_dir() or file_utils.is_python_file(p)]
     status_code: int = unix.ruff_format(paths)
     if status_code != 0:
-        warnings.warn("Found format issues", FormatterWarning, stacklevel=1)
+        msg: str = "Found format issues"
+        warnings.warn(msg, FormatterWarning, stacklevel=1)
 
 
 def restructure_scripts_imports(paths: Iterable[pathlib.Path]) -> None:

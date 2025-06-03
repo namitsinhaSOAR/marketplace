@@ -297,19 +297,17 @@ def execute_command_and_get_output(
 
 
 def _stream_process_output(process: sp.Popen[bytes]) -> Iterator[bytes]:
-    while True:
-        buffer: IO[bytes] | None = process.stdout
-        if process.stdout is None:
-            buffer = process.stderr
+    buffer: IO[bytes] | None = process.stdout
+    if process.stdout is None:
+        buffer = process.stderr
 
-        if buffer is None:
-            break
+    if buffer is None:
+        return
 
-        line: bytes = buffer.readline()
-        if not line:
-            break
-
+    line: bytes = buffer.readline()
+    while line:
         yield line
+        line = buffer.readline()
 
 
 def get_changed_files() -> list[str]:
