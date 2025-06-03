@@ -76,7 +76,7 @@ def format_files(
         ),
     ] = False,
 ) -> None:
-    """`mp format`.
+    """Run the `mp format` command.
 
     Args:
         file_paths: the files to format

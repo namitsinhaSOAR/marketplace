@@ -106,7 +106,7 @@ def build(  # noqa: PLR0913
         ),
     ] = False,
 ) -> None:
-    """`mp build`.
+    """Run the `mp build` command.
 
     Args:
         repository: the repository to build

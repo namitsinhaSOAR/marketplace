@@ -109,7 +109,7 @@ class ReleaseNote(
         return cls(
             description=built["ChangeDescription"],
             deprecated=built["Deprecated"],
-            version=decimal.Decimal.from_float(built["IntroducedInIntegrationVersion"]),
+            version=decimal.Decimal(built["IntroducedInIntegrationVersion"]),
             item_name=built["ItemName"],
             item_type=built["ItemType"],
             new=built["New"],
@@ -124,7 +124,7 @@ class ReleaseNote(
         return cls(
             description=non_built["description"],
             deprecated=non_built["deprecated"],
-            version=decimal.Decimal.from_float(non_built["integration_version"]),
+            version=decimal.Decimal(non_built["integration_version"]),
             item_name=non_built["item_name"],
             item_type=non_built["item_type"],
             new=non_built["new"],

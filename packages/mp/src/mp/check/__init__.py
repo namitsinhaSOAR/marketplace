@@ -37,8 +37,6 @@ import mp.core.file_utils
 import mp.core.unix
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
-
     from mp.core.config import RuntimeParams
 
 __all__: list[str] = ["app"]
@@ -46,8 +44,9 @@ app: typer.Typer = typer.Typer()
 
 
 class CheckParams(NamedTuple):
-    file_paths: list[str] | None
+    file_paths: list[str]
     fix: bool
+    unsafe_fixes: bool
     changed_files: bool
     static_type_check: bool
     raise_error_on_violations: bool
@@ -67,6 +66,12 @@ def check(  # noqa: PLR0913
         bool,
         typer.Option(
             help="Fix minor issues in the code that require no action from the user",
+        ),
+    ] = False,
+    unsafe_fixes: Annotated[
+        bool,
+        typer.Option(
+            help="Fix issues in the code that needs to be reviewed by the user.",
         ),
     ] = False,
     changed_files: Annotated[
@@ -103,11 +108,12 @@ def check(  # noqa: PLR0913
         ),
     ] = False,
 ) -> None:
-    """`mp check`.
+    """Run the `mp check` command.
 
     Args:
         file_paths: file paths to check/lint
         fix: whether to fix found issues
+        unsafe_fixes: whether to fix all fixable issues, even if unsafe
         changed_files: whether to ignore `file_paths` provided and check only the
             changed files in the last commit
         static_type_check: whether to perform static type analysis on the code
@@ -119,29 +125,49 @@ def check(  # noqa: PLR0913
     if file_paths is None:
         file_paths = []
 
-    if raise_error_on_violations:
-        warnings.filterwarnings("error")
-
     run_params: RuntimeParams = mp.core.config.RuntimeParams(quiet, verbose)
     run_params.set_in_config()
     params: CheckParams = CheckParams(
         file_paths=file_paths,
-        fix=False,
-        changed_files=False,
-        static_type_check=False,
-        raise_error_on_violations=False,
+        fix=fix,
+        unsafe_fixes=unsafe_fixes,
+        changed_files=changed_files,
+        static_type_check=static_type_check,
+        raise_error_on_violations=raise_error_on_violations,
     )
     _validate_args(params)
-    sources: list[str] = _get_source_files(file_paths, changed_file=changed_files)
+    _check_paths(params)
+
+
+def _check_paths(check_params: CheckParams) -> None:
+    sources: list[str] = _get_source_files(
+        check_params.file_paths,
+        changed_file=check_params.changed_files,
+    )
     paths: set[pathlib.Path] = _get_relevant_source_paths(sources)
     if not paths:
         rich.print(f"No relevant python files found to check is sources {paths}")
         return
 
-    names: str = ", ".join(p.name for p in paths)
-    _check_paths(paths, names, fix=fix)
-    if static_type_check:
-        _static_check_paths(paths, names)
+    if check_params.raise_error_on_violations:
+        warnings.filterwarnings("error")
+
+    names: str = "\n".join(p.name for p in paths)
+    rich.print(f"Checking {names}")
+    mp.core.code_manipulation.lint_python_files(
+        paths,
+        fix=check_params.fix,
+        unsafe_fixes=check_params.unsafe_fixes,
+    )
+    if check_params.static_type_check:
+        rich.print("Performing static type checking on files")
+        mp.core.code_manipulation.static_type_check_python_files(paths)
+
+    rich.print(
+        "Done checking."
+        " If you see any issues, consider running `mp check --fix` or `mp check --fix"
+        " --unsafe-fixes` to fix them."
+    )
 
 
 def _get_source_files(file_paths: list[str], *, changed_file: bool) -> list[str]:
@@ -166,22 +192,14 @@ def _get_relevant_source_paths(sources: list[str]) -> set[pathlib.Path]:
     }
 
 
-def _check_paths(paths: Iterable[pathlib.Path], names: str, *, fix: bool) -> None:
-    rich.print(f"Checking Python files: {names}")
-    if fix:
-        mp.core.code_manipulation.lint_and_fix_python_files(paths)
-    else:
-        mp.core.code_manipulation.lint_python_files(paths)
-
-
-def _static_check_paths(paths: Iterable[pathlib.Path], names: str) -> None:
-    rich.print(f"Performing static type checking on files: {names}")
-    mp.core.code_manipulation.static_type_check_python_files(paths)
-
-
 def _validate_args(check_params: CheckParams) -> None:
+    msg: str
+    if check_params.unsafe_fixes and not check_params.fix:
+        msg = "To use --unsafe-fixes the --fix option must be passed as well"
+        raise typer.BadParameter(msg)
+
     if check_params.file_paths is None and not check_params.changed_files:
-        msg: str = "At least one path or --changed-files must be provided"
+        msg = "At least one path or --changed-files must be provided"
         raise typer.BadParameter(msg)
 
     if check_params.file_paths is not None and check_params.changed_files:

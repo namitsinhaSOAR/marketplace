@@ -239,7 +239,7 @@ class BuildableScript(pydantic.BaseModel, abc.ABC, Generic[_BT, _NBT]):
             return metadata
 
 
-class ScriptMetadata(BuildableScript, abc.ABC, Generic[_BT, _NBT]):
+class ScriptMetadata(BuildableScript[_BT, _NBT], abc.ABC, Generic[_BT, _NBT]):
     @classmethod
     @abc.abstractmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[Self]:
@@ -318,7 +318,7 @@ class ScriptMetadata(BuildableScript, abc.ABC, Generic[_BT, _NBT]):
             return non_built
 
 
-class SequentialMetadata(Buildable, abc.ABC, Generic[_BT, _NBT]):
+class SequentialMetadata(Buildable[_BT, _NBT], abc.ABC, Generic[_BT, _NBT]):
     @classmethod
     @abc.abstractmethod
     def from_built_integration_path(cls, path: pathlib.Path) -> list[Self]:
