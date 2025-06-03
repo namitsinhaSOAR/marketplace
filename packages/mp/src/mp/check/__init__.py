@@ -163,12 +163,6 @@ def _check_paths(check_params: CheckParams) -> None:
         rich.print("Performing static type checking on files")
         mp.core.code_manipulation.static_type_check_python_files(paths)
 
-    rich.print(
-        "Done checking."
-        " If you see any issues, consider running `mp check --fix` or `mp check --fix"
-        " --unsafe-fixes` to fix them."
-    )
-
 
 def _get_source_files(file_paths: list[str], *, changed_file: bool) -> list[str]:
     sources: list[str] = (
