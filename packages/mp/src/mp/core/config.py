@@ -33,9 +33,8 @@ if TYPE_CHECKING:
 _T = TypeVar("_T")
 
 
-PACKAGE_ROOT: pathlib.Path = pathlib.Path(__file__).parent.parent
-CONFIG_FILE_NAME: str = "config.ini"
-CONFIG_PATH: pathlib.Path = PACKAGE_ROOT / CONFIG_FILE_NAME
+CONFIG_FILE_NAME: str = ".mp_config"
+CONFIG_PATH: pathlib.Path = pathlib.Path.home() / CONFIG_FILE_NAME
 
 MARKETPLACE_PATH_KEY: str = "marketplace_path"
 PROCESSES_NUMBER_KEY: str = "processes"
