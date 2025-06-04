@@ -98,7 +98,7 @@ smoother.
   `tools/README.md`](./tools/README.md).
     * **Integration Zipper**: A utility to package integration versions. More details in
       its [dedicated README](./tools/zip_integration_by_version/README.md).
-* **Marketplace CLI Tool (`mp`)**: [`packages/mp/README.md`] -
+* **Marketplace CLI Tool (`mp`)**: [`packages/mp/README.md`](./packages/mp/README.md) -
   Your powerhouse for building, testing, and ensuring the quality of integrations. (Also
   linked from `packages/README.md`).
 
