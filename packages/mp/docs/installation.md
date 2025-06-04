@@ -7,7 +7,7 @@
 
 ## Installation Steps
 
-### 1. Install uv
+### 1. Install `uv`
 
 Install uv in your base Python interpreter:
 
@@ -22,17 +22,19 @@ git clone <repository-url>
 cd mp
 ```
 
-### 3. Set Up Project with uv
+### 3. Set Up Project with `uv`
 
 #### Development Installation
 
-For development purposes, create a virtual environment and install dependencies in one step:
+For development purposes, create a virtual environment and install dependencies in one
+step:
 
 ```bash
 uv sync --dev
 ```
 
-This command creates a virtual environment in `.venv` directory and installs all dependencies including development ones.
+This command creates a virtual environment in `.venv` directory and installs all
+dependencies including development ones.
 
 #### User Installation
 
@@ -68,6 +70,22 @@ uv pip install .
 uv pip install -e .
 ```
 
+## Configure `mp`
+
+When installing `mp` it automatically assumes the marketplace repo is installed at
+`~/marketpalce`.
+To configure a different path run
+
+```shell
+mp config --marketpalce-path /path/to/marketpalce 
+```
+
+To find more about configurations, run
+
+```shell
+mp config --help
+```
+
 ## Dependencies
 
 The tool automatically installs the following dependencies:
@@ -83,7 +101,8 @@ The tool automatically installs the following dependencies:
 
 ## Development Dependencies
 
-Development dependencies are automatically installed when using `uv sync --dev`. These include:
+Development dependencies are automatically installed when using `uv sync --dev`.
+These include:
 
 - pytest: For running tests
 - pytest-cov: For code coverage
