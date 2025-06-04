@@ -30,7 +30,7 @@ documentation:
 - [Development Guide](docs/development.md)—How to set up your development environment
 - [Marketplace Integration Guide](docs/marketplace.md)—How to work with marketplace
   integrations
-- [Contributing Guidelines](docs/CONTRIBUTING.md)—How to contribute to the project
+- [Contributing Guidelines](docs/contributing.md)—How to contribute to the project
 
 ## Quick Start
 

@@ -19,7 +19,7 @@ mp/
 
 ## Setting Up Development Environment
 
-1. Clone the repository and install in development mode:
+1. Clone the repository and install it in development mode:
 
 ```bash
 git clone <repository-url>
@@ -91,7 +91,7 @@ app = typer.Typer()
 def my_command() -> None:
     """My new command."""
     # Command implementation here
-    pass
+    ...
 
 
 # Then in src/mp/__init__.py
@@ -122,4 +122,4 @@ Extend these classes when adding new data models for integration components.
 3. Run tests and ensure code quality
 4. Submit a pull request
 
-See [contributing.md](../CONTRIBUTING.md) for more details.
+See [contributing.md](./contributing.md) for more details.

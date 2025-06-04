@@ -11,7 +11,7 @@ These are foundational libraries that you'll often use when developing integrati
 *   **`TIPCommon`**: This is your go-to library for a wide range of common utilities and functionalities that are frequently needed when building integrations. It helps you avoid reinventing the wheel and focuses on common patterns seen in marketplace integrations.
 *   **`EnvironmentCommon`**: This library provides functionalities that `TIPCommon` depends on, often related to handling environment-specific configurations or interactions.
 
-### Keeping Up-to-Date (Very Important!)
+### Keeping Up to date (Very Important!)
 
 To benefit from the latest features, bug fixes, and security enhancements, it's crucial to **always use the most recent versions** of these packages. You can find the available versions within their respective folders in this `packages` directory (e.g., `TIPCommon-x.x.x`, `EnvironmentCommon-x.x.x`).
 
@@ -82,7 +82,7 @@ For comprehensive details on how to use this package and its features, please ch
 
 ### Key Superpowers (Features)
 
-*   **Effortless Integration Building & Deconstruction:** Easily convert your source code into the format required by the Google SecOps Marketplace, or deconstruct a built integration back into its source code format.
+*   **Effortless Integration Building & Deconstruction:** Convert your source code into the format required by the Google SecOps Marketplace, or deconstruct a built integration back into its source code format.
 *   **Automated Code Quality:** Keep your codebase clean and robust. `mp` integrates with tools like Ruff for formatting and linting your Python code, and Mypy for static type-checking, helping you catch potential issues early.
 *   **Streamlined Developer Workflow:** `mp` offers a suite of helpful commands to simplify common development tasks. It also leverages `uv` for fast and efficient dependency management.
 

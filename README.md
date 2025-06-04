@@ -14,7 +14,8 @@ and contribute to the Google SecOps ecosystem.
 ## 🗺️ Navigating This Repository: Your Documentation Guide
 
 To help you find your way around and make the most of what's available, we've structured
-our documentation into several key areas. Think of this section as your compass,
+our documentation into several key areas.
+Think of this section as your compass,
 pointing you to detailed information, guides, and resources. Most of our in-depth
 documentation resides in the [`docs/`](./docs/) directory, with specific tools and
 packages also having their own detailed README files.
