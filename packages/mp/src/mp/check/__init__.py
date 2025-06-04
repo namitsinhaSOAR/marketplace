@@ -146,7 +146,7 @@ def _check_paths(check_params: CheckParams) -> None:
     )
     paths: set[pathlib.Path] = _get_relevant_source_paths(sources)
     if not paths:
-        rich.print(f"No relevant python files found to check is sources {paths}")
+        rich.print("No relevant python files to check")
         return
 
     if check_params.raise_error_on_violations:
