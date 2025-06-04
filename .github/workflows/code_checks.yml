@@ -1,0 +1,61 @@
+name: MP Check Changed Files
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  mp_check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install mp package
+      run: |
+        pip install --upgrade pip
+        pip install -e ./packages/mp
+
+    - name: Get changed files
+      id: get_changed_files
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+        else
+          BASE_SHA="${{ github.sha }}~1"
+          HEAD_SHA="${{ github.sha }}"
+        fi
+
+        CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRTUXB "$BASE_SHA" "$HEAD_SHA")
+
+        echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Run mp check with changed files
+      if: steps.get_changed_files.outputs.CHANGED_FILES != ''
+      shell: bash
+      run: |
+        echo "Running mp check on the following files:"
+        echo "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
+
+        FILE_LIST=$(echo "${{ steps.get_changed_files.outputs.CHANGED_FILES }}" | tr '\n' ' ')
+        mp check $FILE_LIST
+
+    - name: Handle no changed files
+      if: steps.get_changed_files.outputs.CHANGED_FILES == ''
+      run: |
+        echo "No files changed in this event. Skipping 'mp check'."
