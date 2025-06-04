@@ -3,10 +3,12 @@ name: MP Check Changed Files
 on:
   push:
     branches:
-      - '**'
+      - 'integrations/commercial/**'
+      - 'integrations/third_party/**'
   pull_request:
     branches:
-      - '**'
+      - 'integrations/commercial/**'
+      - 'integrations/third_party/**'
 
 jobs:
   mp_check:
