@@ -17,9 +17,9 @@ pip install uv
 
 ### 2. Clone the Repository
 
-```bash
+```shell
 git clone <repository-url>
-cd mp
+cd packages/mp
 ```
 
 ### 3. Set Up Project with `uv`
@@ -29,7 +29,7 @@ cd mp
 For development purposes, create a virtual environment and install dependencies in one
 step:
 
-```bash
+```shell
 uv sync --dev
 ```
 
@@ -40,13 +40,13 @@ dependencies including development ones.
 
 For regular usage without development dependencies:
 
-```bash
+```shell
 uv sync
 ```
 
 ### 4. Activate the Virtual Environment
 
-```bash
+```shell
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
@@ -64,7 +64,7 @@ You should see the help menu displaying the available commands.
 
 You can also install the package directly to your base Python interpreter:
 
-```bash
+```shell
 uv pip install .
 # Or for development installation
 uv pip install -e .
@@ -88,29 +88,15 @@ mp config --help
 
 ## Dependencies
 
-The tool automatically installs the following dependencies:
+If you need to update dependencies or re-sync your virtual environment:
 
-- libcst: For code structure transformations
-- mypy: For static type checking (used as a core tool for the project)
-- pyyaml: For YAML file handling
-- rich: For enhanced terminal output
-- ruff: For code linting and formatting (used as a core tool for the project)
-- toml: For TOML file handling
-- typer: For command-line interface
-- uv: For fast and reliable package management (used as a core tool for the project)
+```shell
+uv sync
+```
 
-## Development Dependencies
+For development, also sync the dev-dependencies
 
-Development dependencies are automatically installed when using `uv sync --dev`.
-These include:
 
-- pytest: For running tests
-- pytest-cov: For code coverage
-- pytest-xdist: For parallel test execution
-- type stubs for YAML and TOML
-
-If you need to update dependencies after changes to pyproject.toml:
-
-```bash
+```shell
 uv sync --dev
 ```
