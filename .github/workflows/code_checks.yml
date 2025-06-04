@@ -31,8 +31,4 @@ jobs:
     - name: Run mp check with changed files
       shell: bash
       run: |
-        # echo "Running mp check on the following files:"
-        # echo "${{ steps.get_changed_files.outputs.CHANGED_FILES }}"
-
-        # FILE_LIST=$(echo "${{ steps.get_changed_files.outputs.CHANGED_FILES }}" | tr '\n' ' ')
         mp check --changed-files --raise-error-on-violations
