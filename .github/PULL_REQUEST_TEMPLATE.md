@@ -27,6 +27,13 @@ Please provide a detailed description of your changes. This helps reviewers unde
 
 ---
 
+## Labels and assignee
+
+- [ ] I have labed the pull request
+- [ ] I have assigned the relevant assignees
+
+---
+
 ## Checklist:
 
 Please ensure you have completed the following items before submitting your PR.
