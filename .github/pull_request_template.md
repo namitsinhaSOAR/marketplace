@@ -1,49 +1,83 @@
-## MUST-DOs (Essential for Security and Compliance):
+## Title (Please follow the convention below)
 
-- [ ] Origin in Buganizer: All work must have originated from a Buganizer ticket, even
-  if it's a simple fix.
-- [ ] No PII/Sensitive Data: The PR title, description, and any associated comments on
-  GitHub MUST NOT contain any Personally Identifiable Information (PII) like customer
-  names, email addresses, or any other data that could identify an individual.
-- [ ] No Internal-Only Data: The PR title, description, and any associated comments on
-  GitHub MUST NOT contain internal-only code examples, configurations, URLs, or any
-  other sensitive internal data.
-- [ ] Public-Facing Language: Ensure all language in the PR is suitable for a public
-  audience. Avoid internal jargon unless it's widely understood in the open-source
-  community.
-- [ ] Link to Buganizer: Clearly and consistently include the Buganizer ticket
-  number/link in the PR description (e.g., "Internal Buganizer ID: 123456789" or "
-  Related Buganizer: go/buganizer/123456789"). This is crucial for internal
-  traceability.
-- [ ] Standardized Title: Use a clear, concise, and public-facing PR title. Consider
-  including a Buganizer reference like [Buganizer #123456789] Public-facing summary of
-  change.
-- [ ] Code Sanitization: Double-check that any code examples or test data included in
-  the PR are generic and do not expose internal system details or customer data.
+Please use a clear and concise title that summarizes your changes.
+If this PR is related to an internal Buganizer ticket, please include its ID at the beginning.
 
-## SHOULD-DOs (Best Practices for Collaboration and Efficiency):
+**Convention:** `[Optional Buganizer ID: 123456789] Short, descriptive title of changes`
 
-- [ ] Link to GitHub Issue (if applicable): If a corresponding GitHub issue exists, link
-  the PR to it in the description (e.g., Closes #XYZ).
-- [ ] Concise Summary: Provide a brief, public-facing summary of the changes in the PR
-  description.
-- [ ] Problem/Solution: Briefly explain the problem the PR solves and the solution
-  implemented, from a public perspective.
-- [ ] Testing Instructions (Public): If relevant, provide public-facing instructions on
-  how to test the changes.
-- [ ] Screenshots/GIFs (if applicable): If the change has a visual impact, include
-  anonymized screenshots or GIFs.
-- [ ] Self-Review: Always perform a self-review of your PR before requesting reviews.
-- [ ] Appropriate Labels: Apply relevant GitHub labels to your PR (e.g., bug, feature,
-  refactor).
+**Examples:**
+* `Fix: Resolve issue with API endpoint returning 500 error`
+* `[Buganizer ID: 987654321] Feature: Add support for custom data types`
+* `Docs: Update README with installation instructions`
 
-## MUST-NOT-DOs (Critical Prohibitions):
+---
 
-- [ ] NEVER copy and paste Buganizer internal comments or descriptions directly into a
-  GitHub PR or issue.
-- [ ] DO NOT discuss PII or sensitive internal details in GitHub comments or
-  discussions. Redirect internal discussions to the linked Buganizer ticket.
-- [ ] DO NOT include private API keys, credentials, or other sensitive configuration
-  details in the code or PR description.
-- [ ] DO NOT commit internal-only tools, scripts, or documentation to the public
-  repository.
+## Description
+
+Please provide a detailed description of your changes. This helps reviewers understand your work and its context.
+
+**What problem does this PR solve?**
+(e.g., "Fixes a bug where X was happening," "Implements feature Y to allow Z," "Improves performance of function A.")
+
+**How does this PR solve the problem?**
+(e.g., "Modified algorithm in `src/foo.js`," "Added new component `Bar.vue`," "Updated dependency `baz` to version 1.2.3.")
+
+**Any other relevant information (e.g., design choices, tradeoffs, known issues):**
+(e.g., "Chose approach A over B due to performance considerations," "This change might affect X in certain edge cases," "Requires manual migration steps for existing users.")
+
+---
+
+## Type of Change
+
+Please mark with an `x` (e.g., `- [x]`) the type of change this PR introduces:
+
+- [ ] `bug`: A bug fix or a change that resolves an issue.
+- [ ] `feature`: A new feature or functionality.
+- [ ] `enhancement`: An improvement to existing features or code.
+- [ ] `docs`: Documentation updates (e.g., README, API docs, comments).
+- [ ] `refactor`: Code refactoring without changing external behavior.
+- [ ] `test`: Adding or improving tests.
+- [ ] `chore`: Housekeeping changes (e.g., build system, dependencies, CI/CD).
+- [ ] `security`: Addressing security vulnerabilities.
+
+---
+
+## Checklist:
+
+Please ensure you have completed the following items before submitting your PR.
+This helps us review your contribution faster and more efficiently.
+
+### General Checks:
+
+- [ ] I have read and followed the project's [CONTRIBUTING.md](link-to-your-contributing-guide) guide.
+- [ ] My code follows the project's coding style guidelines.
+- [ ] I have performed a self-review of my own code.
+- [ ] My changes do not introduce any new warnings.
+- [ ] My changes pass all existing tests.
+- [ ] I have added new tests where appropriate to cover my changes. (If applicable)
+- [ ] I have updated the documentation where necessary (e.g., README, API docs). (If applicable)
+
+### Open-Source Specific Checks:
+
+- [ ] My changes do not introduce any Personally Identifiable Information (PII) or sensitive customer data.
+- [ ] My changes do not expose any internal-only code examples, configurations, or URLs.
+- [ ] All code examples, comments, and messages are generic and suitable for a public repository.
+- [ ] I understand that any internal context or sensitive details related to this work are handled separately in internal systems (Buganizer for Google team members).
+
+### For Google Team Members and Reviewers Only:
+
+- [ ] I have included the Buganizer ID in the PR title or description (e.g., "Internal Buganizer ID: 123456789" or "Related Buganizer: go/buganizer/123456789").
+- [ ] I have ensured that all internal discussions and PII related to this work remain in Buganizer.
+
+---
+
+## Screenshots (If Applicable)
+
+If your changes involve UI or visual elements, please include screenshots or GIFs here.
+Ensure any sensitive data is redacted or generalized.
+
+---
+
+## Further Comments / Questions
+
+Any additional comments, questions, or areas where you'd like specific feedback.
