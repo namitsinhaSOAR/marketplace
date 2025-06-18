@@ -27,21 +27,6 @@ Please provide a detailed description of your changes. This helps reviewers unde
 
 ---
 
-## Type of Change
-
-Please mark with an `x` (e.g., `- [x]`) the type of change this PR introduces:
-
-- [ ] `bug`: A bug fix or a change that resolves an issue.
-- [ ] `feature`: A new feature or functionality.
-- [ ] `enhancement`: An improvement to existing features or code.
-- [ ] `docs`: Documentation updates (e.g., README, API docs, comments).
-- [ ] `refactor`: Code refactoring without changing external behavior.
-- [ ] `test`: Adding or improving tests.
-- [ ] `chore`: Housekeeping changes (e.g., build system, dependencies, CI/CD).
-- [ ] `security`: Addressing security vulnerabilities.
-
----
-
 ## Checklist:
 
 Please ensure you have completed the following items before submitting your PR.
