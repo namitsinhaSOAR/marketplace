@@ -47,7 +47,6 @@ def main():
         if status is EXECUTION_STATE_FAILED:
             siemplify.LOGGER.error("Error trying to create a meeting")
             siemplify.LOGGER.exception(output_message)
-            raise
 
 
 if __name__ == "__main__":
