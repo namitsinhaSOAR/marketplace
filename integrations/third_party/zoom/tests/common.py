@@ -14,6 +14,13 @@
 
 from __future__ import annotations
 
+import json
 import pathlib
 
 INTEGRATION_PATH: pathlib.Path = pathlib.Path(__file__).parent.parent
+CONFIG_PATH = pathlib.Path.joinpath(INTEGRATION_PATH, "tests", "config.json")
+
+TEST_CONFIG = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+TEST_ACCOUNT_ID = TEST_CONFIG.get("Account ID", "test_account_id")
+TEST_CLIENT_ID = TEST_CONFIG.get("Client ID", "test_client_id") 
+TEST_CLIENT_SECRET = TEST_CONFIG.get("Client Secret", "test_client_secret")
