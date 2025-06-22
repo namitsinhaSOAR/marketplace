@@ -9,11 +9,11 @@ INTEGRATION_DISPLAY_NAME = "Sample Integration"
 PING_SCRIPT_NAME = f"{INTEGRATION_IDENTIFIER} - Ping"
 SIMPLE_ACTION_EXAMPLE_SCRIPT_NAME = f"{INTEGRATION_IDENTIFIER} - Simple Action Example"
 
-# Default Configuration Paramter Values
+# Default Configuration Parameter Values
 DEFAULT_API_ROOT = "https://api.vatcomply.com"
 DEFAULT_VERIFY_SSL = True
 
-# API Constansts
+# API Constants
 ENDPOINTS = {
     "ping": "/rates",
     "get-base-rate": "/rates",

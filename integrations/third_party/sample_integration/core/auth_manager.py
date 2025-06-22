@@ -3,9 +3,9 @@ import dataclasses
 import constants as consts
 from exceptions import SampleIntegrationError
 from requests import Session
-from SiemplifyAction import SiemplifyAction
-from SiemplifyConnectors import SiemplifyConnectorExecution
-from SiemplifyJob import SiemplifyJob
+from soar_sdk.SiemplifyAction import SiemplifyAction
+from soar_sdk.SiemplifyConnectors import SiemplifyConnectorExecution
+from soar_sdk.SiemplifyJob import SiemplifyJob
 from TIPCommon.base.utils import CreateSession
 from TIPCommon.extraction import extract_script_param
 from TIPCommon.types import ChronicleSOAR

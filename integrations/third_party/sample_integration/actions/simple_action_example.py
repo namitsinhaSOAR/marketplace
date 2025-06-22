@@ -8,14 +8,14 @@ from TIPCommon.transformation import construct_csv
 from TIPCommon.types import JSON
 from TIPCommon.validation import ParameterValidator
 
-from base_action import BaseAction
-from constants import (
+from ..core.base_action import BaseAction
+from ..core.constants import (
     SIMPLE_ACTION_EXAMPLE_SCRIPT_NAME,
     CurrenciesDDLEnum,
     TimeFrameDDLEnum,
 )
-from data_models import DailyRates
-from exceptions import SampleIntegrationInvalidParameterError
+from ..core.data_models import DailyRates
+from ..core.exceptions import SampleIntegrationInvalidParameterError
 
 DEFAULT_CURRENCIES_STR = "USD, EUR"
 DEFAULT_CURRENCIES_DDL = "Select One"

@@ -1,10 +1,12 @@
 import os.path
+from abc import ABC
+
 from auth_manager import AuthManager, build_auth_manager_params
 from api_manager import ApiManager
 from TIPCommon.base.action import Action
 
 
-class BaseAction(Action):
+class BaseAction(Action, ABC):
     """Base action class."""
 
     def _init_api_clients(self) -> ApiManager:
@@ -19,7 +21,7 @@ class BaseAction(Action):
         )
 
     def save_temp_file(self, filename: str, content: str) -> str:
-        """Saves content to file in temporary firectory
+        """Saves content to file in temporary directory
 
         Args:
             filename (str): File name (Base name)
