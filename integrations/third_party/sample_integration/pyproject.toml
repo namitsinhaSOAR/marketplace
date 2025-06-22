@@ -5,6 +5,7 @@ description = "This is an educational integration designed to showcase the most 
 requires-python = ">=3.11"
 dependencies = [
     "environmentcommon",
+    "integration-testing",
     "soar-sdk",
     "tipcommon",
 ]
@@ -18,3 +19,4 @@ dev = [
 soar-sdk = { git = "https://github.com/chronicle/soar-sdk" }
 tipcommon = { path = "../../../packages/TIPCommon-2.0.6/TIPCommon-2.0.6-py2.py3-none-any.whl" }
 environmentcommon = { path = "../../../packages/EnvironmentCommon-1.0.2/EnvironmentCommon-1.0.2-py2.py3-none-any.whl" }
+integration-testing = { path = "../../../packages/integration_testing" }
