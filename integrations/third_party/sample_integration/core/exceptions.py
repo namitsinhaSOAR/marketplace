@@ -9,8 +9,8 @@ class SampleIntegrationInvalidParameterError(SampleIntegrationError):
 class SampleIntegrationHTTPError(SampleIntegrationError):
     """Exception in case of HTTP error."""
 
-    def __init__(self, message, *args, status_code=None, **kwrags) -> None:
-        super().__init__(message, *args, **kwrags)
+    def __init__(self, message, *args, status_code=None) -> None:
+        super().__init__(message, *args)
         self.status_code = status_code
 
 

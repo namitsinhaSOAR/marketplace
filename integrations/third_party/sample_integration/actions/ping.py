@@ -1,7 +1,7 @@
 from typing import NoReturn
 
-from base_action import BaseAction
-from constants import PING_SCRIPT_NAME
+from ..core.base_action import BaseAction
+from ..core.constants import PING_SCRIPT_NAME
 
 SUCCESS_MESSAGE = (
     "Successfully connected to the API Service server with the provided connection "
