@@ -134,8 +134,7 @@ class SimpleActionExample(BaseAction):
         )
 
         self.params.end_date = (
-            dt.datetime.fromisoformat(
-                self.params.end_time.replace("Z", "+00:00"))
+            dt.datetime.fromisoformat(self.params.end_time.replace("Z", "+00:00"))
             if self.params.end_time and time_frame == TimeFrameDDLEnum.CUSTOM
             else dt.datetime.now()
         ).date()
@@ -146,8 +145,7 @@ class SimpleActionExample(BaseAction):
                 'than 7 days. Adjusting "End Time" to be exectly 7 days after '
                 '"Start Time"'
             )
-            self.params.end_date = self.params.start_date + \
-                dt.timedelta(days=7)
+            self.params.end_date = self.params.start_date + dt.timedelta(days=7)
 
     def _create_data_tables(self, exchange_rates: list[DailyRates]) -> None:
         """Creates data tables from the given exchange rates and adds them to the

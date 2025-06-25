@@ -1,9 +1,10 @@
 import os.path
 from abc import ABC
 
-from auth_manager import AuthManager, build_auth_manager_params
-from api_manager import ApiManager
 from TIPCommon.base.action import Action
+
+from .auth_manager import AuthManager, build_auth_manager_params
+from .api_manager import ApiManager
 
 
 class BaseAction(Action, ABC):

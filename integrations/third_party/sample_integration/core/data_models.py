@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from TIPCommon.types import SingleJson
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class BaseRate:
     base: str
     date: str
@@ -18,7 +18,7 @@ class BaseRate:
         ]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class DailyRates:
     date: str
     exchange_rates: list[BaseRate]

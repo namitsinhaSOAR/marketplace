@@ -1,12 +1,13 @@
 import datetime as dt
 from collections.abc import Iterable
-
-from api_utils import get_full_url, validate_response
-from constants import REQUEST_TIMEOUT
-from data_models import BaseRate, DailyRates
 from requests import Session
+
 from TIPCommon.base.utils import NewLineLogger
-from utils import date_range
+
+from .api_utils import get_full_url, validate_response
+from .constants import REQUEST_TIMEOUT
+from .data_models import BaseRate, DailyRates
+from .utils import date_range
 
 
 class ApiManager:
@@ -52,8 +53,8 @@ class ApiManager:
         """
         results = []
 
-        # Ideally, the API endpoint would accept range of value per paramater in request
-        # But vatcomply '/rates' endpoint only supports a single value per base & date,
+        # Ideally, the API endpoint would accept range of value per parameter in request
+        # But Vatcomply '/rates' endpoint only supports a single value per base & date,
         # so we have to do this ugly and risky nested for-loop on dates & currencies
         for date in date_range(start_date, end_date):
             results.extend(

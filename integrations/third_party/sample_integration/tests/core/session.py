@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import Iterable
 
 from integration_testing import router
@@ -30,4 +29,3 @@ class VatComplySession(MockSession[MockRequest, MockResponse, VatComply]):
             return MockResponse(content=rates)
         except ValueError as e:
             return MockResponse(content=str(e), status_code=422)
-

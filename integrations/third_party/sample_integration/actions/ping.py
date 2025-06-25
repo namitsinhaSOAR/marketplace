@@ -1,5 +1,3 @@
-from typing import NoReturn
-
 from ..core.base_action import BaseAction
 from ..core.constants import PING_SCRIPT_NAME
 
@@ -21,7 +19,7 @@ class Ping(BaseAction):
         self.api_client.test_connectivity()
 
 
-def main() -> NoReturn:
+def main():
     Ping().run()
 
 

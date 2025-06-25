@@ -1,35 +1,43 @@
 from __future__ import annotations
 
-import contextlib
 import dataclasses
 import datetime
 
 from TIPCommon.types import SingleJson
 
 from .constants import KNOWN_SYMBOLS
-from .datamodels import BaseRate
+from .datamodels import MockBaseRate
 
 
 @dataclasses.dataclass(slots=True)
 class VatComply:
-    rates: list[BaseRate] = dataclasses.field(default_factory=list)
+    rates: list[MockBaseRate] = dataclasses.field(default_factory=list)
 
-    def get_rates(self, base: str | None = None, symbols: str | None = None,
-                  date: str | None = None) -> SingleJson:
+    def get_rates(
+        self,
+        base: str | None = None,
+        symbols: str | None = None,
+        date: str | None = None,
+    ) -> SingleJson:
         _base = self._validate_base(base)
         _symbols = self._validate_symbols(symbols)
         _date = self._validate_date(date)
 
-        result: BaseRate = next(
+        result: MockBaseRate = next(
             filter(
                 lambda r: r.date == _date and r.base == _base,
                 self.rates,
             ),
-            None
+            None,
         )
         if not result:
-            raise ValueError(f"Value error, Unknown base currency {_base} or date {_date}")
+            raise ValueError(
+                f"Value error, Unknown base currency {_base} or date {_date}"
+            )
         return result.to_json(_symbols)
+
+    def set_rates(self, mock_rates: SingleJson) -> None:
+        self.rates.append(MockBaseRate.from_json(mock_rates))
 
     @staticmethod
     def _validate_base(symbol: str | None) -> str:
