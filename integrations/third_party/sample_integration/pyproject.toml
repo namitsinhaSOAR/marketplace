@@ -5,14 +5,14 @@ description = "This is an educational integration designed to showcase the most 
 requires-python = ">=3.11"
 dependencies = [
     "environmentcommon",
-    "integration-testing",
-    "soar-sdk",
     "tipcommon",
 ]
 
 [dependency-groups]
 dev = [
     "pytest>=8.3.5",
+    "soar-sdk",
+    "integration-testing",
 ]
 
 [tool.uv.sources]
