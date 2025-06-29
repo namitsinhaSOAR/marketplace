@@ -965,26 +965,28 @@ version = "1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "environmentcommon" },
-    { name = "integration-testing" },
-    { name = "soar-sdk" },
     { name = "tipcommon" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "integration-testing" },
     { name = "pytest" },
+    { name = "soar-sdk" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "environmentcommon", path = "../../../packages/EnvironmentCommon-1.0.2/EnvironmentCommon-1.0.2-py2.py3-none-any.whl" },
-    { name = "integration-testing", directory = "../../../packages/integration_testing" },
-    { name = "soar-sdk", git = "https://github.com/chronicle/soar-sdk" },
     { name = "tipcommon", path = "../../../packages/TIPCommon-2.0.6/TIPCommon-2.0.6-py2.py3-none-any.whl" },
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=8.3.5" }]
+dev = [
+    { name = "integration-testing", directory = "../../../packages/integration_testing" },
+    { name = "pytest", specifier = ">=8.3.5" },
+    { name = "soar-sdk", git = "https://github.com/chronicle/soar-sdk" },
+]
 
 [[package]]
 name = "six"
