@@ -10,9 +10,9 @@ from TIPCommon.validation import ParameterValidator
 
 from ..core.base_action import BaseAction
 from ..core.constants import (
-    SIMPLE_ACTION_EXAMPLE_SCRIPT_NAME,
-    CurrenciesDDLEnum,
-    TimeFrameDDLEnum,
+	CurrenciesDDLEnum,
+	SIMPLE_ACTION_EXAMPLE_SCRIPT_NAME,
+	TimeFrameDDLEnum,
 )
 from ..core.data_models import DailyRates
 from ..core.exceptions import SampleIntegrationInvalidParameterError
@@ -163,11 +163,11 @@ class SimpleActionExample(BaseAction):
                 for base_rate in daily_rates.exchange_rates
             )
 
-    def _add_result_case_attacment(self, json_results: JSON) -> None:
-        """Add the json results as an attachment to the current case.
+    def _add_result_case_attachment(self, json_results: JSON) -> None:
+        """Add the JSON results as an attachment to the current case.
 
         Args:
-            json_results (JSON): The json results to be added as an attachment.
+            json_results (JSON): The JSON results to be added as an attachment.
         """
         result_file_path = self.save_temp_file(
             filename="Result.json", content=json.dumps(json_results)
@@ -184,7 +184,7 @@ class SimpleActionExample(BaseAction):
         if self.params.return_json_result:
             self.json_results = json_results
         self._create_data_tables(exchange_rates)
-        self._add_result_case_attacment(json_results)
+        self._add_result_case_attachment(json_results)
         self.output_message = SUCCESS_MESSAGE.format(
             start_time=self.params.start_date,
             end_time=self.params.end_date,

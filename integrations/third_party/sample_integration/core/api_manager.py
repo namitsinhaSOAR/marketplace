@@ -1,8 +1,8 @@
 import datetime as dt
 from collections.abc import Iterable
-from requests import Session
 
 from TIPCommon.base.utils import NewLineLogger
+from requests import Session
 
 from .api_utils import get_full_url, validate_response
 from .constants import REQUEST_TIMEOUT
