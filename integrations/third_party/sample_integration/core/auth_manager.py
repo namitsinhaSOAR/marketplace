@@ -1,19 +1,14 @@
 import dataclasses
-from requests import Session
 
-from soar_sdk.SiemplifyAction import SiemplifyAction
-
-from soar_sdk.SiemplifyConnectors import SiemplifyConnectorExecution
-from soar_sdk.SiemplifyJob import SiemplifyJob
 from TIPCommon.base.utils import CreateSession
 from TIPCommon.extraction import extract_script_param
 from TIPCommon.types import ChronicleSOAR
+from requests import Session
+from soar_sdk.SiemplifyAction import SiemplifyAction
+from soar_sdk.SiemplifyConnectors import SiemplifyConnectorExecution
+from soar_sdk.SiemplifyJob import SiemplifyJob
 
-from .constants import (
-    INTEGRATION_IDENTIFIER,
-    DEFAULT_API_ROOT,
-    DEFAULT_VERIFY_SSL,
-)
+from .constants import DEFAULT_API_ROOT, DEFAULT_VERIFY_SSL, INTEGRATION_IDENTIFIER
 from .exceptions import SampleIntegrationError
 
 

@@ -3,8 +3,8 @@ from abc import ABC
 
 from TIPCommon.base.action import Action
 
-from .auth_manager import AuthManager, build_auth_manager_params
 from .api_manager import ApiManager
+from .auth_manager import AuthManager, build_auth_manager_params
 
 
 class BaseAction(Action, ABC):

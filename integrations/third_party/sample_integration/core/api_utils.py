@@ -1,9 +1,10 @@
 import json
-import requests
 from urllib.parse import urljoin
 
+import requests
+
 from .constants import ENDPOINTS
-from .exceptions import SampleIntegrationHTTPError, InvalidRequestParametersError
+from .exceptions import InvalidRequestParametersError, SampleIntegrationHTTPError
 
 
 def get_full_url(
