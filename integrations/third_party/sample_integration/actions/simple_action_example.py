@@ -24,7 +24,7 @@ DEFAULT_RETURN_JSON_RESULT = True
 
 SUCCESS_MESSAGE = (
     "Successfully returned information about the following currencies from "
-    "{start time} to {end time} :\n{currencies}"
+    "{start_time} to {end_time} :\n{currencies}"
 )
 
 
@@ -75,7 +75,7 @@ class SimpleActionExample(BaseAction):
         )
 
     def _validate_params(self):
-        validator = ParameterValidator()
+        validator = ParameterValidator(self.soar_action)
         self._validate_currencies_params(validator)
         self._validate_time_params(validator)
 
@@ -120,7 +120,7 @@ class SimpleActionExample(BaseAction):
             ddl_values=TimeFrameDDLEnum.values(),
             print_value=True,
         )
-        time_frame = TimeFrameDDLEnum(self.params.time_ftame)
+        time_frame = TimeFrameDDLEnum(self.params.time_frame)
         if time_frame == TimeFrameDDLEnum.CUSTOM and not self.params.start_time:
             raise SampleIntegrationInvalidParameterError(
                 "'Start Time' must be provided if 'Time Frame' is set to 'Custom'",

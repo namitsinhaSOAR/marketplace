@@ -68,7 +68,7 @@ class EnrichEntityActionExample(BaseAction):
     def _perform_action(self, entity: Entity):
         enrichment_data = self._enrich_entity(entity)
         self.enriched_entities.append(entity.identifier)
-        self.json_results[entity.identifier].append(enrichment_data)
+        self.json_results[entity.identifier] = enrichment_data
         self.data_tables.append(
             DataTable(
                 title=f"Sample: {entity.identifier}",

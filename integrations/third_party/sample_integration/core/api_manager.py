@@ -38,7 +38,7 @@ class ApiManager:
         self,
         currencies: Iterable[str],
         start_date: dt.date,
-        end_date: dt.date = dt.date.today(),
+        end_date: dt.date = None,
     ) -> list[DailyRates]:
         """Get daily rates for a given date range and currencies.
 
@@ -53,11 +53,15 @@ class ApiManager:
         """
         results = []
 
-        # Ideally, the API endpoint would accept range of value per parameter in request
-        # But Vatcomply '/rates' endpoint only supports a single value per base & date,
-        # so we have to do this ugly and risky nested for-loop on dates & currencies
+        if end_date is None:
+            end_date = dt.date.today()
+
+        # Ideally, the API endpoint would accept a range of value per parameter in the
+        # request. However, Vatcomply '/rates' endpoint only supports a single value
+        # per base and date, so we have to do this ugly and risky nested for-loop on
+        # dates and currencies
         for date in date_range(start_date, end_date):
-            results.extend(
+            results.append(
                 DailyRates(
                     date=date.isoformat(),
                     exchange_rates=[
