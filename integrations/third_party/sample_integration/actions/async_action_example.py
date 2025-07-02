@@ -151,8 +151,8 @@ class AsyncActionExample(BaseAction):
         )
         self.execution_state = ExecutionState.IN_PROGRESS
         self._result_value = json.dumps({
-            "cases_with_tag": self.cases_with_tag,
-            "waiting_cases": self.waiting_cases,
+            "cases_with_tag": list(self.cases_with_tag),
+            "waiting_cases": list(self.waiting_cases),
         })
 
 
