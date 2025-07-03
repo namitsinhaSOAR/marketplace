@@ -6,7 +6,6 @@ from TIPCommon.extraction import extract_action_param
 from TIPCommon.rest.soar_api import get_case_overview_details
 from TIPCommon.smp_time import is_approaching_action_timeout
 from TIPCommon.validation import ParameterValidator
-from soar_sdk.SiemplifyUtils import unix_now
 
 from ..core.base_action import BaseAction
 from ..core.constants import ASYNC_ACTION_EXAMPLE_SCRIPT_NAME

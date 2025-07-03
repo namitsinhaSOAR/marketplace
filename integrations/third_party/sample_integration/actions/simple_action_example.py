@@ -10,9 +10,9 @@ from TIPCommon.validation import ParameterValidator
 
 from ..core.base_action import BaseAction
 from ..core.constants import (
-	CurrenciesDDLEnum,
-	SIMPLE_ACTION_EXAMPLE_SCRIPT_NAME,
-	TimeFrameDDLEnum,
+    CurrenciesDDLEnum,
+    SIMPLE_ACTION_EXAMPLE_SCRIPT_NAME,
+    TimeFrameDDLEnum,
 )
 from ..core.data_models import DailyRates
 from ..core.exceptions import SampleIntegrationInvalidParameterError

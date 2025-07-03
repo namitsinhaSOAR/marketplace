@@ -1,4 +1,3 @@
-
 from TIPCommon.base.action import EntityTypesEnum
 from TIPCommon.base.action.data_models import DataTable, Entity
 from TIPCommon.extraction import extract_action_param
@@ -8,8 +7,8 @@ from soar_sdk.SiemplifyUtils import unix_now
 
 from ..core.base_action import BaseAction
 from ..core.constants import (
-	ENRICH_ENTITY_ACTION_EXAMPLE_SCRIPT_NAME,
-	SupportedEntitiesEnum,
+    ENRICH_ENTITY_ACTION_EXAMPLE_SCRIPT_NAME,
+    SupportedEntitiesEnum,
 )
 
 DEFAULT_ENTITY_TYPE = SupportedEntitiesEnum.ALL.value
