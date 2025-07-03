@@ -23,9 +23,10 @@ mp/
 
 ```bash
 git clone <repository-url>
+cd packages
 cd mp
 python -m virtualenv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source .venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
