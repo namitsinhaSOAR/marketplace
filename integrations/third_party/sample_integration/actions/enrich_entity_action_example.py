@@ -66,6 +66,7 @@ class EnrichEntityActionExample(BaseAction):
 
     def _perform_action(self, entity: Entity):
         enrichment_data = self._enrich_entity(entity)
+        self.logger.info(f"Successfully enriched entity {entity.identifier}")
         self.enriched_entities.append(entity.identifier)
         self.json_results[entity.identifier] = enrichment_data
         self.data_tables.append(

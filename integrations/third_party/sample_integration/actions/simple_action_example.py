@@ -105,6 +105,9 @@ class SimpleActionExample(BaseAction):
                 "value provided."
             )
         self.params.currencies = currencies
+        self.logger.info(
+            f"Action is going to get data for currencies: {repr(currencies)}"
+        )
 
     def _validate_time_params(self, validator: ParameterValidator) -> None:
         """Validate the provided time_frame, start_time, end_time parameters
@@ -132,6 +135,7 @@ class SimpleActionExample(BaseAction):
             if self.params.start_time
             else time_frame.to_start_date()
         )
+        self.logger.info(f"Using start_time {repr(self.params.start_date)}")
 
         self.params.end_date = (
             dt.datetime.fromisoformat(self.params.end_time.replace("Z", "+00:00"))
@@ -142,10 +146,11 @@ class SimpleActionExample(BaseAction):
         if self.params.end_date - self.params.start_date > dt.timedelta(days=7):
             self.logger.warn(
                 'The delta between "Start Time" and "End Time" can\'t be greater '
-                'than 7 days. Adjusting "End Time" to be exectly 7 days after '
+                'than 7 days. Adjusting "End Time" to be exactly 7 days after '
                 '"Start Time"'
             )
             self.params.end_date = self.params.start_date + dt.timedelta(days=7)
+        self.logger.info(f"Using end_time {repr(self.params.end_date)}")
 
     def _create_data_tables(self, exchange_rates: list[DailyRates]) -> None:
         """Creates data tables from the given exchange rates and adds them to the
@@ -155,6 +160,9 @@ class SimpleActionExample(BaseAction):
             exchange_rates (list[DailyRates]): A list of DailyRates objects.
         """
         for daily_rates in exchange_rates:
+            self.logger.info(
+                f"Creating data tables for exchange date {daily_rates.date}"
+            )
             self.data_tables.extend(
                 DataTable(
                     data_table=construct_csv(base_rate.to_csv()),

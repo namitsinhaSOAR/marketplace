@@ -56,6 +56,9 @@ class AsyncActionExample(BaseAction):
     def _validate_params(self):
         # If no case IDs provided, use the current case ID
         if not self.params.case_ids:
+            self.logger.info(
+                f"no Case IDs provided, defaulting to Case ID {self.soar_action.case_id}"
+            )
             self.params.case_ids = [self.soar_action.case_id]
             return
 
@@ -79,6 +82,7 @@ class AsyncActionExample(BaseAction):
         result = {}
 
         for case_id in case_ids:
+            self.logger.info(f"Fetching Case {case_id} data from Server")
             case = get_case_overview_details(
                 self.soar_action,
                 case_id,
@@ -97,23 +101,35 @@ class AsyncActionExample(BaseAction):
         self._process_cases(cases_to_process)
 
     def _process_cases(self, case_ids: Iterable[int]):
+        self.logger.info("Starting to process cases tags")
         case_tags_status = self._check_case_tags(
             case_ids,
             self.params.case_tag_to_wait_for,
         )
         for case_id, status in case_tags_status.items():
             if status:
+                self.logger.info(
+                    f"Case {case_id} has '{self.params.case_tag_to_wait_for}' attached"
+                )
                 self.cases_with_tag.add(case_id)
                 continue
+            self.logger.info(
+                f"Case {case_id} doesn't have case tag '{self.params.case_tag_to_wait_for}'"
+            )
             self.waiting_cases.add(case_id)
 
     def _perform_action(self, _=None):
         if self._is_approaching_async_timeout():
+            self.logger.info(
+                "Action is approaching async timeout, and will exit gracefully"
+            )
             raise TimeoutError(TIMEOUT_ERROR_MESSAGE)
 
         if self.is_first_run:
+            self.logger.info("First Async action iteration")
             self._first_run()
         else:
+            self.logger.info("This is consecutive action iteration")
             self._consecutive_run()
 
         self.json_results = [
@@ -126,6 +142,7 @@ class AsyncActionExample(BaseAction):
 
     def _finalize_action_on_success(self) -> None:
         if self._is_all_cases_done():
+            self.logger.info("All required cases were found with the desired case tag")
             self.execution_state = ExecutionState.COMPLETED
             self.result_value = True
             self.output_message = SUCCESS_MESSAGE.format(
@@ -134,6 +151,13 @@ class AsyncActionExample(BaseAction):
             )
             return
 
+        self.logger.info(
+            "Not all cases have the required case tag attached. "
+            f"Cases missing the tag: {repr(self.waiting_cases)}"
+        )
+        self.logger.info(
+            "the action will continue its execution on the cases missing the tags in the next iteration."
+        )
         self.output_message = PENDING_MESSAGE.format(
             case_ids=", ".join(self.waiting_cases), tag=self.params.case_tag_to_wait_for
         )
