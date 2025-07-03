@@ -66,17 +66,6 @@ class AsyncActionExample(BaseAction):
             csv_string=self.params.case_ids,
         )
 
-    def _is_timeout_approaching(self) -> bool:
-        """Check if the action is approaching timeout."""
-        # Check if we're within 10% of the timeout
-        current_time = unix_now()
-        execution_time = current_time - self.action_start_time
-        timeout = (
-            self.soar_action.execution_deadline_unix_time_ms - self.action_start_time
-        )
-
-        return execution_time > (timeout * 0.9)
-
     def _check_case_tags(self, case_ids: List[str], tag: str) -> dict[int, bool]:
         """Check if the specified cases have the specified tag.
 
