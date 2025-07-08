@@ -518,7 +518,7 @@ class EmailUtils:
                 ):
                     ips[ip] = 1
         ips = list(ips)
-        self.logger.info(f"Extracted IPS: {ips}")
+
         return ips
 
     @staticmethod
