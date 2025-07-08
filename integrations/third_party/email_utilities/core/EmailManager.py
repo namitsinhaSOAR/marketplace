@@ -647,6 +647,11 @@ class EmailUtils:
                                 entity["identifier"] = EmailUtils.clean_found_url(
                                     m.group(0),
                                 )
+                            elif (
+                                entity_type == "ADDRESS"
+                                and not extract_valid_ips_from_body(m.group(0))
+                            ):
+                                continue
                             else:
                                 entity["identifier"] = m.group(0)
 
