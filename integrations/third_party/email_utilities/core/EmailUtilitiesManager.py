@@ -22,7 +22,6 @@ import re
 import sys
 import time
 
-from netaddr import IPAddress, AddrFormatError
 import dnslib
 
 # only needed for arc
@@ -37,6 +36,7 @@ try:
     import nacl.signing
 except ImportError:
     pass
+from netaddr import valid_ipv4, valid_ipv6
 
 import eml_parser
 from dkim.crypto import (
@@ -2259,14 +2259,7 @@ def extract_valid_ips_from_body(body: str) -> list[str]:
         list[str]: list of valid ips.
     """
     candidates = re.findall(r"\b[0-9a-fA-F:.]+\b", body)
-    valid_ips = []
-
-    for candidate in candidates:
-        try:
-            ip = IPAddress(candidate)
-            valid_ips.append(str(ip))
-
-        except AddrFormatError:
-            pass
-
-    return valid_ips
+    return [
+        candidate for candidate in candidates
+        if valid_ipv4(candidate) or valid_ipv6(candidate)
+    ]
