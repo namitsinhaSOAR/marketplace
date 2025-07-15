@@ -765,7 +765,9 @@ class DomainSigner:
             self.set_message(message)
 
         self.logger = logger
-        self.info_content = info_content and logger.isEnabledFor(logging.info)
+        self.info_content = (
+            info_content and logger is not None and logger.isEnabledFor(logging.info)
+        )
         if signature_algorithm not in HASH_ALGORITHMS:
             raise ParameterError(
                 "Unsupported signature algorithm: " + signature_algorithm,
