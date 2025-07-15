@@ -516,7 +516,11 @@ class EmailUtils:
         """
         ips: typing.Counter[str] = Counter()
         for ip in extract_valid_ips_from_body(body):
-            ipaddress_match = ipaddress.ip_address(ip)
+            try:
+                ipaddress_match = ipaddress.ip_address(ip)
+            except ValueError:
+                # Skip IP addresses that can't be parsed by ipaddress module
+                continue
 
             if not (ipaddress_match.is_private) or (
                 include_internal and ip != "::"
