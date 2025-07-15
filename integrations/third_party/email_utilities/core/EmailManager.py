@@ -52,7 +52,6 @@ from tld import get_fld
 from urlextract import URLExtract
 
 from . import EmailParserRouting, OleId
-from .EmailUtilitiesManager import fix_malformed_eml_content
 from soar_sdk.SiemplifyDataModel import Attachment
 
 from .EmailUtilitiesManager import (
