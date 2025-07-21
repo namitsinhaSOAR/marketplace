@@ -381,7 +381,7 @@ class SequentialMetadata(Buildable[_BT, _NBT], abc.ABC, Generic[_BT, _NBT]):
 
         """
         non_built: str = meta_path.read_text(encoding="utf-8")
-        return cls._from_non_built_integration_raw_text(non_built)
+        return cls.from_non_built_str(non_built)
 
     @classmethod
     def from_non_built_str(cls, raw_text: str) -> list[Self]:
