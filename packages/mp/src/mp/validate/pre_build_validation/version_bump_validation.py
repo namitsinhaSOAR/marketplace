@@ -27,8 +27,6 @@ from mp.core.exceptions import NonFatalValidationError
 if TYPE_CHECKING:
     import pathlib
 
-    from mp.validate.validation_results import ValidationResults
-
 
 class FileVersions(TypedDict):
     """Structure for holding old and new versions of a file."""
@@ -68,47 +66,53 @@ class NewIntegrationFiles(TypedDict):
 VersionBumpValidationData: TypeAlias = tuple[ExistingIntegrationFiles, NewIntegrationFiles]
 
 
-REQUIRED_CHANGED_FILES_NUM: int = 2
+class VersionBumpValidation:
+    validation_init_msg: str = "[yellow]Running version bump validation [/yellow]"
 
+    def run_validator(self, integration_path: pathlib.Path) -> None:  # noqa: PLR6301
+        """Validate that `project.toml` and `release_notes.yml` files are correctly versioned.
 
-def version_bump_validation(
-    integration_path: pathlib.Path, validation_results_obj: ValidationResults
-) -> None:
-    """Validate that `project.toml` and `release_notes.yml` files are correctly versioned.
+        Args:
+            integration_path (pathlib.Path): Path to the integration directory.
 
-    Args:
-        integration_path (pathlib.Path): Path to the integration directory.
-        validation_results_obj (ValidationResults): Object to store validation outcomes.
+        Raises:
+            NonFatalValidationError: If versioning rules are violated.
 
-    Raises:
-        NonFatalValidationError: If versioning rules are violated.
+        """
+        head_sha: str | None = os.environ.get("GITHUB_SHA")
+        if not head_sha:
+            return
 
-    """
-    validation_results_obj.errors.append("[yellow]Running version bump validation [/yellow]")
+        changed_files: list[pathlib.Path] = mp.core.unix.get_files_unmerged_to_main_branch(
+            "main", head_sha, integration_path
+        )
+        if not changed_files:
+            return
 
-    head_sha: str | None = os.environ.get("GITHUB_SHA")
-    if not head_sha:
-        return
+        rn_path: pathlib.Path = None
+        toml_path: pathlib.Path = None
+        for p in changed_files:
+            if p.name == PROJECT_FILE:
+                rn_path = p
+            elif p.name == RELEASE_NOTES_FILE:
+                toml_path = p
 
-    changed_files: list[pathlib.Path] = mp.core.unix.get_files_unmerged_to_main_branch(
-        "main", head_sha, integration_path
-    )
-    if not changed_files:
-        return
+        if not rn_path and not toml_path:
+            msg: str = "project.toml and release_notes.yml files must be updated before PR"
+            raise NonFatalValidationError(msg)
+        if not toml_path:
+            msg: str = "project.toml file must be updated before PR"
+            raise NonFatalValidationError(msg)
+        if not rn_path:
+            msg: str = "release_notes.yml file must be updated before PR"
+            raise NonFatalValidationError(msg)
 
-    relevant_files: list[pathlib.Path] = [
-        p for p in changed_files if p.name in {PROJECT_FILE, RELEASE_NOTES_FILE}
-    ]
-    if not relevant_files or len(relevant_files) != REQUIRED_CHANGED_FILES_NUM:
-        msg: str = "project.toml and release_notes.yml files must be updated before PR"
-        raise NonFatalValidationError(msg)
-
-    existing_files, new_files = _create_data_for_version_bump_validation(relevant_files)
-    _version_bump_validation_run_checks(existing_files, new_files)
+        existing_files, new_files = _create_data_for_version_bump_validation(rn_path, toml_path)
+        _version_bump_validation_run_checks(existing_files, new_files)
 
 
 def _create_data_for_version_bump_validation(
-    relevant_files: list[pathlib.Path],
+    rn_path: pathlib.Path, toml_path: pathlib.Path
 ) -> VersionBumpValidationData:
     existing_files: ExistingIntegrationFiles = {
         "toml": TomlFileVersions(),
@@ -116,39 +120,30 @@ def _create_data_for_version_bump_validation(
     }
     new_files: NewIntegrationFiles = NewIntegrationFiles()
 
-    pyproject_path = next(p for p in relevant_files if p.name == PROJECT_FILE)
-    rn_path = next(p for p in relevant_files if p.name == RELEASE_NOTES_FILE)
-
     try:
-        old_toml_content = mp.core.unix.get_file_content_from_main_branch(pyproject_path)
-        existing_files["toml"]["old"] = PyProjectToml.load_to_pyproject_toml_object_from_raw_string(
-            old_toml_content
-        )
-        existing_files["toml"]["new"] = PyProjectToml.load_to_pyproject_toml_object_from_raw_string(
-            pyproject_path.read_text()
-        )
+        old_toml_content = mp.core.unix.get_file_content_from_main_branch(toml_path)
+        existing_files["toml"]["old"] = PyProjectToml.from_toml_str(old_toml_content)
+        existing_files["toml"]["new"] = PyProjectToml.from_toml_str(toml_path.read_text())
 
         old_rn_content = mp.core.unix.get_file_content_from_main_branch(rn_path)
         existing_files["rn"]["old"] = _get_last_note(old_rn_content)
         existing_files["rn"]["new"] = _get_new_rn_notes(rn_path.read_text(), old_rn_content)
 
     except mp.core.unix.NonFatalCommandError:
-        new_files["toml"] = PyProjectToml.load_to_pyproject_toml_object_from_raw_string(
-            pyproject_path.read_text()
-        )
-        new_files["rn"] = ReleaseNote.from_non_built_raw_string(rn_path.read_text())
+        new_files["toml"] = PyProjectToml.from_toml_str(toml_path.read_text())
+        new_files["rn"] = ReleaseNote.from_non_built_str(rn_path.read_text())
 
     return existing_files, new_files
 
 
 def _get_last_note(content: str) -> ReleaseNote | None:
-    notes = ReleaseNote.from_non_built_raw_string(content)
+    notes = ReleaseNote.from_non_built_str(content)
     return notes[-1] if notes else None
 
 
 def _get_new_rn_notes(new_rn_content: str, old_rn_content: str) -> list[ReleaseNote]:
-    new_notes: list[ReleaseNote] = ReleaseNote.from_non_built_raw_string(new_rn_content)
-    old_notes: list[ReleaseNote] = ReleaseNote.from_non_built_raw_string(old_rn_content)
+    new_notes: list[ReleaseNote] = ReleaseNote.from_non_built_str(new_rn_content)
+    old_notes: list[ReleaseNote] = ReleaseNote.from_non_built_str(old_rn_content)
     return new_notes[len(old_notes) :]
 
 
@@ -156,9 +151,11 @@ def _version_bump_validation_run_checks(
     existing_files: ExistingIntegrationFiles, new_files: NewIntegrationFiles
 ) -> None:
     msg: str
-    if existing_files["toml"].get("new") and existing_files["toml"].get("old"):
-        toml_new_version = existing_files["toml"].get("new").project.version
-        toml_old_version = existing_files["toml"].get("old").project.version
+    if (new_toml := existing_files["toml"].get("new")) and (
+        old_toml := existing_files["toml"].get("old")
+    ):
+        toml_new_version = new_toml.project.version
+        toml_old_version = old_toml.project.version
 
         if toml_new_version != toml_old_version + 1.0:
             msg = "The project.toml Version must be incremented by exactly 1.0."

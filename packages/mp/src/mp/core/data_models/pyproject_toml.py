@@ -47,7 +47,7 @@ class PyProjectToml(pydantic.BaseModel):
         return cls(project=PyProjectAttrs.model_load(pyproject_toml["project"]))
 
     @classmethod
-    def load_to_pyproject_toml_object_from_raw_string(cls, text: str) -> PyProjectToml:
+    def from_toml_str(cls, text: str) -> PyProjectToml:
         """Load a toml string into a PyProjectToml object.
 
         Args:

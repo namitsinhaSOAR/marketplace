@@ -22,19 +22,16 @@ import mp.core.unix
 if TYPE_CHECKING:
     import pathlib
 
-    from mp.validate.validation_results import ValidationResults
 
+class UvLockValidation:
+    validation_init_msg: str = "[yellow]Running uv lock validation [/yellow]"
 
-def uv_lock_validation(
-    integration_path: pathlib.Path, validation_results_obj: ValidationResults
-) -> None:
-    """Check if the 'uv.lock' file is consistent with 'pyproject.toml' file.
+    def run_validator(self, integration_path: pathlib.Path) -> None:  # noqa: PLR6301
+        """Check if the 'uv.lock' file is consistent with 'pyproject.toml' file.
 
-    Args:
-        integration_path (pathlib.Path): Path to the integration directory.
-        validation_results_obj (ValidationResults): Object to store validation outcomes.
+        Args:
+            integration_path (pathlib.Path): Path to the integration directory.
 
-    """
-    validation_results_obj.errors.append("[yellow]Running uv lock validation [/yellow]")
-    if not mp.core.file_utils.is_built(integration_path):
-        mp.core.unix.check_lock_file(integration_path)
+        """
+        if not mp.core.file_utils.is_built(integration_path):
+            mp.core.unix.check_lock_file(integration_path)

@@ -452,7 +452,7 @@ def get_files_unmerged_to_main_branch(
 
     """
     command: list[str] = [
-        "/usr/bin/git",
+        "git",
         "diff",
         f"origin/{base}...{head_sha}",
         "--name-only",
@@ -470,8 +470,7 @@ def get_files_unmerged_to_main_branch(
         ]
 
     except sp.CalledProcessError as error:
-        error_output = error.stderr.strip()
-        error_output = f"{COMMAND_ERR_MSG.format('git diff')}: {error_output}"
+        error_output: str = f"{COMMAND_ERR_MSG.format('git diff')}: {error.stderr.strip()}"
         raise NonFatalCommandError(error_output) from error
 
 
@@ -488,19 +487,22 @@ def get_file_content_from_main_branch(file_path: pathlib.Path) -> str:
         NonFatalCommandError: If the git command fails (e.g., file not found on main).
 
     """
-    git_path_arg = f"origin/main:{file_path!s}"
-    command: list[str] = ["/usr/bin/git", "show", git_path_arg]
+    git_path_arg: str = f"origin/main:{file_path!s}"
+    command: list[str] = ["git", "show", git_path_arg]
 
     try:
         results: sp.CompletedProcess[str] = sp.run(  # noqa: S603
             command, check=True, text=True, capture_output=True
         )
-        return results.stdout  # noqa: TRY300
 
     except sp.CalledProcessError as error:
-        error_output = error.stderr.strip()
-        error_output = f"Failed to get content of '{file_path}' from main branch: {error_output}"
+        error_output: str = (
+            f"Failed to get content of '{file_path}' from main branch: {error.stderr.strip()}"
+        )
         raise NonFatalCommandError(error_output) from error
+
+    else:
+        return results.stdout
 
 
 def _get_python_version() -> str:

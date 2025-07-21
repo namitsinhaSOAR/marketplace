@@ -384,7 +384,7 @@ class SequentialMetadata(Buildable[_BT, _NBT], abc.ABC, Generic[_BT, _NBT]):
         return cls._from_non_built_integration_raw_text(non_built)
 
     @classmethod
-    def _from_non_built_integration_raw_text(cls, raw_text: str) -> list[Self]:
+    def from_non_built_str(cls, raw_text: str) -> list[Self]:
         """Create the script's metadata object from the non-built integration's raw text.
 
         Args:

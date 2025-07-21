@@ -14,9 +14,7 @@
 
 from __future__ import annotations
 
-import pathlib
-from collections.abc import Callable
-from typing import TypeAlias
+from typing import TYPE_CHECKING, Protocol
 
 import rich
 import typer
@@ -24,11 +22,24 @@ import typer
 from mp.core.exceptions import FatalValidationError, NonFatalValidationError
 from mp.validate.validation_results import ValidationResults, ValidationTypes
 
-from .uv_lock_validation import uv_lock_validation
-from .version_bump_validation import version_bump_validation
+from .uv_lock_validation import UvLockValidation as UvLockValidation
+from .version_bump_validation import VersionBumpValidation as VersionBumpValidation
 
-ValidationFn: TypeAlias = Callable[[pathlib.Path, ValidationResults], None]
-REQUIRED_CHANGED_FILES_NUM: int = 2
+if TYPE_CHECKING:
+    import pathlib
+
+
+class ValidatorObj(Protocol):
+    validation_init_msg: str
+
+    def run_validator(self, validation_path: pathlib.Path) -> None:
+        """Execute the validation process on the specified path.
+
+        Args:
+            validation_path: A `pathlib.Path` object pointing to the directory
+                or file that needs to be validated.
+
+        """
 
 
 class PreBuildValidations:
@@ -51,9 +62,12 @@ class PreBuildValidations:
             f"---- {self.integration_path.name} ---- \n[/bold green]"
         )
 
-        for func in self._get_validation_functions():
+        for validator_obj in self._get_validation():
             try:
-                func(self.integration_path, self.results)
+                validator = validator_obj()
+                self.results.errors.append(validator.validation_init_msg)
+                validator.run_validator(self.integration_path)
+
             except NonFatalValidationError as e:
                 self.results.errors.append(f"[red]{e}\n[/red]")
 
@@ -66,10 +80,8 @@ class PreBuildValidations:
             f"---- {self.integration_path.name} ---- \n[/bold green]"
         )
 
-        self.results.is_success = len(self.results.errors) == (
-            len(self._get_validation_functions()) + 2
-        )
+        self.results.is_success = len(self.results.errors) == (len(self._get_validation()) + 2)
 
     @classmethod
-    def _get_validation_functions(cls) -> list[ValidationFn]:
-        return [uv_lock_validation, version_bump_validation]
+    def _get_validation(cls) -> list[ValidatorObj]:
+        return [UvLockValidation, VersionBumpValidation]
