@@ -58,8 +58,8 @@ class PreBuildValidations:
 
         """
         self.results.errors.append(
-            "[bold green]Running pre build validation on "
-            f"---- {self.integration_path.name} ---- \n[/bold green]"
+            "[bold green]Running pre build validation on"
+            f" ---- {self.integration_path.name} ---- \n[/bold green]"
         )
 
         for validator_obj in self._get_validation():
