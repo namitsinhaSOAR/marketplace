@@ -123,15 +123,19 @@ def _create_data_for_version_bump_validation(
     try:
         old_toml_content = mp.core.unix.get_file_content_from_main_branch(toml_path)
         existing_files["toml"]["old"] = PyProjectToml.from_toml_str(old_toml_content)
-        existing_files["toml"]["new"] = PyProjectToml.from_toml_str(toml_path.read_text())
+        existing_files["toml"]["new"] = PyProjectToml.from_toml_str(
+            toml_path.read_text(encoding="utf-8")
+        )
 
         old_rn_content = mp.core.unix.get_file_content_from_main_branch(rn_path)
         existing_files["rn"]["old"] = _get_last_note(old_rn_content)
-        existing_files["rn"]["new"] = _get_new_rn_notes(rn_path.read_text(), old_rn_content)
+        existing_files["rn"]["new"] = _get_new_rn_notes(
+            rn_path.read_text(encoding="utf-8"), old_rn_content
+        )
 
     except mp.core.unix.NonFatalCommandError:
-        new_files["toml"] = PyProjectToml.from_toml_str(toml_path.read_text())
-        new_files["rn"] = ReleaseNote.from_non_built_str(rn_path.read_text())
+        new_files["toml"] = PyProjectToml.from_toml_str(toml_path.read_text(encoding="utf-8"))
+        new_files["rn"] = ReleaseNote.from_non_built_str(rn_path.read_text(encoding="utf-8"))
 
     return existing_files, new_files
 
