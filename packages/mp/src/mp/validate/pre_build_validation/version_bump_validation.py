@@ -93,9 +93,9 @@ class VersionBumpValidation:
         toml_path: pathlib.Path = None
         for p in changed_files:
             if p.name == PROJECT_FILE:
-                rn_path = p
-            elif p.name == RELEASE_NOTES_FILE:
                 toml_path = p
+            elif p.name == RELEASE_NOTES_FILE:
+                rn_path = p
 
         if not rn_path and not toml_path:
             msg: str = "project.toml and release_notes.yml files must be updated before PR"
