@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 class UvLockValidation:
     validation_init_msg: str = "[yellow]Running uv lock validation [/yellow]"
 
-    def run_validator(self, integration_path: pathlib.Path) -> None:  # noqa: PLR6301
+    def run(self, integration_path: pathlib.Path) -> None:  # noqa: PLR6301
         """Check if the 'uv.lock' file is consistent with 'pyproject.toml' file.
 
         Args:

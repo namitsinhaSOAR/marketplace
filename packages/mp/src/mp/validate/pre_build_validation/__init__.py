@@ -29,10 +29,10 @@ if TYPE_CHECKING:
     import pathlib
 
 
-class ValidatorObj(Protocol):
+class Validator(Protocol):
     validation_init_msg: str
 
-    def run_validator(self, validation_path: pathlib.Path) -> None:
+    def run(self, validation_path: pathlib.Path) -> None:
         """Execute the validation process on the specified path.
 
         Args:
@@ -62,11 +62,10 @@ class PreBuildValidations:
             f" ---- {self.integration_path.name} ---- \n[/bold green]"
         )
 
-        for validator_obj in self._get_validation():
+        for validator in self._get_validation():
             try:
-                validator = validator_obj()
                 self.results.errors.append(validator.validation_init_msg)
-                validator.run_validator(self.integration_path)
+                validator.run(self.integration_path)
 
             except NonFatalValidationError as e:
                 self.results.errors.append(f"[red]{e}\n[/red]")
@@ -83,5 +82,5 @@ class PreBuildValidations:
         self.results.is_success = len(self.results.errors) == (len(self._get_validation()) + 2)
 
     @classmethod
-    def _get_validation(cls) -> list[ValidatorObj]:
-        return [UvLockValidation, VersionBumpValidation]
+    def _get_validation(cls) -> list[Validator]:
+        return [UvLockValidation(), VersionBumpValidation()]

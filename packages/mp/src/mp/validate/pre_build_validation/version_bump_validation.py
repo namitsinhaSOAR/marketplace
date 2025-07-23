@@ -69,7 +69,7 @@ VersionBumpValidationData: TypeAlias = tuple[ExistingIntegrationFiles, NewIntegr
 class VersionBumpValidation:
     validation_init_msg: str = "[yellow]Running version bump validation [/yellow]"
 
-    def run_validator(self, integration_path: pathlib.Path) -> None:  # noqa: PLR6301
+    def run(self, integration_path: pathlib.Path) -> None:  # noqa: PLR6301
         """Validate that `project.toml` and `release_notes.yml` files are correctly versioned.
 
         Args:
@@ -89,22 +89,23 @@ class VersionBumpValidation:
         if not changed_files:
             return
 
-        rn_path: pathlib.Path = None
-        toml_path: pathlib.Path = None
+        rn_path: pathlib.Path | None = None
+        toml_path: pathlib.Path | None = None
         for p in changed_files:
             if p.name == PROJECT_FILE:
                 toml_path = p
             elif p.name == RELEASE_NOTES_FILE:
                 rn_path = p
 
+        msg: str
         if not rn_path and not toml_path:
-            msg: str = "project.toml and release_notes.yml files must be updated before PR"
+            msg = "project.toml and release_notes.yml files must be updated before PR"
             raise NonFatalValidationError(msg)
         if not toml_path:
-            msg: str = "project.toml file must be updated before PR"
+            msg = "project.toml file must be updated before PR"
             raise NonFatalValidationError(msg)
         if not rn_path:
-            msg: str = "release_notes.yml file must be updated before PR"
+            msg = "release_notes.yml file must be updated before PR"
             raise NonFatalValidationError(msg)
 
         existing_files, new_files = _create_data_for_version_bump_validation(rn_path, toml_path)
@@ -155,6 +156,7 @@ def _version_bump_validation_run_checks(
     existing_files: ExistingIntegrationFiles, new_files: NewIntegrationFiles
 ) -> None:
     msg: str
+    new_notes: list[ReleaseNote]
     if (new_toml := existing_files["toml"].get("new")) and (
         old_toml := existing_files["toml"].get("old")
     ):
@@ -165,14 +167,14 @@ def _version_bump_validation_run_checks(
             msg = "The project.toml Version must be incremented by exactly 1.0."
             raise NonFatalValidationError(msg)
 
-        new_notes: list[ReleaseNote] = existing_files["rn"].get("new")
+        new_notes = existing_files["rn"].get("new")
         msg = "The release note's version must match the new version of the project.toml."
         if not _rn_is_valid(new_notes, toml_new_version):
             raise NonFatalValidationError(msg)
 
     elif new_files.get("toml") and new_files.get("rn"):
         toml_version = new_files["toml"].project.version
-        new_notes: list[ReleaseNote] = new_files["rn"]
+        new_notes = new_files["rn"]
         msg = (
             "New integration project.toml and release_note.yaml version must be initialize to 1.0."
         )
@@ -185,6 +187,4 @@ def _version_bump_validation_run_checks(
 
 
 def _rn_is_valid(new_notes: list[ReleaseNote], version_to_compare: float = 1.0) -> bool:
-    if not new_notes:
-        return False
     return all(new_note.version == version_to_compare for new_note in new_notes)
